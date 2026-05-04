@@ -1,5 +1,10 @@
 from pymodbus.client import ModbusTcpClient
 from pymodbus.exceptions import ModbusException
+import logging
+
+#! Remove o erro que fica dando quando não conecta
+logging.getLogger("pymodbus").setLevel(logging.CRITICAL)
+
 
 class Conexao:
 
@@ -22,14 +27,14 @@ class Conexao:
                 return self.cliente
 
         except ModbusException as e:
-            print (f"Ocorreu um erro na conexão : {e}")
             self.cliente=None
             return self.cliente
        
 
     def FecharConexao(self):
 
-        self.cliente.close()
+        if self.cliente is not None:
+            self.cliente.close()
         
 
 
