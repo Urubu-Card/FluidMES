@@ -57,6 +57,8 @@ class Cadastro:
 
         if request.method == "POST":
             form = Cadastrar(request.POST)
+            if form.is_valid():
+                print("Foi")
 
         else:
             form = Cadastrar()
