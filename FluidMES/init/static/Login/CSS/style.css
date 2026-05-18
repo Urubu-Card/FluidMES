@@ -1,0 +1,186 @@
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0b1527;
+    --navy2:   #0f1e36;
+    --card-bg: rgba(10, 20, 40, 0.72);
+    --border:  rgba(56, 130, 230, 0.35);
+    --border-active: rgba(56, 130, 230, 0.85);
+    --blue:    #3a82f6;
+    --blue2:   #1a5fd4;
+    --text:    #e8edf6;
+    --muted:   #7a90b0;
+    --input-bg: rgba(255,255,255,0.05);
+    --divider: rgba(56, 130, 230, 0.4);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+  }
+
+  /* ── Background ── */
+  .bg {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      linear-gradient(to bottom, rgba(11,21,39,0.72) 0%, rgba(11,21,39,0.55) 50%, rgba(11,21,39,0.72) 100%),
+      url('https://images.unsplash.com/photo-1565014379778-84f1c9a29fb6?w=1600&q=80') center/cover no-repeat;
+  }
+
+  /* ── Navbar ── */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    height: 58px;
+    background: rgba(8,14,28,0.85);
+    border-bottom: 1px solid rgba(56,130,230,0.15);
+  }
+
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+
+  .nav-icon {
+    width: 34px; height: 34px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); cursor: pointer;
+  }
+  .nav-icon svg { width: 18px; height: 18px; }
+
+  /* ── Back link ── */
+  .back {
+    position: relative; z-index: 10;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 18px 0 0 28px;
+    font-size: 13px; color: var(--muted);
+    cursor: pointer; text-decoration: none;
+    transition: color .2s;
+  }
+  .back:hover { color: var(--text); }
+  .back svg { width: 16px; height: 16px; }
+
+  /* ── Card wrapper ── */
+  .page {
+    position: relative; z-index: 5;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 24px 20px 60px;
+    min-height: calc(100vh - 58px);
+  }
+
+  .card {
+    width: 100%; max-width: 680px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 36px 40px 40px;
+    box-shadow: 0 0 60px rgba(30,80,200,0.12), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px; font-weight: 700;
+    text-align: center;
+    letter-spacing: 1px;
+    color: #fff;
+    margin-bottom: 32px;
+  }
+
+  /* ── Two-column layout ── */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0 24px;
+    margin-bottom: 28px;
+  }
+
+  .divider-v {
+    width: 1px;
+    background: var(--divider);
+    align-self: stretch;
+  }
+
+  .col-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px; font-weight: 600;
+    letter-spacing: .6px;
+    color: #c8d8f0;
+    margin-bottom: 20px;
+  }
+
+  .field { margin-bottom: 14px; }
+
+  .field input {
+    width: 100%;
+    height: 44px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 0 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .field input::placeholder { color: var(--muted); }
+
+  .field input:focus {
+    border-color: var(--border-active);
+    box-shadow: 0 0 0 3px rgba(58,130,246,0.18);
+  }
+
+  .field-icon {
+    position: relative;
+  }
+  .field-icon input { padding-right: 42px; }
+  .field-icon span {
+    position: absolute; right: 13px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    display: flex;
+  }
+  .field-icon span svg { width: 17px; height: 17px; }
+
+  /* ── Cadastrar button ── */
+  .btn-submit {
+    display: block; width: 100%;
+    height: 48px;
+    background: linear-gradient(90deg, #1e60d8 0%, #3a82f6 60%, #1e60d8 100%);
+    background-size: 200% auto;
+    border: none; border-radius: 10px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 500;
+    letter-spacing: .4px;
+    cursor: pointer;
+    transition: background-position .4s, box-shadow .2s, transform .1s;
+    box-shadow: 0 0 18px rgba(58,130,246,0.35);
+  }
+  .btn-submit:hover {
+    background-position: right center;
+    box-shadow: 0 0 28px rgba(58,130,246,0.55);
+  }
+  .btn-submit:active { transform: scale(.98); }
+
+  /* ── Star decoration ── */
+  .star {
+    position: fixed; bottom: 28px; right: 28px; z-index: 20;
+    width: 28px; height: 28px; opacity: .7;
+  }
+
+  @media (max-width: 540px) {
+    .columns { grid-template-columns: 1fr; }
+    .divider-v { display: none; }
+    .card { padding: 28px 22px 32px; }
+  }
