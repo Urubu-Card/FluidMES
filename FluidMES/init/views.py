@@ -1,7 +1,10 @@
-from django.shortcuts import render ,redirect
+from django.shortcuts import render ,redirect ,get_object_or_404
 from plasmic.clp_control import Modbus_Control
 from django.http import JsonResponse
 from .forms import Cadastro as Cadastrar 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate , login , logout
+
 
 IP = "127.0.0.1"
 
@@ -50,18 +53,24 @@ class Clp:
             return JsonResponse({"estado": estado,"cliente":bool(clp.cliente)})
 
 
-class Cadastro:
+class Autenticacao:
 
 
-    def Page(request):
+    def Cadastrar(request):
 
         if request.method == "POST":
             form = Cadastrar(request.POST)
+            #print("a")
             if form.is_valid():
-                print("Foi")
-
+                print("Chega")
+                form.save()
+                return redirect("login")
         else:
             form = Cadastrar()
 
 
-        return render(request,"Login/index.html",{"form":form}) 
+        return render(request,"Auth/cadastro.html",{"form":form}) 
+
+    def Login(request):
+
+        return render(request,"Auth/login.html")
