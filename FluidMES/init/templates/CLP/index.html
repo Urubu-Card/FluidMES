@@ -1,247 +1,1202 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MES — Painel de Controle</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'CLP/CSS/clp_style.css' %}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FluidMES, Plataforma de Operações Industriais</title>
+  <meta name="description" content="FluidMES é o MES software que transforma operações industriais com visibilidade em tempo real, rastreabilidade completa e controle total da produção." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ──────────────────────────────────────────
+       RESET & BASE
+    ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep:    #10151B;
+      --bg-mid:     #2D3645;
+      --accent:     #3E7DFF;
+      --accent-dark:#2E4E99;
+      --light:      #DBF3FF;
+      --white:      #FFFFFF;
+      --text-muted: #8E9CB5;
+      --radius:     12px;
+      --radius-lg:  20px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ──────────────────────────────────────────
+       ANIMATIONS
+    ────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(62,125,255,0.4); }
+      50%       { box-shadow: 0 0 28px 8px rgba(62,125,255,0.2); }
+    }
+    @keyframes floatDot {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes scanLine {
+      0%   { top: 0; opacity: 0.6; }
+      100% { top: 100%; opacity: 0; }
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+    .delay-5 { animation-delay: 0.7s; }
+
+    /* ──────────────────────────────────────────
+       UTILITIES
+    ────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 96px 0; }
+    .section-sm { padding: 64px 0; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(62,125,255,0.12);
+      border: 1px solid rgba(62,125,255,0.3);
+      color: var(--light);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .tag::before { content: '●'; color: var(--accent); font-size: 8px; }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, var(--accent), var(--light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: var(--white);
+      font-weight: 700; font-size: 15px;
+      padding: 14px 28px; border-radius: var(--radius);
+      border: none; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: pulseGlow 3s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(62,125,255,0.45); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--light);
+      font-weight: 600; font-size: 15px;
+      padding: 14px 28px; border-radius: var(--radius);
+      border: 1px solid rgba(219,243,255,0.2);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { background: rgba(219,243,255,0.06); border-color: rgba(219,243,255,0.4); }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(62,125,255,0.3), transparent);
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(45,54,69,0.6), rgba(16,21,27,0.8));
+      border: 1px solid rgba(62,125,255,0.12);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(62,125,255,0.5), transparent);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(62,125,255,0.35);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.4);
+    }
+
+    /* ──────────────────────────────────────────
+       NAV
+    ────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(16,21,27,0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(62,125,255,0.1);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px; padding: 0 24px; max-width: 1200px; margin: 0 auto;
+    }
+    .logo {
+      font-size: 22px; font-weight: 900; letter-spacing: -0.03em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+    }
+
+    /* ──────────────────────────────────────────
+       HERO
+    ────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding-top: 68px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(62,125,255,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(46,78,153,0.15) 0%, transparent 60%),
+        var(--bg-deep);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0; opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(62,125,255,1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(62,125,255,1) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+      padding: 80px 0;
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-ctas { justify-content: center; }
+      .hero-visual { display: none; }
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(62,125,255,0.1);
+      border: 1px solid rgba(62,125,255,0.25);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--light); margin-bottom: 24px;
+    }
+    .hero-eyebrow::before { content: '⚡'; font-size: 11px; }
+    .hero-title {
+      font-size: clamp(38px, 5.5vw, 68px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero-subtitle {
+      font-size: 18px; color: var(--text-muted);
+      line-height: 1.75; max-width: 520px; margin-bottom: 40px;
+    }
+    .hero-ctas { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 56px; flex-wrap: wrap;
+    }
+    .stat-item { }
+    .stat-num {
+      font-size: 32px; font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(90deg, var(--white), var(--light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+    /* Hero visual / dashboard mock */
+    .hero-visual {
+      position: relative;
+    }
+    .dashboard-mock {
+      background: linear-gradient(135deg, rgba(45,54,69,0.7), rgba(16,21,27,0.9));
+      border: 1px solid rgba(62,125,255,0.2);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(62,125,255,0.08);
+      animation: fadeUp 0.8s 0.3s ease both;
+      position: relative; overflow: hidden;
+    }
+    .dashboard-mock::after {
+      content: '';
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: scanLine 3s linear infinite;
+    }
+    .mock-topbar {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-title { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-left: 8px; }
+    .mock-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .mock-metric {
+      background: rgba(62,125,255,0.07);
+      border: 1px solid rgba(62,125,255,0.15);
+      border-radius: 8px; padding: 12px;
+    }
+    .mock-metric-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .mock-metric-val { font-size: 20px; font-weight: 800; color: var(--light); margin: 4px 0 2px; }
+    .mock-metric-delta { font-size: 10px; color: #4ade80; font-weight: 600; }
+    .mock-metric-delta.red { color: #f87171; }
+    .mock-bar-section { }
+    .mock-bar-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+    .mock-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .mock-bar-name { font-size: 10px; color: rgba(219,243,255,0.7); width: 70px; flex-shrink: 0; }
+    .mock-bar-track { flex: 1; height: 6px; background: rgba(62,125,255,0.1); border-radius: 3px; overflow: hidden; }
+    .mock-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--light)); }
+    .mock-bar-pct { font-size: 10px; color: var(--light); font-weight: 700; width: 32px; text-align: right; }
+    .floating-badge {
+      position: absolute;
+      background: linear-gradient(135deg, rgba(45,54,69,0.95), rgba(16,21,27,0.95));
+      border: 1px solid rgba(62,125,255,0.3);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(8px);
+    }
+    .badge-1 { bottom: -20px; left: -30px; animation: floatDot 4s ease-in-out infinite; }
+    .badge-2 { top: -16px; right: -24px; animation: floatDot 3.5s 1s ease-in-out infinite; }
+    .badge-icon { width: 28px; height: 28px; border-radius: 8px; background: rgba(62,125,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+    /* ──────────────────────────────────────────
+       TICKER
+    ────────────────────────────────────────── */
+    .ticker-wrap {
+      background: rgba(45,54,69,0.4);
+      border-top: 1px solid rgba(62,125,255,0.1);
+      border-bottom: 1px solid rgba(62,125,255,0.1);
+      padding: 14px 0; overflow: hidden;
+    }
+    .ticker-track {
+      display: flex; gap: 0;
+      animation: ticker 28s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 40px;
+      font-size: 13px; font-weight: 500; color: var(--text-muted);
+      white-space: nowrap;
+      border-right: 1px solid rgba(62,125,255,0.15);
+    }
+    .ticker-item span { color: var(--accent); font-weight: 700; }
+
+    /* ──────────────────────────────────────────
+       PROBLEM / PAIN
+    ────────────────────────────────────────── */
+    #problem { background: linear-gradient(180deg, var(--bg-deep) 0%, rgba(45,54,69,0.2) 100%); }
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px; margin-top: 52px;
+    }
+    .pain-card {
+      background: rgba(45,54,69,0.3);
+      border: 1px solid rgba(255,100,100,0.1);
+      border-radius: var(--radius-lg); padding: 28px;
+      position: relative;
+    }
+    .pain-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .pain-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .pain-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+    /* ──────────────────────────────────────────
+       SOLUTION / BENEFITS
+    ────────────────────────────────────────── */
+    #solution { }
+    .benefits-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px; margin-top: 52px;
+    }
+    .benefit-card { }
+    .benefit-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, rgba(62,125,255,0.2), rgba(46,78,153,0.2));
+      border: 1px solid rgba(62,125,255,0.25);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 18px;
+    }
+    .benefit-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .benefit-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ──────────────────────────────────────────
+       FEATURES (PLATFORM)
+    ────────────────────────────────────────── */
+    #features { background: rgba(45,54,69,0.15); }
+    .features-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center; margin-top: 64px;
+    }
+    @media (max-width: 900px) {
+      .features-layout { grid-template-columns: 1fr; }
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 4px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .feature-item:hover, .feature-item.active {
+      background: rgba(62,125,255,0.08);
+    }
+    .feature-item.active .feature-dot { background: var(--accent); }
+    .feature-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(62,125,255,0.3); margin-top: 6px; flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .feature-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .feature-item p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+    .features-visual {
+      background: linear-gradient(135deg, rgba(45,54,69,0.5), rgba(16,21,27,0.8));
+      border: 1px solid rgba(62,125,255,0.15);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      min-height: 400px;
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative; overflow: hidden;
+    }
+    .features-visual::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .fv-row {
+      background: rgba(62,125,255,0.06);
+      border: 1px solid rgba(62,125,255,0.1);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .fv-icon { font-size: 18px; }
+    .fv-info { flex: 1; }
+    .fv-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+    .fv-val { font-size: 15px; font-weight: 700; color: var(--light); }
+    .fv-badge {
+      font-size: 11px; font-weight: 700; padding: 4px 10px;
+      border-radius: 100px; background: rgba(74,222,128,0.1); color: #4ade80;
+      border: 1px solid rgba(74,222,128,0.2);
+    }
+    .fv-badge.warn { background: rgba(251,191,36,0.1); color: #fbbf24; border-color: rgba(251,191,36,0.2); }
+
+    /* ──────────────────────────────────────────
+       METRICS / RESULTS
+    ────────────────────────────────────────── */
+    #results {
+      background: linear-gradient(135deg, rgba(62,125,255,0.08) 0%, rgba(46,78,153,0.06) 100%);
+      border-top: 1px solid rgba(62,125,255,0.1);
+      border-bottom: 1px solid rgba(62,125,255,0.1);
+    }
+    .results-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px; margin-top: 56px;
+    }
+    .result-item { text-align: center; }
+    .result-num {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--accent), var(--light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1;
+    }
+    .result-unit { font-size: 22px; font-weight: 700; vertical-align: super; }
+    .result-desc { font-size: 14px; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+
+    /* ──────────────────────────────────────────
+       HOW IT WORKS
+    ────────────────────────────────────────── */
+    #how-it-works { }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 52px; }
+    .step-card {
+      text-align: center;
+      padding: 36px 24px;
+      border-radius: var(--radius-lg);
+      background: rgba(45,54,69,0.3);
+      border: 1px solid rgba(62,125,255,0.1);
+      position: relative;
+    }
+    .step-num {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900;
+      margin: 0 auto 20px;
+    }
+    .step-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .step-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+    /* ──────────────────────────────────────────
+       SOCIAL PROOF / TESTIMONIALS
+    ────────────────────────────────────────── */
+    #proof { background: rgba(45,54,69,0.12); }
+    .logos-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 32px 48px; margin: 40px 0 64px;
+    }
+    .logo-placeholder {
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0.45; filter: grayscale(1);
+      font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+      transition: opacity 0.2s, filter 0.2s;
+    }
+    .logo-placeholder:hover { opacity: 0.8; filter: grayscale(0); }
+    .logo-placeholder .lp-icon {
+      width: 32px; height: 32px; background: var(--bg-mid);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .testimonial-card { }
+    .stars { color: #fbbf24; font-size: 14px; margin-bottom: 14px; }
+    .testimonial-card blockquote { font-size: 15px; line-height: 1.75; color: rgba(255,255,255,0.85); margin-bottom: 20px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--white);
+      flex-shrink: 0;
+    }
+    .author-name { font-size: 14px; font-weight: 700; }
+    .author-title { font-size: 12px; color: var(--text-muted); }
+
+    /* ──────────────────────────────────────────
+       OBJECTION HANDLING / FAQ
+    ────────────────────────────────────────── */
+    #faq { }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 52px; }
+    @media (max-width: 700px) { .faq-grid { grid-template-columns: 1fr; } }
+    .faq-item {
+      background: rgba(45,54,69,0.3);
+      border: 1px solid rgba(62,125,255,0.1);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+    }
+    .faq-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--light); }
+    .faq-item p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ──────────────────────────────────────────
+       CTA FINAL
+    ────────────────────────────────────────── */
+    #cta-final {
+      padding: 96px 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 50%, rgba(62,125,255,0.1) 0%, transparent 70%),
+        var(--bg-deep);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #cta-final::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(62,125,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(62,125,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .cta-final-inner { position: relative; z-index: 1; }
+    .cta-final-title {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 900; letter-spacing: -0.03em; margin-bottom: 20px;
+    }
+    .cta-final-sub { font-size: 18px; color: var(--text-muted); max-width: 560px; margin: 0 auto 40px; line-height: 1.7; }
+    .cta-btns { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .cta-trust {
+      margin-top: 32px; display: flex; align-items: center; justify-content: center;
+      gap: 28px; flex-wrap: wrap;
+    }
+    .trust-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+    .trust-item::before { content: '✓'; color: #4ade80; font-weight: 700; }
+
+    /* ──────────────────────────────────────────
+       FOOTER
+    ────────────────────────────────────────── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid rgba(62,125,255,0.1);
+      padding: 48px 0 32px;
+    }
+    .footer-inner {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px; margin-bottom: 48px;
+    }
+    @media (max-width: 900px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .footer-inner { grid-template-columns: 1fr; } }
+    .footer-brand p { font-size: 14px; color: var(--text-muted); margin-top: 14px; line-height: 1.7; max-width: 300px; }
+    .footer-col h5 { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 28px; border-top: 1px solid rgba(62,125,255,0.08);
+      font-size: 13px; color: var(--text-muted); flex-wrap: wrap; gap: 12px;
+    }
+    .footer-bottom a { color: var(--text-muted); margin-left: 20px; }
+    .footer-bottom a:hover { color: var(--white); }
+  </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon">M</div>
-        <h2>MES Líquidos</h2>
-        <p>Sistema de Controle</p>
+<!-- ══════════════════════════════════════
+     NAV
+═══════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">⚡</div>
+      Fluid<span>MES</span>
+    </a>
+    <div class="nav-links">
+      <a href="#solution">Plataforma</a>
+      <a href="#features">Funcionalidades</a>
+      <a href="#results">Resultados</a>
+      <a href="#proof">Clientes</a>
+      <a href="#faq">FAQ</a>
     </div>
-    <nav>
-        
-        <div class="nav-label">Principal</div>
-        <a class="nav-item active" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            Visão Geral
-        </a>
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            Máquinas
-        </a>
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Monitoramento
-        </a>
-        <div class="nav-label">Controle</div>
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            Histórico
-        </a>
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            Configurar CLP
-        </a>
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-            Relatórios
-        </a>
-    </nav>
-    <div class="sidebar-footer">
-        <a class="nav-item" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            Sair
-        </a>
+    <a href="#cta-final" class="btn-primary" style="animation:none; padding: 10px 22px; font-size: 14px;">
+      Solicitar Demo →
+    </a>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <!-- LEFT -->
+      <div>
+        <div class="hero-eyebrow fade-up">MES Software Industrial</div>
+        <h1 class="hero-title fade-up delay-1">
+          Operação industrial<br/>
+          em <span class="gradient-text">tempo real.</span><br/>
+          Sem fricção.
+        </h1>
+        <p class="hero-subtitle fade-up delay-2">
+          FluidMES conecta chão de fábrica, dados e decisão numa única plataforma.
+          Visibilidade total, rastreabilidade completa e controle da produção, do início ao fim do ciclo.
+        </p>
+        <div class="hero-ctas fade-up delay-3">
+          <a href="#cta-final" class="btn-primary">Agendar Demonstração →</a>
+          <a href="#solution" class="btn-ghost">Ver a Plataforma</a>
+        </div>
+        <div class="hero-stats fade-up delay-4">
+          <div class="stat-item">
+            <div class="stat-num">+40%</div>
+            <div class="stat-label">Eficiência operacional</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">98%</div>
+            <div class="stat-label">Rastreabilidade garantida</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">30 dias</div>
+            <div class="stat-label">Para entrar em operação</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT, dashboard mock -->
+      <div class="hero-visual">
+        <div class="dashboard-mock">
+          <div class="mock-topbar">
+            <div class="mock-dot" style="background:#f87171;"></div>
+            <div class="mock-dot" style="background:#fbbf24;"></div>
+            <div class="mock-dot" style="background:#4ade80;"></div>
+            <span class="mock-title">FluidMES, Painel de Produção</span>
+          </div>
+          <div class="mock-grid">
+            <div class="mock-metric">
+              <div class="mock-metric-label">OEE Global</div>
+              <div class="mock-metric-val">87.4%</div>
+              <div class="mock-metric-delta">▲ +3.2%</div>
+            </div>
+            <div class="mock-metric">
+              <div class="mock-metric-label">Ordens Ativas</div>
+              <div class="mock-metric-val">142</div>
+              <div class="mock-metric-delta">● Em tempo real</div>
+            </div>
+            <div class="mock-metric">
+              <div class="mock-metric-label">Defeitos / 1k</div>
+              <div class="mock-metric-val">2.1</div>
+              <div class="mock-metric-delta red">▼ -18%</div>
+            </div>
+          </div>
+          <div class="mock-bar-section">
+            <div class="mock-bar-label">Utilização por Linha</div>
+            <div class="mock-bar-row">
+              <span class="mock-bar-name">Linha A</span>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:92%"></div></div>
+              <span class="mock-bar-pct">92%</span>
+            </div>
+            <div class="mock-bar-row">
+              <span class="mock-bar-name">Linha B</span>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:78%"></div></div>
+              <span class="mock-bar-pct">78%</span>
+            </div>
+            <div class="mock-bar-row">
+              <span class="mock-bar-name">Linha C</span>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:85%"></div></div>
+              <span class="mock-bar-pct">85%</span>
+            </div>
+            <div class="mock-bar-row">
+              <span class="mock-bar-name">Linha D</span>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:61%"></div></div>
+              <span class="mock-bar-pct">61%</span>
+            </div>
+          </div>
+        </div>
+        <div class="floating-badge badge-1">
+          <div class="badge-icon">📦</div>
+          <div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Rastreabilidade</div>
+            <div style="font-size:13px; color:#4ade80;">100% Completa</div>
+          </div>
+        </div>
+        <div class="floating-badge badge-2">
+          <div class="badge-icon">⚡</div>
+          <div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Alertas em tempo real</div>
+            <div style="font-size:13px; color:var(--light);">3 ocorrências</div>
+          </div>
+        </div>
+      </div>
     </div>
-</aside>
+  </div>
+</section>
 
-<div class="main">
-    <div class="topbar">
-        <h1>Painel de Controle</h1>
-        <div class="topbar-right">
-            <div class="connection-badge">
-                
-                {% if cliente %}
-                    <div class="dot on"></div>
-                    <span>CLP Conectado · 127.0.0.1:5020</span>
-                    {% else %}
-                    <div class="dot off"></div>
-                    <span>CLP não conectado</span>
-                {% endif %}
-                    
-                
-            </div>
-        </div>
-    </div>
 
-    <div class="content">
-
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-label">Máquina Principal</div>
-                <div class="kpi-value" id="kpi-maquina">—</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Coils Ativas</div>
-                <div class="kpi-value" id="kpi-ativas">0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Última Leitura</div>
-                <div class="kpi-value" id="kpi-tempo" style="font-size:16px">—</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Endereço CLP</div>
-                <div class="kpi-value" style="font-size:16px">192.168.1.10</div>
-            </div>
-        </div>
-
-        <div class="status-section">
-            <div class="card">
-                <div class="card-title">Estado da Máquina — Coil 4</div>
-                <div class="machine-display">
-                    <div class="machine-icon unknown" id="machine-icon">⚙️</div>
-                    <div class="machine-status-text unknown" id="machine-status-text">AGUARDANDO</div>
-                    <div class="machine-sub" id="machine-sub">Conectando ao CLP...</div>
-                    <div class="timestamp" id="machine-ts">—</div>
-
-                    <div class="power-controls">
-                        <form method="post" style="margin: 0;">
-                            {% csrf_token %}
-                            <input type="hidden" name="endereco" value="4">
-                            <input type="hidden" name="valor" value="on">
-                            <button type="submit" name="editar" value="True" class="btn btn-power-on">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                LIGAR
-                            </button>
-                        </form>
-                        <form method="post" style="margin: 0;">
-                            {% csrf_token %}
-                            <input type="hidden" name="endereco" value="4">
-                            <button type="submit" name="editar" value="True" class="btn btn-power-off">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-                                DESLIGAR
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Monitor de Coils</div>
-                <div class="coil-list" id="coil-list">
-                    <div class="coil-item">
-                        <div class="coil-left">
-                            <div class="coil-dot off"></div>
-                            <div>
-                                <div class="coil-name">Aguardando dados...</div>
-                                <div class="coil-addr">ADDR: —</div>
-                            </div>
-                        </div>
-                        <span class="coil-badge off">—</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="forms-grid">
-            <div class="card">
-                <div class="card-title">Ler Coil Manual</div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <input type="number" max="99" name="adress" placeholder="Endereço" required>
-                        <button class="btn btn-primary" type="submit" name="busca" value="True">Buscar</button>
-                    </div>
-                </form>
-                {% if resposta %}
-                <div class="resposta-box">{{ resposta }}</div>
-                {% endif %}
-            </div>
-
-            <div class="card">
-                <div class="card-title">Escrever Coil Manual</div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <input type="number" max="99" name="endereco" placeholder="Endereço" required>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="valor"> Ativar
-                        </label>
-                        <button class="btn btn-danger" type="submit" name="editar" value="True">Escrever</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-    </div>
+<!-- ══════════════════════════════════════
+     TICKER
+═══════════════════════════════════════ -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item">Rastreabilidade End-to-End <span>✦</span></div>
+    <div class="ticker-item">OEE em Tempo Real <span>✦</span></div>
+    <div class="ticker-item">Gestão de Ordens de Produção <span>✦</span></div>
+    <div class="ticker-item">Controle de Qualidade Integrado <span>✦</span></div>
+    <div class="ticker-item">Integração ERP / SCADA <span>✦</span></div>
+    <div class="ticker-item">Dashboards Operacionais <span>✦</span></div>
+    <div class="ticker-item">Gestão de Não Conformidades <span>✦</span></div>
+    <div class="ticker-item">Eficiência do Chão de Fábrica <span>✦</span></div>
+    <!-- duplicado para loop suave -->
+    <div class="ticker-item">Rastreabilidade End-to-End <span>✦</span></div>
+    <div class="ticker-item">OEE em Tempo Real <span>✦</span></div>
+    <div class="ticker-item">Gestão de Ordens de Produção <span>✦</span></div>
+    <div class="ticker-item">Controle de Qualidade Integrado <span>✦</span></div>
+    <div class="ticker-item">Integração ERP / SCADA <span>✦</span></div>
+    <div class="ticker-item">Dashboards Operacionais <span>✦</span></div>
+    <div class="ticker-item">Gestão de Não Conformidades <span>✦</span></div>
+    <div class="ticker-item">Eficiência do Chão de Fábrica <span>✦</span></div>
+  </div>
 </div>
 
-<script>
-    function atualizarStatus(estadoRaw,cliente) {
-        const icon = document.getElementById('machine-icon');
-        const text = document.getElementById('machine-status-text');
-        const sub  = document.getElementById('machine-sub');
-        const kpi  = document.getElementById('kpi-maquina');
-        const ts   = document.getElementById('machine-ts');
-        const now  = new Date().toLocaleTimeString('pt-BR');
-    
 
-        // estadoRaw vem como "A Coil está no estado : TRUE" ou "FALSE"
-        const isTrue = estadoRaw === true || estadoRaw === 'True' || estadoRaw === 'true';
-        const isError = estadoRaw === null || estadoRaw === undefined;
+<!-- ══════════════════════════════════════
+     PROBLEM, Seção de Dor
+═══════════════════════════════════════ -->
+<section id="problem" class="section">
+  <div class="container">
+    <div class="tag">O problema que resolvemos</div>
+    <h2 class="section-title" style="max-width:600px;">
+      Ainda gerenciando sua produção<br/>
+      <span class="gradient-text">no escuro?</span>
+    </h2>
+    <p class="section-subtitle">
+      A maioria das fábricas ainda opera com visibilidade fragmentada, planilhas desatualizadas e decisões tardias. O custo disso é enorme, e silencioso.
+    </p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <span class="pain-icon">📊</span>
+        <h3>Dados dispersos, decisões cegas</h3>
+        <p>Informações de produção espalhadas em planilhas, sistemas díspares e papel. Quando você percebe o problema, o prejuízo já aconteceu.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">🔍</span>
+        <h3>Rastreabilidade impossível</h3>
+        <p>Rastrear um lote, identificar a origem de um defeito ou gerar um relatório de auditoria leva dias, e ainda assim pode estar incompleto.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">⏱️</span>
+        <h3>Paradas inesperadas custam caro</h3>
+        <p>Sem monitoramento em tempo real, paradas de máquina e gargalos de produção só aparecem quando já travaram o fluxo.</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-icon">🔗</span>
+        <h3>ERP desconectado do chão de fábrica</h3>
+        <p>O que o ERP registra e o que realmente acontece na linha de produção raramente são a mesma coisa. Essa lacuna custa eficiência todo dia.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        icon.className = 'machine-icon ' + (isError ? 'unknown' : isTrue ? 'on' : 'off');
-        text.className = 'machine-status-text ' + (isError ? 'unknown' : isTrue ? 'on' : 'off');
+<div class="divider container" style="max-width:100%; margin:0;"></div>
 
-        if (isError) {
-            text.innerText = 'ERRO';
-            sub.innerText = 'Falha na leitura do CLP';
-            kpi.innerText = 'ERRO';
-        } else if (isTrue) {
-            text.innerText = 'LIGADA';
-            sub.innerText = 'Máquina em operação';
-            kpi.innerText = 'LIGADA';
-            document.getElementById('kpi-ativas').innerText = '1';
-        } else {
-            text.innerText = 'DESLIGADA';
-            sub.innerText = 'Máquina parada';
-            kpi.innerText = 'DESLIGADA';
-            document.getElementById('kpi-ativas').innerText = '0';
-        }
 
-        ts.innerText = 'Última atualização: ' + now;
-        document.getElementById('kpi-tempo').innerText = now;
+<!-- ══════════════════════════════════════
+     SOLUTION, Benefícios
+═══════════════════════════════════════ -->
+<section id="solution" class="section">
+  <div class="container">
+    <div style="text-align:center; margin-bottom: 4px;">
+      <div class="tag">A solução FluidMES</div>
+    </div>
+    <h2 class="section-title" style="text-align:center; margin: 0 auto 16px;">
+      Uma plataforma. <span class="gradient-text">Controle total.</span>
+    </h2>
+    <p class="section-subtitle" style="text-align:center; margin: 0 auto 0;">
+      FluidMES integra planejamento, execução, qualidade e rastreabilidade em um único hub, conectado ao ERP, ao chão de fábrica e à sua equipe.
+    </p>
+    <div class="benefits-grid">
+      <div class="card benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h3>Visibilidade em Tempo Real</h3>
+        <p>Dashboards operacionais ao vivo com OEE, produção por turno, status de ordens e alertas automáticos. Nada escapa ao seu radar.</p>
+      </div>
+      <div class="card benefit-card">
+        <div class="benefit-icon">🔗</div>
+        <h3>Rastreabilidade Completa End-to-End</h3>
+        <p>Rastreie cada componente, lote e operação do recebimento à expedição. Auditorias em segundos, não em dias.</p>
+      </div>
+      <div class="card benefit-card">
+        <div class="benefit-icon">📋</div>
+        <h3>Gestão de Ordens de Produção</h3>
+        <p>Planejamento, sequenciamento e execução de ordens integrados. Sua equipe sabe exatamente o que fazer, quando e como.</p>
+      </div>
+      <div class="card benefit-card">
+        <div class="benefit-icon">✅</div>
+        <h3>Controle de Qualidade Integrado</h3>
+        <p>Inspeções, registros de não conformidade e planos de controle diretamente no fluxo de produção, sem retrabalho manual.</p>
+      </div>
+      <div class="card benefit-card">
+        <div class="benefit-icon">🔌</div>
+        <h3>Integração ERP & SCADA</h3>
+        <p>Conecta-se aos principais ERPs do mercado e sistemas SCADA sem grandes projetos de TI. Implementação ágil, valor imediato.</p>
+      </div>
+      <div class="card benefit-card">
+        <div class="benefit-icon">📈</div>
+        <h3>Análise e Melhoria Contínua</h3>
+        <p>Indicadores de desempenho, relatórios automáticos e insights para identificar desperdícios e acelerar ciclos de melhoria.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // Atualiza coil list
-        const list = document.getElementById('coil-list');
-        list.innerHTML = `
-            <div class="coil-item">
-                <div class="coil-left">
-                    <div class="coil-dot ${isTrue ? 'on' : 'off'}"></div>
-                    <div>
-                        <div class="coil-name">Máquina Principal</div>
-                        <div class="coil-addr">ADDR: 4</div>
-                    </div>
-                </div>
-                <span class="coil-badge ${isTrue ? 'on' : 'off'}">${isTrue ? 'TRUE' : 'FALSE'}</span>
-            </div>
-        `;
-    }
 
-    
-    setInterval(async () => {
-        try {
-            const res = await fetch("/status/", {
-                headers: {
-                    "X-Requested-With": "WE1MSHR0cFJlcXVlc3Q="
-                }
-            });
-            const data = await res.json();          
-            atualizarStatus(data.estado,data.cliente);
-        } catch (error) {
-            console.error("Erro ao buscar status:", error);
-            atualizarStatus(null);
-        }
-    }, 1000);
-</script>
+<!-- ══════════════════════════════════════
+     RESULTS, Números
+═══════════════════════════════════════ -->
+<section id="results" class="section-sm">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="tag">Resultados comprovados</div>
+      <h2 class="section-title" style="text-align:center;">Os números falam por si</h2>
+      <p class="section-subtitle" style="text-align:center; margin: 0 auto;">
+        Médias observadas em implementações FluidMES em operações industriais de médio e grande porte.
+      </p>
+    </div>
+    <div class="results-grid">
+      <div class="result-item">
+        <div class="result-num">+40<span class="result-unit">%</span></div>
+        <div class="result-desc">de aumento em eficiência operacional</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num">-60<span class="result-unit">%</span></div>
+        <div class="result-desc">nos custos de não qualidade</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num">98<span class="result-unit">%</span></div>
+        <div class="result-desc">de rastreabilidade garantida</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num">30<span style="font-size:28px; font-weight:900; vertical-align:middle;">d</span></div>
+        <div class="result-desc">prazo médio para go-live</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num">3<span class="result-unit">x</span></div>
+        <div class="result-desc">ROI médio no primeiro ano</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FEATURES, Plataforma
+═══════════════════════════════════════ -->
+<section id="features" class="section">
+  <div class="container">
+    <div class="tag">Módulos da plataforma</div>
+    <h2 class="section-title" style="max-width:540px;">
+      Tudo que sua operação precisa,<br/>
+      <span class="gradient-text">num só lugar.</span>
+    </h2>
+    <p class="section-subtitle">
+      Módulos conectados que cobrem o ciclo completo de operações industriais, adaptáveis à sua realidade produtiva.
+    </p>
+    <div class="features-layout">
+      <div class="feature-list">
+        <div class="feature-item active">
+          <div class="feature-dot"></div>
+          <div>
+            <h4>Chão de Fábrica Digital</h4>
+            <p>Elimine papel e planilhas. Operadores registram produção, qualidade e ocorrências diretamente no sistema em tempo real.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div>
+            <h4>Gestão de Não Conformidades</h4>
+            <p>Captura, análise de causa raiz e plano de ação para cada desvio de qualidade, tudo rastreado e auditável.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div>
+            <h4>Monitoramento de Equipamentos</h4>
+            <p>Acompanhe disponibilidade, MTBF, MTTR e indicadores de manutenção. Integra com SCADA e IoT industrial.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div>
+            <h4>Rastreabilidade & Genealogia</h4>
+            <p>Árvore de genealogia completa de produtos, rastreie para frente e para trás em segundos para qualquer peça ou lote.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div>
+            <h4>Análise & Business Intelligence</h4>
+            <p>Relatórios configuráveis, KPIs de turno e dashboards executivos para suporte à decisão baseado em dados reais.</p>
+          </div>
+        </div>
+      </div>
+      <div class="features-visual">
+        <div class="fv-row">
+          <span class="fv-icon">🏭</span>
+          <div class="fv-info">
+            <div class="fv-label">Status do Chão de Fábrica</div>
+            <div class="fv-val">4 linhas ativas / 1 em setup</div>
+          </div>
+          <span class="fv-badge">Ao vivo</span>
+        </div>
+        <div class="fv-row">
+          <span class="fv-icon">🔍</span>
+          <div class="fv-info">
+            <div class="fv-label">Última Não Conformidade</div>
+            <div class="fv-val">NC-0347, Causa identificada</div>
+          </div>
+          <span class="fv-badge warn">Em análise</span>
+        </div>
+        <div class="fv-row">
+          <span class="fv-icon">⚙️</span>
+          <div class="fv-info">
+            <div class="fv-label">Disponibilidade Equipamentos</div>
+            <div class="fv-val">94.3%, Turno atual</div>
+          </div>
+          <span class="fv-badge">Normal</span>
+        </div>
+        <div class="fv-row">
+          <span class="fv-icon">📦</span>
+          <div class="fv-info">
+            <div class="fv-label">Último Lote Rastreado</div>
+            <div class="fv-val">LOT-2024-1189, 100% ok</div>
+          </div>
+          <span class="fv-badge">Concluído</span>
+        </div>
+        <div class="fv-row">
+          <span class="fv-icon">📈</span>
+          <div class="fv-info">
+            <div class="fv-label">OEE Consolidado, Hoje</div>
+            <div class="fv-val">87.4% vs. meta 85%</div>
+          </div>
+          <span class="fv-badge">Acima da meta</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════ -->
+<section id="how-it-works" class="section" style="background: rgba(45,54,69,0.1);">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="tag">Como funciona</div>
+      <h2 class="section-title" style="text-align:center;">
+        Do diagnóstico à operação em <span class="gradient-text">30 dias</span>
+      </h2>
+      <p class="section-subtitle" style="text-align:center; margin: 0 auto 0;">
+        Implementação ágil, sem grandes projetos de TI. Nossa equipe garante a adoção rápida e o resultado desde o primeiro mês.
+      </p>
+    </div>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Diagnóstico Operacional</h3>
+        <p>Mapeamos seus processos, dores e objetivos para uma implementação precisa e com escopo fechado desde o início.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Configuração e Integração</h3>
+        <p>A plataforma é configurada para a sua realidade, linhas, produtos, fluxos, e integrada ao seu ERP e sistemas existentes.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Treinamento e Go-Live</h3>
+        <p>Capacitação das equipes de chão de fábrica e gestão. Go-live acompanhado por especialistas FluidMES.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h3>Resultados e Evolução</h3>
+        <p>Monitoramento de indicadores, suporte contínuo e roadmap de evolução para extrair cada vez mais valor da plataforma.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SOCIAL PROOF
+═══════════════════════════════════════ -->
+<section id="proof" class="section">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="tag">Quem confia no FluidMES</div>
+      <h2 class="section-title" style="text-align:center;">
+        Indústrias que <span class="gradient-text">transformaram</span><br/>sua operação
+      </h2>
+    </div>
+
+    <div class="logos-row">
+      <div class="logo-placeholder"><div class="lp-icon">🏭</div> MetalTech</div>
+      <div class="logo-placeholder"><div class="lp-icon">⚙️</div> AutoParts BR</div>
+      <div class="logo-placeholder"><div class="lp-icon">🔩</div> IndústriaForja</div>
+      <div class="logo-placeholder"><div class="lp-icon">🧪</div> ChemBrasil</div>
+      <div class="logo-placeholder"><div class="lp-icon">📦</div> EmbalaMax</div>
+      <div class="logo-placeholder"><div class="lp-icon">💡</div> ElectroPrime</div>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="card testimonial-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Antes do FluidMES, uma auditoria de rastreabilidade nos tomava 3 dias. Hoje fazemos em menos de 10 minutos. O impacto na nossa operação foi imediato e mensurável."
+        </blockquote>
+        <div class="testimonial-author">
+          <div class="avatar">RC</div>
+          <div>
+            <div class="author-name">Ricardo Carvalho</div>
+            <div class="author-title">Gerente de Operações, MetalTech</div>
+          </div>
+        </div>
+      </div>
+      <div class="card testimonial-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "A visibilidade que o FluidMES trouxe para o chão de fábrica mudou a cultura da nossa equipe. As decisões agora são baseadas em dados reais, não em achismos."
+        </blockquote>
+        <div class="testimonial-author">
+          <div class="avatar">AM</div>
+          <div>
+            <div class="author-name">Ana Martins</div>
+            <div class="author-title">Diretora Industrial, AutoParts BR</div>
+          </div>
+        </div>
+      </div>
+      <div class="card testimonial-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Reduzimos nosso índice de rejeição em 58% no primeiro semestre de uso. A integração com nosso ERP foi mais rápida do que esperávamos, e a equipe adotou sem resistência."
+        </blockquote>
+        <div class="testimonial-author">
+          <div class="avatar">FS</div>
+          <div>
+            <div class="author-name">Felipe Souza</div>
+            <div class="author-title">Superintendente de Qualidade, ChemBrasil</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FAQ, Objeções
+═══════════════════════════════════════ -->
+<section id="faq" class="section" style="background: rgba(45,54,69,0.12);">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="tag">Perguntas frequentes</div>
+      <h2 class="section-title" style="text-align:center;">
+        Dúvidas comuns <span class="gradient-text">respondidas</span>
+      </h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>Quanto tempo leva para implementar o FluidMES?</h4>
+        <p>A implementação padrão é concluída em 30 dias. Projetos com maior complexidade ou múltiplas plantas podem variar, mas nossa metodologia garante valor entregue rapidamente.</p>
+      </div>
+      <div class="faq-item">
+        <h4>O FluidMES integra com o meu ERP atual?</h4>
+        <p>Sim. FluidMES possui conectores nativos para os principais ERPs do mercado (SAP, TOTVS, Oracle, entre outros) e uma API aberta para integrações customizadas.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Preciso de uma equipe de TI dedicada?</h4>
+        <p>Não. A plataforma é gerenciada por nós na nuvem, com suporte e atualizações incluídos. Sua equipe operacional pode utilizá-la sem conhecimento técnico avançado.</p>
+      </div>
+      <div class="faq-item">
+        <h4>A plataforma escala com o crescimento da minha operação?</h4>
+        <p>Sim. FluidMES é modular e escalável, começa pelos módulos mais críticos e expande conforme sua operação cresce, sem retrabalho na base instalada.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Os dados da minha operação ficam seguros?</h4>
+        <p>Utilizamos infraestrutura cloud com criptografia, conformidade LGPD, backups automáticos e SLA de disponibilidade de 99,9% para proteger seus dados operacionais.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Qual o retorno esperado sobre o investimento?</h4>
+        <p>Nossos clientes reportam ROI médio de 3x no primeiro ano, com ganhos mensuráveis em OEE, redução de rejeitos e horas produtivas recuperadas nos primeiros 90 dias.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CTA FINAL
+═══════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container cta-final-inner">
+    <div class="tag" style="margin: 0 auto 20px; display: table;">Comece agora</div>
+    <h2 class="cta-final-title">
+      Pronto para ter visibilidade<br/>
+      <span class="gradient-text">total da sua operação?</span>
+    </h2>
+    <p class="cta-final-sub">
+      Agende uma demonstração personalizada e veja o FluidMES funcionando com os dados da sua fábrica. Sem compromisso, sem burocracia.
+    </p>
+    <div class="cta-btns">
+      <a href="#" class="btn-primary" style="font-size: 16px; padding: 16px 36px;">
+        Agendar Demonstração Gratuita →
+      </a>
+      <a href="#" class="btn-ghost" style="font-size: 16px; padding: 16px 32px;">
+        Falar com um especialista
+      </a>
+    </div>
+    <div class="cta-trust">
+      <div class="trust-item">Implementação em 30 dias</div>
+      <div class="trust-item">Sem necessidade de TI dedicada</div>
+      <div class="trust-item">Integração com ERP garantida</div>
+      <div class="trust-item">Suporte especializado incluído</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon">⚡</div>
+          Fluid<span style="color:var(--accent);">MES</span>
+        </div>
+        <p>Plataforma de operações industriais que conecta chão de fábrica, dados e decisão. Visibilidade em tempo real, rastreabilidade completa, controle total.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Plataforma</h5>
+        <a href="#">Módulos</a>
+        <a href="#">Integrações</a>
+        <a href="#">Segurança</a>
+        <a href="#">Roadmap</a>
+      </div>
+      <div class="footer-col">
+        <h5>Empresa</h5>
+        <a href="#">Sobre nós</a>
+        <a href="#">Cases</a>
+        <a href="#">Blog</a>
+        <a href="#">Carreiras</a>
+      </div>
+      <div class="footer-col">
+        <h5>Suporte</h5>
+        <a href="#">Documentação</a>
+        <a href="#">Fale conosco</a>
+        <a href="#">Status da plataforma</a>
+        <a href="#">Parceiros</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 FluidMES. Todos os direitos reservados.</span>
+      <div>
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Uso</a>
+        <a href="#">LGPD</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>

@@ -1,9 +1,10 @@
 from django.shortcuts import render ,redirect ,get_object_or_404
 from plasmic.clp_control import Modbus_Control
 from django.http import JsonResponse
-from .forms import Cadastro as Cadastrar 
+from .forms import Cadastro as Cadastrar ,Login as LoginForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate , login , logout
+from django.contrib.auth import  login , logout
+from django.contrib import messages
 
 
 IP = "127.0.0.1"
@@ -13,6 +14,7 @@ PORT = "5020"
 
 class Clp:
 
+    @login_required
     def teste_clp(request):
         clp = Modbus_Control(ip=IP,port=PORT)
         
@@ -39,7 +41,7 @@ class Clp:
 
         
         return render(request,"CLP/index.html",{"resposta":resposta,"cliente":cliente})
-
+    @login_required
     def status(request):
         clp = Modbus_Control(ip=IP,port=PORT)
         
@@ -72,5 +74,30 @@ class Autenticacao:
         return render(request,"Auth/cadastro.html",{"form":form}) 
 
     def Login(request):
+        if request.user.is_authenticated:
+            return redirect("clp_test")
 
-        return render(request,"Auth/login.html")
+        if request.method == "POST":
+            print("Dados brutos do POST:", request.POST)
+
+            form = LoginForm(request.POST)
+            
+
+            if form.is_valid():
+                usuario = form.Autenticar(request)
+                if usuario:
+                    login(request, usuario)
+                    return redirect("clp_test")
+                else:
+                    messages.error(request, "CPF/E-mail ou senha incorretos.")
+                    return redirect("login")
+                
+            else:
+                for erro_campo, erros in form.errors.items():
+                    for erro in erros:
+                        messages.error(request, f"{erro}")
+                return redirect("login")
+        else:
+            form = LoginForm()
+
+        return render(request, "Auth/login.html", {"form": form})

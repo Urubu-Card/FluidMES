@@ -90,6 +90,12 @@ DATABASES = {
 
 AUTH_USER_MODEL = "init.Usuarios"
 
+AUTHENTICATION_BACKENDS= [
+    'init.backends.MultiLogin',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -122,3 +128,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+LOGIN_URL = 'login'

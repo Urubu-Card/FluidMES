@@ -1,8 +1,9 @@
 from django import forms 
-from django.contrib.auth.forms import UserCreationForm 
+from django.contrib.auth.forms import UserCreationForm ,AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from validate_docbr import CPF,CNPJ
 from init.models import Empresa,Usuarios
+from django.contrib.auth import authenticate , login , logout
 
 validator_CPF = CPF()
  
@@ -64,4 +65,22 @@ class Cadastro(UserCreationForm):
     
 class Login(forms.Form):
 
-    a="WIP"
+    usuario = forms.CharField(max_length=150,
+                               required=True,
+                               widget=forms.TextInput({"placeholder":"Digite seu email ou CPF:"})
+                               )
+
+
+    password = forms.CharField(max_length=250,
+                               required=True,
+                               widget=forms.PasswordInput(attrs={"placeholder":"Digite sua senha:"}))
+
+
+
+    def Autenticar(self,request):
+
+        username    = self.cleaned_data.get("usuario")
+        senha       = self.cleaned_data.get("password")
+
+        user = authenticate(request,username=username,password=senha)
+        return user

@@ -188,6 +188,7 @@
 .errorlist {
   list-style: none;
   margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .errorlist li {
@@ -198,6 +199,7 @@
   border-radius: 6px;
   padding: 6px 10px;
   margin-top: 4px;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -208,3 +210,33 @@
   font-size: 11px;
   color: #f87171;
 }
+
+.page { align-items: center; }
+
+.login-card { max-width: 420px; }
+.login-card .field { margin-bottom: 16px; }
+
+.forgot {
+  display: block;
+  text-align: right;
+  font-size: 13px;
+  color: var(--blue);
+  text-decoration: none;
+  margin-top: -6px;
+  margin-bottom: 24px;
+  transition: opacity .2s;
+}
+.forgot:hover { opacity: .7; }
+
+.register-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 18px;
+}
+.register-hint a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.register-hint a:hover { text-decoration: underline; }
