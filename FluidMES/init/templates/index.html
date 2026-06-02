@@ -1,0 +1,120 @@
+<!doctype html>
+{% load static %}
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>Primeiro landing</title>
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logotipo">
+            <h1>FluidMES</h1>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#sobre">Sobre nós</a></li>
+                <li><a href="#trabalho">Trabalhos</a></li>
+            </ul>
+        </nav>
+
+    </header>
+
+    <!-- SECAO 1 -->
+    <section class="secao1" id="inicio">
+        <img src="{% static '/assets/FLUID (2).png' %}" alt="" class="bg">
+        <h2>FluidMES</h2>
+        <div>
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolorem a deleniti consequuntur nam quasi dicta
+                temporibus voluptates voluptas porro enim aspernatur velit cum esse consectetur in iure, maxime, veniam
+                sequi.</p>
+            <div class="divBtn">
+                <button class="btnPrimary">Cadastrar</button>
+                <button class="btnSecundary">Entrar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECAO 2 -->
+    <section class="secao2" id="sobre">
+        <h2 class="title-secao">Sobre nós</h2>
+        <div class="divCards">
+            <div class="card">
+                <div class="ico-perfil">
+                    <img src="{% static '/assets/ico_pedro.png' %}" alt=".">
+                </div>
+                <div class="tag">
+                    <h3>Pedro Lima</h3>
+                    <h4>K2</h4>
+                </div>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe nobis fugiat sunt perferendis id hic.
+                    Dolores, ullam, iste excepturi reprehenderit inventore architecto ducimus deleniti quam beatae
+                    numquam eum itaque neque?</p>
+            </div>
+            <div class="card branco">
+                <div class="ico-perfil">
+                    <img src="{% static '/assets/ico_edu.png' %}" alt=".">
+                </div>
+                <div class="tag">
+                    <h3>Eduardo Silva</h3>
+                    <h4>Urubivis</h4>
+                </div>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe nobis fugiat sunt perferendis id hic.
+                    Dolores, ullam, iste excepturi reprehenderit inventore architecto ducimus deleniti quam beatae
+                    numquam eum itaque neque?</p>
+            </div>
+            <div class="card branco">
+                <div class="ico-perfil">
+                    <img src="{% static '/assets/ico_rona.png' %}" alt=".">
+                </div>
+                <div class="tag">
+                    <h3>Ronaldo Bragança de Orléans Bourbon-Duas Sicílias de Habsburgo-Lorena de Saxe-Coburgo-Gota de
+                        Hohenzollern-Sigmaringen de Avis e Beja de Trastâmara de Médici de Valois de Cavalcanti de
+                        Albuquerque de Moura Estevão de Oliveira e Silva de Santa Cruz dos Milagres de Vila Viçosa do
+                        Rio de Janeiro de Santo Antônio do Descoberto de Todos os Santos e Sousa</h3>
+                    <h4>Rona</h4>
+                </div>
+
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe nobis fugiat sunt perferendis id hic.
+                    Dolores, ullam, iste excepturi reprehenderit inventore architecto ducimus deleniti quam beatae
+                    numquam eum itaque neque?</p>
+            </div>
+            <div class="card">
+                <div class="ico-perfil">
+                    <img src="{% static '/assets/ico_fael.png' %}" alt=".">
+                </div>
+
+                <div class="tag">
+                    <h3>Rafael PINTO</h3>
+                    <h4>Fael</h4>
+                </div>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe nobis fugiat sunt perferendis id hic.
+                    Dolores, ullam, iste excepturi reprehenderit inventore architecto ducimus deleniti quam beatae
+                    numquam eum itaque neque?</p>
+            </div>
+        </div>
+    </section>
+    <section class="secao3" id="trabalho">
+        <!-- SECAO 3 -->
+        <h2 class="title-secao">SLA</h2>
+        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Iusto harum hic deserunt, nobis cum vel facilis
+            exercitationem, dolorem, non assumenda minus placeat debitis fuga. Nisi eos a velit voluptatem illo?</p>
+        <div class="divImages">
+            <img src="assets/img1.png" alt="">
+            <img src="assets/img2.png" alt="">
+            <img src="assets/img3.png" alt="">
+            <img src="assets/img4.png" alt="">
+            <img src="assets/img5.png" alt="">
+            <img src="assets/img6.png" alt="">
+            <img src="assets/img7.png" alt="">
+            <img src="assets/img8.png" alt="">
+        </div>
+    </section>
+</body>
+
+</html>

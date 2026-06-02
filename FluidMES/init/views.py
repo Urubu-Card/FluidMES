@@ -11,6 +11,11 @@ IP = "127.0.0.1"
 
 PORT = "5020"
 
+class Inicio:
+
+    def landing_page(request):
+
+        return render(request,"index.html")
 
 class Clp:
 

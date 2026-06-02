@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 class MultiLogin(ModelBackend):
-    # OBRIGATÓRIO: Mantenha o nome 'username' no argumento da função!
+    #! OBRIGATÓRIO: Mantenha o nome 'username' no argumento da função!
     def authenticate(self, request, username=None, password=None, **kwargs):
         
         UserModel = get_user_model()
