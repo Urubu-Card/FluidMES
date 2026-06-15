@@ -55,9 +55,8 @@ class Usuarios(AbstractUser):
         on_delete=models.CASCADE,
         related_name="usuarios",
         db_column="empresa_idempresa",
-        null=False,
+        null=True,
         blank=True,
-        default= 1
     )
  
 
