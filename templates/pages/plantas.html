@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}FluidMES · Plantas{% endblock %}
+{% block nav_plantas %}active{% endblock %}
+
+{% block content %}
+  <div class="topbar">
+    <h1 class="page-title">Plantas</h1>
+    <div class="controls">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar planta ou CLP por nome ou IP...">
+      </div>
+      <button class="sort-btn" id="sortBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+        Ordenar por: <span id="sortLabel">Nome</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+{% endblock %}
+
+{% block fab %}
+  <button class="fab" id="fabBtn" title="Adicionar planta/CLP">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ clps|json_script:"clps-data" }}
+<script>
+  // ---------- Dados vindos da view Django ----------
+  // Contexto esperado: `clps` = lista de dicts, um por planta/CLP:
+  //   { "id": 1, "nome": "Planta #001", "ip": "192.168.0.21", "porta": 502 }
+  let clps = [];
+  try {
+    const raw = document.getElementById('clps-data').textContent.trim();
+    clps = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('Erro ao ler dados de plantas/CLPs vindos do Django:', e);
+    clps = [];
+  }
+
+  function statusInfo(p){
+    if (p.online === true)  return { cls: 'is-online',  label: 'Online' };
+    if (p.online === false) return { cls: 'is-offline', label: 'Offline' };
+    return { cls: 'is-unknown', label: 'Desconhecido' };
+  }
+
+  function cardClp(p){
+    const st = statusInfo(p);
+    return `
+    <div class="card" data-search="${(p.nome + ' ' + p.ip).toLowerCase()}">
+      <div class="card-head head-overview">
+        <p class="planta-id">${p.nome}</p>
+        <p class="planta-status"><span class="status-dot ${st.cls}"></span>${st.label}</p>
+      </div>
+      <div class="card-body">
+        <div class="meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="9" rx="2"/><path d="M6 19h.01M10 19h.01M14 19h.01M18 19h.01"/></svg>
+          IP: ${p.ip}
+        </div>
+        <div class="meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 9h6v6H9z"/></svg>
+          Porta: ${p.porta}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const grid = document.getElementById('grid');
+
+  function render(list){
+    if(!list.length){
+      grid.innerHTML = `<div class="empty-state"><b>Nenhuma planta/CLP encontrada</b>Ajuste sua busca ou cadastre uma nova planta.</div>`;
+      return;
+    }
+    grid.innerHTML = list.map(cardClp).join('');
+  }
+
+  render(clps);
+
+  // ---------- Busca ----------
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if(!q){ render(clps); return; }
+    render(clps.filter(p => (`${p.nome} ${p.ip}`).toLowerCase().includes(q)));
+  });
+
+  // ---------- Ordenação ----------
+  const sortBtn = document.getElementById('sortBtn');
+  const sortLabel = document.getElementById('sortLabel');
+  const sortModes = [
+    { label:'Nome', fn:(a,b)=> a.nome.localeCompare(b.nome) },
+    { label:'IP',   fn:(a,b)=> a.ip.localeCompare(b.ip, undefined, {numeric:true}) },
+  ];
+  let sortIdx = 0;
+  sortBtn.addEventListener('click', () => {
+    sortIdx = (sortIdx + 1) % sortModes.length;
+    sortLabel.textContent = sortModes[sortIdx].label;
+    render(clps.slice().sort(sortModes[sortIdx].fn));
+  });
+
+  // ---------- FAB ----------
+  document.getElementById('fabBtn').addEventListener('click', () => {
+    alert('Abrir formulário de nova planta/CLP (em breve no FluidMES).');
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}FluidMES · Plantas{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+<div class="main">
+    <div class="topbar">
+        <h1>Painel de Controle</h1>
+        <div class="topbar-right">
+            <div class="connection-badge">
+                
+                {% if cliente %}
+                    <div class="dot on"></div>
+                    <span>CLP Conectado · 127.0.0.1:5020</span>
+                    {% else %}
+                    <div class="dot off"></div>
+                    <span>CLP não conectado</span>
+                {% endif %}
+                    
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Máquina Principal</div>
+                <div class="kpi-value" id="kpi-maquina">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Coils Ativas</div>
+                <div class="kpi-value" id="kpi-ativas">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Última Leitura</div>
+                <div class="kpi-value" id="kpi-tempo" style="font-size:16px">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Endereço CLP</div>
+                <div class="kpi-value" style="font-size:16px">192.168.1.10</div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <div class="card">
+                <div class="card-title">Estado da Máquina — Coil 4</div>
+                <div class="machine-display">
+                    <div class="machine-icon unknown" id="machine-icon">⚙️</div>
+                    <div class="machine-status-text unknown" id="machine-status-text">AGUARDANDO</div>
+                    <div class="machine-sub" id="machine-sub">Conectando ao CLP...</div>
+                    <div class="timestamp" id="machine-ts">—</div>
+
+                    <div class="power-controls">
+                        <form method="post" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="endereco" value="4">
+                            <input type="hidden" name="valor" value="on">
+                            <button type="submit" name="editar" value="True" class="btn btn-power-on">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                LIGAR
+                            </button>
+                        </form>
+                        <form method="post" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="endereco" value="4">
+                            <button type="submit" name="editar" value="True" class="btn btn-power-off">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                                DESLIGAR
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Monitor de Coils</div>
+                <div class="coil-list" id="coil-list">
+                    <div class="coil-item">
+                        <div class="coil-left">
+                            <div class="coil-dot off"></div>
+                            <div>
+                                <div class="coil-name">Aguardando dados...</div>
+                                <div class="coil-addr">ADDR: —</div>
+                            </div>
+                        </div>
+                        <span class="coil-badge off">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="forms-grid">
+            <div class="card">
+                <div class="card-title">Ler Coil Manual</div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <input type="number" max="99" name="adress" placeholder="Endereço" required>
+                        <button class="btn btn-primary" type="submit" name="busca" value="True">Buscar</button>
+                    </div>
+                </form>
+                {% if resposta %}
+                <div class="resposta-box">{{ resposta }}</div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="card-title">Escrever Coil Manual</div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <input type="number" max="99" name="endereco" placeholder="Endereço" required>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="valor"> Ativar
+                        </label>
+                        <button class="btn btn-danger" type="submit" name="editar" value="True">Escrever</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function atualizarStatus(estadoRaw,cliente) {
+        const icon = document.getElementById('machine-icon');
+        const text = document.getElementById('machine-status-text');
+        const sub  = document.getElementById('machine-sub');
+        const kpi  = document.getElementById('kpi-maquina');
+        const ts   = document.getElementById('machine-ts');
+        const now  = new Date().toLocaleTimeString('pt-BR');
+    
+
+        // estadoRaw vem como "A Coil está no estado : TRUE" ou "FALSE"
+        const isTrue = estadoRaw === true || estadoRaw === 'True' || estadoRaw === 'true';
+        const isError = estadoRaw === null || estadoRaw === undefined;
+
+        icon.className = 'machine-icon ' + (isError ? 'unknown' : isTrue ? 'on' : 'off');
+        text.className = 'machine-status-text ' + (isError ? 'unknown' : isTrue ? 'on' : 'off');
+
+        if (isError) {
+            text.innerText = 'ERRO';
+            sub.innerText = 'Falha na leitura do CLP';
+            kpi.innerText = 'ERRO';
+        } else if (isTrue) {
+            text.innerText = 'LIGADA';
+            sub.innerText = 'Máquina em operação';
+            kpi.innerText = 'LIGADA';
+            document.getElementById('kpi-ativas').innerText = '1';
+        } else {
+            text.innerText = 'DESLIGADA';
+            sub.innerText = 'Máquina parada';
+            kpi.innerText = 'DESLIGADA';
+            document.getElementById('kpi-ativas').innerText = '0';
+        }
+
+        ts.innerText = 'Última atualização: ' + now;
+        document.getElementById('kpi-tempo').innerText = now;
+
+        // Atualiza coil list
+        const list = document.getElementById('coil-list');
+        list.innerHTML = `
+            <div class="coil-item">
+                <div class="coil-left">
+                    <div class="coil-dot ${isTrue ? 'on' : 'off'}"></div>
+                    <div>
+                        <div class="coil-name">Máquina Principal</div>
+                        <div class="coil-addr">ADDR: 4</div>
+                    </div>
+                </div>
+                <span class="coil-badge ${isTrue ? 'on' : 'off'}">${isTrue ? 'TRUE' : 'FALSE'}</span>
+            </div>
+        `;
+    }
+
+    
+    setInterval(async () => {
+        try {
+            const res = await fetch("/status/", {
+                headers: {
+                    "X-Requested-With": "WE1MSHR0cFJlcXVlc3Q="
+                }
+            });
+            const data = await res.json();          
+            atualizarStatus(data.estado,data.cliente);
+        } catch (error) {
+            console.error("Erro ao buscar status:", error);
+            atualizarStatus(null);
+        }
+    }, 1000);
+</script>
+</body>
+</html>
