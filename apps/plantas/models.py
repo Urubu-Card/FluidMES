@@ -15,8 +15,6 @@ class Planta(models.Model):
 
     class Meta:
         db_table = 'planta'
-        verbose_name = 'Planta'
-        verbose_name_plural = 'Plantas'
 
     def __str__(self):
         return self.nome
@@ -37,8 +35,46 @@ class Clp(models.Model):
 
     class Meta:
         db_table = 'clp'
-        verbose_name = 'CLP'
-        verbose_name_plural = 'CLPs'
 
     def __str__(self):
         return f'{self.nome} ({self.ip}:{self.porta})'
+
+
+class Sensor(models.Model):
+
+    class Tipo(models.TextChoices):
+        VOLUME      = 'volume',      'Volume'
+        TEMPERATURA = 'temperatura', 'Temperatura'
+        PRESSAO     = 'pressao',     'Pressão'
+
+    class TipoRegistro(models.TextChoices):
+        COIL             = 'coil',             'Coil'
+        HOLDING_REGISTER = 'holding_register', 'Holding Register'
+        INPUT_STATUS     = 'input_status',     'Input Status'
+
+    idsensor      = models.AutoField(primary_key=True)
+    nome          = models.CharField(max_length=45)
+    tipo          = models.CharField(max_length=20, choices=Tipo.choices)
+    unidade       = models.CharField(max_length=10)
+    minimo        = models.FloatField()
+    maximo        = models.FloatField()
+    tipo_registro = models.CharField(max_length=20, choices=TipoRegistro.choices)
+    endereco      = models.PositiveIntegerField()
+    clp           = models.ForeignKey(Clp, on_delete=models.CASCADE, related_name='sensores')
+
+    class Meta:
+        db_table = 'sensor'
+
+    def __str__(self):
+        return f'{self.nome} ({self.tipo})'
+
+
+class Leitura(models.Model):
+    idleitura = models.AutoField(primary_key=True)
+    valor     = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    sensor    = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='leituras')
+
+    class Meta:
+        db_table = 'leitura'
+        ordering = ['-timestamp']

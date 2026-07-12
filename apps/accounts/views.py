@@ -1,47 +1,65 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib import messages
-from .forms import Cadastro, Login as LoginForm
+from rest_framework.views            import APIView
+from rest_framework.response         import Response
+from rest_framework                  import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from .sertializers                   import CadastroSerializer, LoginSerializer , UsuarioSerializer
+
+class CadastroView(APIView):
+    
+    def post(self, request ):
+        
+        serializer = CadastroSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            usuario = serializer.save()
+            return Response(
+                UsuarioSerializer(usuario).data,
+                status= status.HTTP_201_CREATED
+                )
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def landing_page(request):
-    return render(request, 'index.html')
+class LoginView(APIView):
+    
+    def post(self,request):
+        serializer = LoginSerializer(data=request.data,context={'request': request})
+        
+        
+        if serializer.is_valid():
+            user    = serializer.validated_data['user']
+            print(user)
+            print(user.id)
+            print(type(user.id))
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'acess'  : str(refresh.access_token),
+                'refresh': str(refresh),
+                'usuario': UsuarioSerializer(user).data,
+            })
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class LogoutView(APIView):
+    
+    
+    def post(self,request):
+        
+        try:
+            refresh = request.data['refresh']
+            token   = RefreshToken(refresh)
+            token.blacklist()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+            
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class MeView(APIView):
+    
+    def get(self,request):
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(UsuarioSerializer(request.user).data)
 
-
-def cadastrar(request):
-    if request.method == 'POST':
-        form = Cadastro(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = Cadastro()
-    return render(request, 'Auth/cadastro.html', {'form': form})
-
-
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('plantas')
-
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            usuario = form.Autenticar(request)
-            if usuario:
-                login(request, usuario)
-                return redirect('plantas')
-            else:
-                messages.error(request, 'CPF/E-mail ou senha incorretos.')
-                return redirect('login')
-        else:
-            for campo, erros in form.errors.items():
-                for erro in erros:
-                    messages.error(request, erro)
-            return redirect('login')
-
-    return render(request, 'Auth/login.html', {'form': LoginForm()})
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+        

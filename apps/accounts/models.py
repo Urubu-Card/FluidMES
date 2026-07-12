@@ -38,13 +38,9 @@ class Usuarios(AbstractUser):
         VISUALIZADOR = 3, 'Funcionário'
 
     username   = None
-    first_name = None
-    last_name  = None
 
     objects = UsuariosManager()
-
     email   = models.EmailField(max_length=256, unique=True)
-    nome    = models.CharField(max_length=256)
     cpf     = models.CharField(max_length=14, unique=True)
     role    = models.IntegerField(choices=Role.choices, default=Role.VISUALIZADOR)
     empresa = models.ForeignKey(
@@ -57,7 +53,7 @@ class Usuarios(AbstractUser):
     )
 
     USERNAME_FIELD  = 'email'
-    REQUIRED_FIELDS = ['nome', 'cpf']
+    REQUIRED_FIELDS = ['first_name', 'cpf']#*Adicionar
 
     class Meta:
         db_table = 'usuarios'
@@ -65,4 +61,5 @@ class Usuarios(AbstractUser):
         verbose_name_plural = 'Usuários'
 
     def __str__(self):
-        return self.nome
+        return self.first_name
+

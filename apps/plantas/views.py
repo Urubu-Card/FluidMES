@@ -23,6 +23,7 @@ def plantas(request):
             'id':     clp.idclp,
             'nome':   clp.nome,
             'ip':     clp.ip,
+            'planta': clp.planta.nome,
             'porta':  clp.porta,
             'online': online,
         })

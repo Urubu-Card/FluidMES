@@ -51,16 +51,16 @@
 
   <nav class="menu">
     <a href="{% url 'home' %}"  class="{% block nav_home %}{% endblock %}"><i class="bi bi-house"></i>Home</a>
-    <a href="{% url 'pedidos' %}" class="{% block nav_pedidos %}{% endblock %}"></a>></a>"><i class="bi bi-file-earmark-text"></i></i>Pedidos</a>
-    <a href="{% url 'rendimento' %}" class="{% block nav_rendimentos %}{% endblock %}"></a>><i class="bi bi-graph-up"></i></svg>Rendimento</a>
+    <a href="{% url 'pedidos' %}" class="{% block nav_pedidos %}{% endblock %}"><i class="bi bi-file-earmark-text"></i></i>Pedidos</a>
+    <a href="{% url 'rendimento' %}" class="{% block nav_rendimentos %}{% endblock %}"><i class="bi bi-graph-up"></i></svg>Rendimento</a>
     <a href="{% url 'plantas' %}" class="{% block nav_plantas %}{% endblock %}"><i class="bi bi-cpu"></i>Plantas</a>
-    <a href="{% url 'funcionarios' %}" class="{% block nav_funcionarios %}{% endblock %}"></a>><i class="bi bi-people"></i>Funcionários</a>
-    <a href="{% url 'receitas' %}" class="{% block nav_receitas %}{% endblock %}"></a>><i class="bi bi-flask"></i>Receitas</a>
+    <a href="{% url 'funcionarios' %}" class="{% block nav_funcionarios %}{% endblock %}"><i class="bi bi-people"></i>Funcionários</a>
+    <a href="{% url 'receitas' %}" class="{% block nav_receitas %}{% endblock %}"><i class="bi bi-flask"></i>Receitas</a>
   </nav>
 
   <div class="sidebar-footer">
-    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V19a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H5a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H11a1.6 1.6 0 0 0 1-1.5V5a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V11c.4.3 1 .5 1.5 1H19a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Configurações</a>
-    <a href="#" class="danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Sair da conta</a>
+    <a href="#"><i class="bi bi-gear"></i>Configurações</a>
+    <a href="#" class="danger"><i class="bi bi-door-open"></i>Sair da conta</a>
   </div>
 </aside>
 
