@@ -1,5 +1,4 @@
-# Movido de plasmic/clp_control.py → services/clp_control.py
-from services import clp_conn as conn
+import clp_conn as conn
 from pymodbus.exceptions import ModbusException
 import asyncio
 
@@ -72,3 +71,7 @@ class Modbus_Control:
             return f'Erro: {e}'
         finally:
             self.conexao.FecharConexao()
+
+if __name__ == "__main__":
+    client = Modbus_Control("127.0.0.1",5020)
+    client.Escrever_Coil(0,False)

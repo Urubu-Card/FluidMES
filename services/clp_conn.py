@@ -26,3 +26,9 @@ class Conexao:
     def FecharConexao(self):
         if self.cliente is not None:
             self.cliente.close()
+
+if __name__ =="__main__":
+    
+    cliente = Conexao("127.0.0.1",5020)
+    
+    cliente
