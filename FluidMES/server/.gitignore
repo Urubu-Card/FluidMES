@@ -1,8 +1,3 @@
-node_modules/
+venv
 .env
-dev.db
-*.db
-*.db-journal
-
-# Prisma (Prevenção)
-/prisma/migrations/
+.vscode

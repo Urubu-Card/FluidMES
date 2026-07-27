@@ -5,14 +5,14 @@ function Landing() {
         <div className='container' style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '80vh' }}>
             <header style={{ marginBottom: '30px' }}>
                 <h1 style={{ fontSize: '2.8rem', color: '#00adb5', margin: '0' }}>Gerenciador de Tarefas</h1>
-                <p style={{ fontSize: '1.1rem', color: '#eee', marginTop: '10px' }}>
+                <p style={{ fontSize: '1.1rem', color: '#000000', marginTop: '10px' }}>
                     Organize sua rotina e gerencie seus focos diários em um ambiente moderno.
                 </p>
             </header>
 
             <main style={{ marginBottom: '40px' }}>
                 <div style={{ background: '#252930', padding: '25px', borderRadius: '8px', maxWidth: '450px', margin: '0 auto', border: '1px solid #333' }}>
-                    <h3 style={{ color: '#fff', marginTop: '0' }}>Funcionalidades principais</h3>
+                    <h3 style={{ color: '#000000', marginTop: '0' }}>Funcionalidades principais</h3>
                     <ul style={{ textAlign: 'left', marginTop: '15px', color: '#ccc', lineHeight: '1.8', listStyleType: 'none', padding: '0' }}>
                         <li>✅ Criação e exclusão de tarefas em tempo real</li>
                         <li>⏳ Controle de status (Pendentes e Concluídas)</li>

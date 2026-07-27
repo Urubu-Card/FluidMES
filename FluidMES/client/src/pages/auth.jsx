@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
 import api from '../services/api.js';
+import axios from 'axios';
 
 export default function Auth() {
     const formRef = useRef(null);
@@ -17,7 +18,8 @@ export default function Auth() {
     // Estados exclusivos do cadastro
     const [nomeEmpresa, setNomeEmpresa] = useState('');
     const [cnpj, setCnpj] = useState('');
-    const [nome, setNome] = useState('');
+    const [primeiroNome, setPrimeiroNome] = useState('');
+    const [ultimoNome, setUltimoNome] = useState('');
     const [email, setEmail] = useState('');
 
     // Limpa os estados para esvaziar os inputs controlados da tela
@@ -29,7 +31,8 @@ export default function Auth() {
         setPassword('');
         setNomeEmpresa('');
         setCnpj('');
-        setNome('');
+        setPrimeiroNome('');
+        setUltimoNome('');
         setEmail('');
         setErro('');
     }
@@ -40,20 +43,22 @@ export default function Auth() {
 
         try {
             if (isLogin) {
-                const response = await api.post('/api/token', {
-                    username: cpf,
+                const response = await api.post('/api/login/', {
+                    usuario: cpf,email,
                     password
                 });
-                localStorage.setItem('@api:token', response.data.access);
+                localStorage.setItem('@api:token', response.data.acess);
+                localStorage.setItem('@api:refresh', response.data.refresh);
                 navigate('/app');
             } else {
-                await api.post('/api/cadastro', {
+                await api.post('/api/cadastro/', {
+                    first_name: primeiroNome, 
+                    last_name: ultimoNome,  
+                    email,
+                    cpf,
+                    password, 
                     nomeEmpresa,
                     cnpj,
-                    nome,
-                    email,
-                    username: cpf,
-                    password
                 });
 
                 alert('Cadastro realizado com sucesso! Faça seu login.');
@@ -125,10 +130,20 @@ export default function Auth() {
                             <div className='user-pass'>
                                 <input
                                     type='text'
-                                    placeholder='Nome Completo'
+                                    placeholder='Primeiro Nome'
                                     required
-                                    value={nome}
-                                    onChange={e => setNome(e.target.value)}
+                                    value={primeiroNome}
+                                    onChange={e => setPrimeiroNome(e.target.value)}
+                                />
+                                <i className='bi bi-person'></i>
+                            </div>
+                            <div className='user-pass'>
+                                <input
+                                    type='text'
+                                    placeholder='Último Nome'
+                                    required
+                                    value={ultimoNome}
+                                    onChange={e => setUltimoNome(e.target.value)}
                                 />
                                 <i className='bi bi-person'></i>
                             </div>

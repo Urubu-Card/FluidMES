@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './style.css';
+import api from '../../../services/api.js';
 
 export default function Sidebar() {
     const location = useLocation(); // Escuta as mudanças de rota
@@ -23,9 +24,10 @@ export default function Sidebar() {
             try {
                 // Recupera o token salvo no localStorage para autenticar a chamada
                 const token = localStorage.getItem('@api:token');
-
+                console.log(localStorage.getItem('@api:refresh'));
+                console.log(localStorage.getItem('@api:token'));
                 // Mantida a URL completa para evitar erros de rota no Front-end
-                const response = await fetch('http://localhost:3000/api/profile', {
+                const response = await api.get('/api/me/', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -33,14 +35,15 @@ export default function Sidebar() {
                     }
                 });
 
-                if (!response.ok) {
+                if ( response.status !== 200) {
                     throw new Error('Não foi possível carregar os dados do perfil.');
                 }
 
-                const dados = await response.json();
+                const dados = await response.data;
                 
                 setUsuario({
-                    nome: dados.nome || 'Usuário',
+                    primeiroNome: dados.first_name || 'Usuário',
+                    segundoNome: dados.last_name || '',
                     cargo: dados.cargo || 'Não informado',
                     fotoUrl: dados.fotoUrl || null
                 });
@@ -87,8 +90,8 @@ export default function Sidebar() {
         };
     }, [userExit]);
 
-    const primeiroNome = usuario.nome ? usuario.nome.split(' ')[0] : 'Usuário';
-    const segundoNome = usuario.nome ? usuario.nome.split(' ')[1] : 'Usuário';
+    const primeiroNome = usuario.primeiroNome || 'Usuário';
+    const segundoNome = usuario.segundoNome || '';
 
     return (
         <>
@@ -100,7 +103,7 @@ export default function Sidebar() {
                                 <img src={usuario.fotoUrl} alt='Foto do usuário' className='avatar-img' />
                             ) : (
                                 <span className='avatar-placeholder'>
-                                    {usuario.nome ? usuario.nome.charAt(0).toUpperCase() : 'U'}
+                                    {usuario.primeiroNome ? usuario.primeiroNome.charAt(0).toUpperCase() : 'U'}
                                 </span>
                             )}
                         </div>
@@ -172,6 +175,8 @@ export default function Sidebar() {
                         <button onClick={() => setUserExit(false)}>Cancelar</button>
                         <NavLink to='/auth' onClick={() => {
                             localStorage.removeItem('@api:token');
+                            localStorage.removeItem('@api:refresh');
+                            localStorage.removeItem('@api:user');
                             setUserExit(false);
                         }}>Sair</NavLink>
                     </div>

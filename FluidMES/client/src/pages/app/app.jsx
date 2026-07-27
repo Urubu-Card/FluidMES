@@ -8,7 +8,7 @@ export default function App() {
             <Sidebar />
 
             {/* CONTENT */}
-            <main style={{ flex: 1, overflowY: 'auto', padding: '24px', backgroundColor: '#f5f5f7' }}>
+            <main style={{ flex: 1, overflowY: 'auto', padding: '24px', backgroundColor: '#101629' }}>
                 <Outlet />
             </main>
         </div>
