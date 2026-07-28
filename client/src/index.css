@@ -7,11 +7,20 @@
     font-family: "Exo 2", sans-serif;
 }
 
+:root {
+    --azul-petroleo: #101629;
+    --cinza-escuro: #2D3645;
+    --azul-ceu: #3E7DFF;
+    --azul-ceu-escuro: #2E4E99;
+    --branco-azulado: #DBF3FF;
+    --black: #000000;
+    --full-white: #FFFFFF;
+}
+
 body {
     margin: 0;
     overflow-x: hidden;
     min-height: 100vh;
-    /*background: linear-gradient(0deg, rgba(20, 0, 36, 1) 0%, rgba(60, 9, 121, 1) 50%, rgba(100, 0, 255, 1) 100%);*/
 }
 
 .auth-page {
@@ -20,18 +29,19 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    background-image: url('../../public/espaco.jpg');
+    /* background-image: url('../../public/espaco.jpg'); */
+    background-color: var(--azul-petroleo);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 
     * {
-        color: #DBF3FF;
+        color: var(--branco-azulado);
     }
 
     header {
-        background-color: #101629;
+        background-color: var(--azul-petroleo);
         border-bottom: 2px solid rgba(219, 243, 255, 0.4);
         position: fixed;
         top: 0;
@@ -59,10 +69,10 @@ body {
         width: 420px;
         max-width: 90%;
         background-color: rgba(0, 0, 0, 0.3);
-        border: 2px solid #ffffff;
+        border: 2px solid var(--full-white);
         border-radius: 10px;
         padding: 1rem 2rem;
-        box-shadow: 0 0 10px #000000;
+        box-shadow: 0 0 10px var(--black);
         margin-bottom: 10px;
     }
 
@@ -98,7 +108,7 @@ body {
             &:-webkit-autofill:focus,
             &:-webkit-autofill:active {
                 -webkit-box-shadow: 0 0 0 100px rgba(0, 0, 0, 0.3) inset !important;
-                -webkit-text-fill-color: #DBF3FF !important;
+                -webkit-text-fill-color: var(--branco-azulado) !important;
                 transition: background-color 5000s ease-in-out 0s;
             }
         }
@@ -111,7 +121,7 @@ body {
             display: flex;
 
             svg {
-                color: #DBF3FF;
+                color: var(--branco-azulado);
                 width: 20px;
                 height: 20px;
             }
@@ -122,7 +132,7 @@ body {
         margin-top: 20px;
         width: 100%;
         height: 48px;
-        background: linear-gradient(90deg, #1e60d8 0%, #3a82f6 60%, #1e60d8 100%);
+        background: linear-gradient(90deg, var(--cinza-escuro) 0%, var(--azul-ceu) 60%, var(--cinza-escuro) 100%);
         background-size: 200% auto;
         border: none;
         border-radius: 8px;
