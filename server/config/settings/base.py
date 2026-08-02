@@ -78,7 +78,7 @@ REST_FRAMEWORK = {
 }
 
 
-ASGI_APPLICATION = "core.asgi.application"
+ASGI_APPLICATION = 'config.asgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
@@ -103,6 +103,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+#STATICFILES_DIRS = [BASE_DIR / 'static']
 
 LOGIN_URL = 'login'
