@@ -2,7 +2,7 @@ import asyncio
 from django.core.management.base import BaseCommand
 from channels.layers import get_channel_layer
 from services.clp_control import Modbus_Control
-from plantas.models import Clp
+from apps.plantas.models import Clp
 from asgiref.sync import sync_to_async
 import re
 

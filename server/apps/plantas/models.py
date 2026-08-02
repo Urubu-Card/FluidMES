@@ -26,6 +26,7 @@ class Clp(models.Model):
     ip     = models.GenericIPAddressField(protocol='both')
     porta  = models.CharField(max_length=45)
     status = models.CharField(max_length=45)
+    ativo  = models.BooleanField()
     planta = models.ForeignKey(
         Planta,
         on_delete=models.CASCADE,
