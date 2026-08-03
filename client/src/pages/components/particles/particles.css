@@ -1,0 +1,24 @@
+/* ---- reset ---- */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#particles-js {
+    width: 100%;
+    height: 100vh;
+    background: #000022;
+}
+
+canvas {
+    display: block;
+}
+
+@media (max-width: 650px) {
+    #particles-js {
+        display: none;
+    }
+}
