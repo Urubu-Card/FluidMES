@@ -1,6 +1,0 @@
-from django.apps import AppConfig
-
-class PlantasConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.plantas'
-    verbose_name = 'Plantas'
