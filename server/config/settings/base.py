@@ -8,6 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','django-insecure-kf)h_nohacd_nnhsqot9r50675l9+=+9a!r$er7%qjb+v#!agv')
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,6 +77,19 @@ REST_FRAMEWORK = {
     ),
 }
 
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
 #* Configurações do tempo do token
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=30),
@@ -88,6 +103,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+#STATICFILES_DIRS = [BASE_DIR / 'static']
 
 LOGIN_URL = 'login'
