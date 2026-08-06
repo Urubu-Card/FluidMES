@@ -4,7 +4,6 @@ from django.db.models import Q
 
 
 class MultiLogin(ModelBackend):
-    #! OBRIGATÓRIO: mantenha o argumento como 'username'
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
