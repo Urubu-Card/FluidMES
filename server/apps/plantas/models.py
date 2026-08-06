@@ -1,10 +1,11 @@
 from django.db import models
 from apps.accounts.models import Empresa
-
+import uuid
 
 class Planta(models.Model):
     idplanta    = models.AutoField(primary_key=True)
     nome        = models.CharField(max_length=45)
+    uuid        = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     localizacao = models.CharField(max_length=45)
     empresa     = models.ForeignKey(
         Empresa,
@@ -17,7 +18,7 @@ class Planta(models.Model):
         db_table = 'planta'
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} {self.empresa.nome}"
 
 
 class Clp(models.Model):

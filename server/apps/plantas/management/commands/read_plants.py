@@ -16,6 +16,7 @@ def busca_clps():
             "nome":clp.nome,
             "ip":clp.ip,
             "porta":clp.porta,
+            "uuid":clp.planta.uuid
         })
     return dados
         
@@ -39,7 +40,7 @@ class Command(BaseCommand):
     
     help = "Comando Modbus para distrubuição dos WebSockets"
     
-    async def poll_loop(self, nome, ip, port, sensores):
+    async def poll_loop(self, uuid, ip, port, sensores):
         channel_layer = get_channel_layer()
         client = Modbus_Control(ip, port)
         await client.Conectar()
@@ -48,14 +49,18 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("Não foi possivel conectar ao servidor"))
             return
 
+        if bool(sensores) is False:
+            self.stdout.write(self.style.ERROR("Nenhum sensor registrado ao clp"))
+            return
+            
+            
         try:
             while True:
                 data = {}
-
+                
                 for sensor in sensores:
                     tipo = sensor['tipo']
                     endereco = sensor['endereco']
-
                     if tipo == 'coil':
                         resultado = await client.Ler_Coil(endereco, 1)
                     elif tipo == 'input':
@@ -65,16 +70,14 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(self.style.WARNING(f"Tipo desconhecido: {tipo}"))#! IMPOSSIVEL DE ACONTECER REMOVER
                         continue
-
                     data[f"{tipo}_{endereco}"] = resultado[0]
 
                 if data:
-                    nome_planta = re.sub(r'[^a-zA-Z0-9._-]', '', nome)[:99]
                     await channel_layer.group_send(
-                        f'plant_{nome_planta}',
+                        f'plant_{uuid}',
                         {'type': "plant.update", 'data': data}
                     )
-                    self.stdout.write(f"Enviando para {nome_planta} data:{data}")
+                    self.stdout.write(f"Enviando para {uuid} data:{data}")
                 else:
                     self.stdout.write(self.style.WARNING("Deu merda"))
 
@@ -95,7 +98,7 @@ class Command(BaseCommand):
         lista_de_clps =[]
         for clp in clps:
             sensores_do_clp =sensores[clp['id']]
-            lista_de_clps.append(self.poll_loop(clp['nome'],clp['ip'],clp['porta'],sensores_do_clp))
+            lista_de_clps.append(self.poll_loop(clp['uuid'],clp['ip'],clp['porta'],sensores_do_clp))
             
             
         await asyncio.gather(*lista_de_clps)
