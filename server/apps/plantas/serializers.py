@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.plantas.models import Planta ,Clp
+from apps.plantas.models import Planta ,Clp , Sensor
 
 
 
@@ -15,3 +15,11 @@ class ClpSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clp
         fields = ['nome','ip','porta','ativo']
+        
+
+class SensorSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Sensor
+        fields = ['*']
+    

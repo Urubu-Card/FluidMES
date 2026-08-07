@@ -48,11 +48,20 @@ class Sensor(models.Model):
         VOLUME      = 'volume',      'Volume'
         TEMPERATURA = 'temperatura', 'Temperatura'
         PRESSAO     = 'pressao',     'Pressão'
+        VAZAO       = 'vazao',       'Vazão'   
 
     class TipoRegistro(models.TextChoices):
         COIL             = 'coil',             'Coil'
         HOLDING_REGISTER = 'holding_register', 'Holding Register'
         INPUT_STATUS     = 'input_status',     'Input Status'
+        
+    class Unidade(models.TextChoices):
+        CELSIUS     = 'celsius',    'Celsius(°C)'
+        FAHRENHEIT  = 'fahrenheit', 'Fahrenheit(°f)'
+        BAR         = 'bar',        'Bar'
+        PASCAL      = 'pascal',     'Pascal (kPa)'
+        LITROS      = 'litros',     'Litros(L)' 
+        
 
     idsensor      = models.AutoField(primary_key=True)
     nome          = models.CharField(max_length=45)

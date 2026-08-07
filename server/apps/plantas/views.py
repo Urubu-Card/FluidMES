@@ -1,6 +1,6 @@
-from rest_framework import generics
-from apps.plantas.models import Planta ,Clp
-from apps.plantas.serializers import PlantaSerializer,ClpSerializer
+from rest_framework             import generics
+from apps.plantas.models        import Planta ,Clp , Sensor
+from apps.plantas.serializers   import PlantaSerializer,ClpSerializer,SensorSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -20,3 +20,11 @@ class ClpListView(generics.ListAPIView):
     def get_queryset(self):
          user = self.request.user
          return Clp.objects.filter(planta__empresa=user.empresa)
+     
+class SensoresListView(generics.ListAPIView):
+    serializer_class = SensorSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Sensor.objects.filter(clp__planta__empresa = user.empresa)
