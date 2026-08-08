@@ -4,7 +4,9 @@ from channels.layers import get_channel_layer
 from services.clp_control import Modbus_Control
 from apps.plantas.models import Clp, Sensor
 from asgiref.sync import sync_to_async
+from redis.exceptions import ConnectionError
 import re
+import time
 
 
 def busca_clps():
@@ -19,6 +21,17 @@ def busca_clps():
             "uuid":clp.planta.uuid
         })
     return dados
+        
+def busca_sensores_um_clp(clpID):
+    dados= {}
+    sensores = Sensor.objects.filter(clp=clpID)
+    sensores_do_clp = []
+    for sensor in sensores:
+            sensores_do_clp.append({
+                "tipo": sensor.tipo_registro,
+                "endereco": sensor.endereco,
+            })
+    return sensores_do_clp
         
         
 def busca_sensores(clps):
@@ -40,22 +53,41 @@ class Command(BaseCommand):
     
     help = "Comando Modbus para distrubuição dos WebSockets"
     
-    async def poll_loop(self, uuid, ip, port, sensores):
+    INTERVALO = 30 #*30 segundos de intervalo para a busca no banco
+    
+    async def verificar_conexao(self,client):
+        while True:
+                try:
+                    await client.Conectar()
+                    if client.isConnected():
+                        break
+                    else:
+                        self.stdout.write(self.style.ERROR(f"Não foi possivel conectar ao servidor: IP{client.conexao.ip} PORT{client.conexao.porta}"))
+                        await asyncio.sleep(5)
+                except Exception as e:
+                    self.stdout.write(self.style.NOTICE(e))
+    
+    
+    async def poll_loop(self,id, uuid, ip, port, sensores):
         channel_layer = get_channel_layer()
-        client = Modbus_Control(ip, port)
+        client = Modbus_Control(ip,port)
         await client.Conectar()
 
         if not client.isConnected():
-            self.stdout.write(self.style.ERROR("Não foi possivel conectar ao servidor"))
-            return
+            await self.verificar_conexao(client)
 
         if bool(sensores) is False:
             self.stdout.write(self.style.ERROR("Nenhum sensor registrado ao clp"))
             return
             
-            
         try:
+            counter = 0
             while True:
+                if not client.isConnected():
+                    await self.verificar_conexao(client)
+                if counter % self.INTERVALO ==0:
+                    sensores = await sync_to_async(busca_sensores_um_clp)(id)
+                
                 data = {}
                 
                 for sensor in sensores:
@@ -73,14 +105,18 @@ class Command(BaseCommand):
                     data[f"{tipo}_{endereco}"] = resultado[0]
 
                 if data:
-                    await channel_layer.group_send(
-                        f'plant_{uuid}',
-                        {'type': "plant.update", 'data': data}
-                    )
-                    self.stdout.write(f"Enviando para {uuid} data:{data}")
+                    try:
+                        await channel_layer.group_send(
+                            f'plant_{uuid}',
+                            {'type': "plant.update", 'data': data}
+                        )
+                        self.stdout.write(f"Enviando para {uuid} data:{data}")
+                    except ConnectionError as e:
+                        self.stdout.write(self.style.WARNING(f"Redis não conectado : {e}"))
                 else:
-                    self.stdout.write(self.style.WARNING("Deu merda"))
+                    self.stdout.write(self.style.WARNING("Data não foi realizada"))
 
+                counter += 1
                 await asyncio.sleep(1)
 
         finally:
@@ -98,7 +134,6 @@ class Command(BaseCommand):
         lista_de_clps =[]
         for clp in clps:
             sensores_do_clp =sensores[clp['id']]
-            lista_de_clps.append(self.poll_loop(clp['uuid'],clp['ip'],clp['porta'],sensores_do_clp))
-            
+            lista_de_clps.append(self.poll_loop(clp['id'],clp['uuid'],clp['ip'],clp['porta'],sensores_do_clp))
             
         await asyncio.gather(*lista_de_clps)

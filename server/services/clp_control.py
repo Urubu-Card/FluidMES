@@ -16,8 +16,10 @@ class Modbus_Control:
         self.cliente = conector
         return self.cliente
 
+
+
     def isConnected(self):
-        ''' Retorna valor bool indicando status da conexão'''
+
         return self.cliente is not None and self.cliente.connected
 
     async def Ler_Coil(self, address: int, count :int = 1):
