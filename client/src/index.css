@@ -23,18 +23,19 @@ body {
     min-height: 100vh;
 }
 
-.background-darkveil,
+.background-fluid,
 .background-particles {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100rem;
 }
 
 .landing-page {
     position: relative;
     width: 100%;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow: auto;
 
 
     .content {
@@ -51,12 +52,10 @@ body {
             
             span {
                 padding: 2px;
-                background-color: #101629;
                 border-radius: 20px;
-                color: #3E7DFF;
+                color: #DBF3FF;
             }
         }
-
         .titulo {
             justify-content: center;
             align-items: center;
@@ -90,6 +89,10 @@ body {
                 transform: translateX(-50%) scale(0.95);
             }
         }
+    }
+
+    .conteudo-abaixo{
+        position: absolute;
     }
 }
 
