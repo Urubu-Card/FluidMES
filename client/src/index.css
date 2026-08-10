@@ -9,7 +9,7 @@
 
 :root {
     --azul-petroleo: #101629;
-    --cinza-escuro: #2D3645;
+    --cinza-escuro: #2D3645;    
     --azul-ceu: #3E7DFF;
     --azul-ceu-escuro: #2E4E99;
     --branco-azulado: #DBF3FF;
@@ -54,7 +54,7 @@ body {
             display: flex;
             align-items: center;
             color: white;
-            font-size: 10rem;
+            font-size: clamp(2rem,10rem,25rem);
             
             span {
                 padding: 2px;
@@ -99,8 +99,8 @@ body {
 
     .conteudo-abaixo{
         position: absolute;
-        background-color: #101629;
-        color: var(--branco-azulado);
+        background-color: var(--azul-petroleo);
+        color: var(--azul-petroleo);
     }
 }
 
