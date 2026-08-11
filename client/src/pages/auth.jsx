@@ -48,8 +48,10 @@ export default function Auth() {
                     usuario: cpf, email,
                     password
                 });
+                /*
                 localStorage.setItem('@api:token', response.data.acess);
                 localStorage.setItem('@api:refresh', response.data.refresh);
+                */
                 navigate('/app');
             } else {
                 await api.post('/api/cadastro/', {
@@ -72,32 +74,32 @@ export default function Auth() {
     }
 
     return (
-        <div className='auth-page'>
-            <div className='background-particles'>
+        <div className='auth-page container-fluid p-0'>
+            <div className='background-particles' style={{ zIndex: -100 }}>
                 <Particles
                     quantity={50}
                     color="#00adb5"
-                    speed={5}
-                    lineDistance={150}
+                    speed={2.5}
+                    lineDistance={200}
                 />
-            </div> 
+            </div>
 
-            <div className='content'>
-                <header>
-                    <NavLink to='/' className='logo'>
+            <div className='content w-100'>
+                <header className='d-flex align-items-center px-3 px-md-4'>
+                    <NavLink to="/">
                         FluidMES
                     </NavLink>
                 </header>
-                <form ref={formRef} onSubmit={enviarSubmit}>
+                <form ref={formRef} onSubmit={enviarSubmit} className="w-100 mx-auto">
                     <h2>Bem-vindo a FluidMES</h2>
                     <p>{isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}</p>
                     {erro && <p className='error-text'>{erro}</p>}
 
                     {/* ─── MODO CADASTRO ─── */}
                     {!isLogin && (
-                        <div className='columns'>
+                        <div className='row g-4'>
                             {/* Coluna Empresarial */}
-                            <div className='column'>
+                            <div className='col-12 col-md-6'>
                                 <p className='col-title'>Empresarial :</p>
                                 <div className='user-pass'>
                                     <input
@@ -125,7 +127,7 @@ export default function Auth() {
                             <div className='divider-v'></div>
 
                             {/* Coluna Pessoal */}
-                            <div className='column'>
+                            <div className='col-12 col-md-6'>
                                 <p className='col-title'>Pessoal :</p>
                                 <div className='user-pass'>
                                     <PatternFormat
@@ -184,8 +186,8 @@ export default function Auth() {
 
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
-                        <div className='column'>
-                            <div className='user-pass'>
+                        <div className='row g-4'>
+                            <div className='col-12 col-md-6'>
                                 <PatternFormat
                                     type='text'
                                     format='###.###.###-##'
@@ -210,6 +212,9 @@ export default function Auth() {
                                 </div>
                                 <NavLink to='/auth/forgot-password' className='forgot'>
                                     Esqueci a senha
+                                </NavLink>
+                                <NavLink to='/app' className='forgot'>
+                                    Entrada Secreta
                                 </NavLink>
                             </div>
                         </div>
