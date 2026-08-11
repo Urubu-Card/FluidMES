@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
-import Particles from './components/particles/particles.jsx';
-import api from '../services/api.js';
+import Particles from '../components/particles/particles.jsx';
+import api from '../../services/api.js';
 import axios from 'axios';
 
 export default function Auth() {

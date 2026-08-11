@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import './index.css'
 
-import LandingPage from './pages/landing.jsx'
-import Auth from './pages/auth.jsx'
-import ForgotPassword from './pages/forgot.jsx'
+import LandingPage from './pages/landing/landing.jsx'
+import Auth from './pages/auth/auth.jsx'
+import ForgotPassword from './pages/forgot/forgot.jsx'
 import App from './pages/app/app.jsx'
 
 
