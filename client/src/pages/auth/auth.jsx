@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
-import Particles from '../components/particles/particles.jsx';
+import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
 import axios from 'axios';
+import './index.css';
 
 export default function Auth() {
     const formRef = useRef(null);
@@ -75,13 +76,13 @@ export default function Auth() {
 
     return (
         <div className='auth-page container-fluid p-0'>
-            <div className='background-particles' style={{ zIndex: -100 }}>
-                <Particles
+            <div className='background-particles'>
+                {<Particles 
                     quantity={50}
-                    color="#00adb5"
+                    color="#00bfff"
                     speed={2.5}
                     lineDistance={200}
-                />
+                />}
             </div>
 
             <div className='content w-100'>
@@ -90,7 +91,8 @@ export default function Auth() {
                         FluidMES
                     </NavLink>
                 </header>
-                <form ref={formRef} onSubmit={enviarSubmit} className="w-100 mx-auto">
+                
+                <form ref={formRef} onSubmit={enviarSubmit} className={`w-100 mx-auto ${isLogin ? 'auth-login' : 'auth-register'}`}>
                     <h2>Bem-vindo a FluidMES</h2>
                     <p>{isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}</p>
                     {erro && <p className='error-text'>{erro}</p>}
@@ -99,13 +101,14 @@ export default function Auth() {
                     {!isLogin && (
                         <div className='row g-4'>
                             {/* Coluna Empresarial */}
-                            <div className='col-12 col-md-6'>
+                            <div className='coline col-12 col-md-6'>
                                 <p className='col-title'>Empresarial :</p>
                                 <div className='user-pass'>
                                     <input
                                         type='text'
                                         placeholder='Nome da Empresa'
                                         required
+                                        className=''
                                         value={nomeEmpresa}
                                         onChange={e => setNomeEmpresa(e.target.value)}
                                     />
@@ -124,10 +127,10 @@ export default function Auth() {
                                 </div>
                             </div>
 
-                            <div className='divider-v'></div>
+                            
 
                             {/* Coluna Pessoal */}
-                            <div className='col-12 col-md-6'>
+                            <div className=' col-12 col-md-6'>
                                 <p className='col-title'>Pessoal :</p>
                                 <div className='user-pass'>
                                     <PatternFormat
@@ -187,8 +190,9 @@ export default function Auth() {
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
                         <div className='row g-4'>
-                            <div className='col-12 col-md-6'>
+                            <div className='user-pass col-12 col-6'>
                                 <PatternFormat
+                                    id='cpf'
                                     type='text'
                                     format='###.###.###-##'
                                     placeholder='CPF'

@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0rem;
+    padding: 0rem;
+    box-sizing: border-box;
+    font-family: "Exo 2", sans-serif;
+}
+
+:root {
+    --azul-petroleo: #101629;
+    --cinza-escuro: #2D3645;    
+    --azul-ceu: #3E7DFF;
+    --azul-ceu-escuro: #2E4E99;
+    --branco-azulado: #DBF3FF;
+    --black: #000000;
+    --full-white: #FFFFFF;
+}
