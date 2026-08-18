@@ -4,7 +4,7 @@ import { PatternFormat } from 'react-number-format';
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
 import axios from 'axios';
-import './index.css';
+import './style.css';
 
 export default function Auth() {
     const formRef = useRef(null);
@@ -76,10 +76,10 @@ export default function Auth() {
 
     return (
         <div className='auth-page container-fluid p-0'>
-            <div className='background-particles'>
+            <div className={`${isLogin ? 'login-active' : 'login-inactive'}`}>
                 {<Particles 
-                    quantity={50}
-                    color="#00bfff"
+                    quantity={65}
+                    color="#3E7DFF"
                     speed={2.5}
                     lineDistance={200}
                 />}
@@ -93,8 +93,8 @@ export default function Auth() {
                 </header>
                 
                 <form ref={formRef} onSubmit={enviarSubmit} className={`w-100 mx-auto ${isLogin ? 'auth-login' : 'auth-register'}`}>
-                    <h2>Bem-vindo a FluidMES</h2>
-                    <p>{isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}</p>
+                    <h2>{isLogin ? 'Entrar':'Cadastrar-se'}</h2>
+                    <p className='subtitle'>{isLogin ? 'Faça login para acessar sua conta' : 'Crie sua conta para começar'}</p>
                     {erro && <p className='error-text'>{erro}</p>}
 
                     {/* ─── MODO CADASTRO ─── */}
@@ -189,21 +189,22 @@ export default function Auth() {
 
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
+                    
                         <div className='row g-4'>
-                            <div className='user-pass col-12 col-6'>
+                            <div>
+                            <div className='user-pass'>
                                 <PatternFormat
-                                    id='cpf'
-                                    type='text'
-                                    format='###.###.###-##'
-                                    placeholder='CPF'
-                                    required
-                                    value={cpf}
-                                    onValueChange={(values) => setCpf(values.value)}
-                                />
-                                <i className='bi bi-person-vcard'></i>
+                                        type='text'
+                                        format='##.###.###/####-##'
+                                        placeholder='CNPJ'
+                                        required
+                                        value={cnpj}
+                                        onValueChange={(values) => setCnpj(values.value)}
+                                    />
+                                    <i className='bi bi-person-vcard'></i>
                             </div>
 
-                            <div>
+                            
                                 <div className='user-pass'>
                                     <input
                                         type='password'
@@ -217,7 +218,7 @@ export default function Auth() {
                                 <NavLink to='/auth/forgot-password' className='forgot'>
                                     Esqueci a senha
                                 </NavLink>
-                                <NavLink to='/app' className='forgot'>
+                                <NavLink to='/app' className='secret'>
                                     Entrada Secreta
                                 </NavLink>
                             </div>

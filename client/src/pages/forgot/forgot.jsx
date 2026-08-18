@@ -1,10 +1,20 @@
 import React from 'react';
+import Particles from '../components/Particles/particles.jsx';
+import './style.css';
+
 
 const MinhaPagina = () => {
     return (
         <div>
             {/* O conteúdo da página vai aqui */}
-            oiiiiiiiiii
+            <div className='background-particles'>
+                {<Particles 
+                    quantity={50}
+                    color="#3E7DFF"
+                    speed={2.5}
+                    lineDistance={200}
+                />}
+            </div>
         </div>
     );
 };

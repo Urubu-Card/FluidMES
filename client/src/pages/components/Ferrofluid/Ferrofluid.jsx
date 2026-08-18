@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import './Ferrofluid.css';
+import './style.css';
 
 const MAX_COLORS = 8;
 

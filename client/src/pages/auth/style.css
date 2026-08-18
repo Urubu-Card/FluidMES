@@ -6,7 +6,7 @@
     background-color: var(--azul-petroleo);
 }
 
-.background-particles {
+.login-active, .login-inactive {
     position: fixed;
     top: 0;
     left: 0;
@@ -26,45 +26,48 @@
 }
 
 header {
-    background-color: var(--azul-petroleo);
-    border-bottom: 2px solid rgba(219, 243, 255, 0.4);
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0 0 auto;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px;
     width: 100vw;
     height: 60px;
-    margin-bottom: 20px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--azul-petroleo);
+    border-bottom: 2px solid rgba(219, 243, 255, 0.4);
 }
 
 form {
-    margin: 0 auto;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--full-white);
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 0px solid var(--full-white);
-    border-radius: 10px;
     padding: 1rem 2rem;
-    box-shadow: 0 0 10px var(--black);
-    margin-bottom: 10px;
+    color: var(--full-white);
+    background-color: rgba(45, 54, 69, 0.45);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--cinza-escuro);
 }
 
 .auth-login {
     max-width: 420px;
 }
 
+.auth-register {
+    max-width: 800px;
+}
+
 .coline {
     border-right: 1px solid var(--azul-ceu);
 }
 
-.auth-register {
-    max-width: 800px;
+.subtitle {
+    color: grey;
+    font-size: 14px;
 }
 
 .user-pass {
@@ -117,30 +120,40 @@ form {
             height: 20px;
         }
     }
-
-
 }
 
-.row {
 
+.row {
     width: 100%;
 }
 
 .btn-submit {
-    margin-top: 20px;
     width: 100%;
     height: 48px;
-    background: linear-gradient(90deg, var(--cinza-escuro) 0%, var(--azul-ceu) 60%, var(--cinza-escuro) 100%);
-    background-size: 200% auto;
+    margin: 20px 0 1rem;
+
     color: var(--full-white);
-    border: none;
-    border-radius: 8px;
-    letter-spacing: 0.5px;
     font-size: 15px;
     font-weight: 500;
-    cursor: pointer;
-    transition: background-position 0.4s, box-shadow 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+
+    background: linear-gradient(
+        90deg,
+        var(--cinza-escuro) 0%,
+        var(--azul-ceu) 60%,
+        var(--cinza-escuro) 100%
+    );
+    background-size: 200% auto;
+
+    border: none;
+    border-radius: 8px;
     box-shadow: 0 0 18px rgba(58, 130, 246, 0.35);
+
+    cursor: pointer;
+    transition:
+        background-position 0.4s,
+        box-shadow 0.2s,
+        transform 0.1s;
 
     &:hover {
         background-position: right center;
@@ -148,7 +161,7 @@ form {
     }
 
     &:active {
-        transform: scale(.98);
+        transform: scale(0.98);
     }
 }
 
@@ -157,37 +170,62 @@ form {
     gap: 0 24px;
 }
 
-.divider-v {
-    width: 1px;
-    background: rgba(56, 130, 230, 0.4);
-    align-self: stretch;
-}
-
 .col-title {
+    margin-bottom: 20px;
     font-size: 17px;
     font-weight: 600;
-    letter-spacing: .6px;
-    margin-bottom: 20px;
+    letter-spacing: 0.6px;
 }
 
 .forgot {
     display: flex;
     flex-direction: column;
-    align-items: end;
-    font-size: 13px;
-    color: #3a82f6 !important;
-    text-decoration: none;
-    margin-top: -px;
+    align-items: flex-end;
+
+    margin-top: 0;
     margin-bottom: 24px;
-    transition: opacity .2s;
+
+    color: var(--azul-ceu) !important;
+    font-size: 13px;
+    text-decoration: none;
+
+    transition: opacity 0.2s;
 
     &:hover {
-        opacity: .7;
+        opacity: 0.7;
     }
 }
 
 @media (max-width:767px) {
+    form {
+        margin-top: 60px;
+        width: 90%;
+        height: 100%;
+        padding: 1rem;
+    }
+
     .coline{
         border: none;
     }
+
+    .login-active {
+        display: block;
+    }
+
+    .login-inactive {
+        display: none;
+    }
+
+    .auth-register, .auth-login {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .btn-submit{
+        width: 50%;
+    }
+}
+
+.secret {
+    display: none;
 }

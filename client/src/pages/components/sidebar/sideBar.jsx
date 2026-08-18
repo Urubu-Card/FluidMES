@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import './style.css';
 import api from '../../../services/api.js';
+import './style.css';
 
 export default function Sidebar() {
     const location = useLocation(); // Escuta as mudanças de rota

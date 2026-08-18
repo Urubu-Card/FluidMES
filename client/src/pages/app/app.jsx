@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../components/Sidebar/index.jsx'; 
+import Sidebar from '../components/Sidebar/sideBar.jsx'; 
 
 export default function App() {
     return (
