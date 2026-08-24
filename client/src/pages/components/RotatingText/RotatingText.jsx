@@ -12,7 +12,6 @@ const RotatingText = forwardRef((props, ref) => {
     transition = { type: 'spring', damping: 25, stiffness: 300 },
     initial = { y: '100%', opacity: 0 },
     animate = { y: 0, opacity: 1 },
-    exit,
     animatePresenceMode = 'wait',
     animatePresenceInitial = false,
     rotationInterval = 2000,

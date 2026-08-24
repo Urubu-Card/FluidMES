@@ -6,15 +6,21 @@ import CardNav from '../components/NavBar/navBar';
 import logo from '../../../public/logo/android-chrome-192x192.png';
 import './style.css';
 
+import { Link } from 'react-router-dom'
+import RotatingText from '../components/RotatingText/RotatingText'
+import Ferrofluid from '../components/Ferrofluid/Ferrofluid';
+import CardNav from '../components/NavBar/navbar'
+import logo from '../../../public/logo/android-chrome-192x192.png';
+import './landing.css'
 const items = [
     {
         label: "Sobre",
         bgColor: "#3E7DFF",
         textColor: "#fff",
         links: [
-            { label: "Home", ariaLabel: "About Company", href: 'https://google.com' },
-            { label: "Sobre", ariaLabel: "About Company", href: 'https://google.com' },
-            { label: "Funcionalidades", ariaLabel: "About Company", href: 'https://google.com' }
+            { label: "Home", ariaLabel: "About Company", href: 'https://www.google.com/' },
+            { label: "Sobre", ariaLabel: "About Company", href: 'https://www.google.com/' },
+            { label: "Funcionalidades", ariaLabel: "About Company", href: 'https://www.google.com/' }
         ]
     },
     {
@@ -37,8 +43,8 @@ const items = [
     }
 ];
 
-function Landing() {
 
+function Landing() {
     return (
         <div className="landing-page">
             <CardNav
@@ -74,13 +80,13 @@ function Landing() {
                         <span>
                             <RotatingText
                                 texts={[' é inovação', ' é controle', ' é gestão', 'MES']}
-                                mainclassName="px-2 sm:px-2 md:px-3 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+                                mainClassName="px-2 sm:px-2 md:px-3 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
                                 style={{ backgroundColor: '#2E4E99' }}
                                 staggerFrom="center"
                                 initial={{ y: "100%" }}
                                 animate={{ y: 0 }}
                                 staggerDuration={0.02}
-                                splitLevelclassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                                splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
                                 transition={{ type: "spring", damping: 20, stiffness: 500 }}
                                 rotationInterval={1500}
                                 splitBy="lines"
@@ -89,6 +95,12 @@ function Landing() {
                             />
                         </span>
                     </h1>
+                </div>
+            </section>
+
+            <section className="ContentContainer">
+                <div className="Content">
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, aut ipsum exercitationem consectetur deserunt quas nulla libero possimus iure adipisci explicabo impedit eos beatae suscipit sed enim sit labore quam?</p>
                 </div>
             </section>
             <section className="landing-content">
@@ -110,7 +122,7 @@ function Landing() {
                 </div>
             </section>
         </div>
-    );
+    )
 }
 
-export default Landing;
+export default Landing
