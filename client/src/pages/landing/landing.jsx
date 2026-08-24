@@ -1,17 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import RotatingText from '../components/RotatingText/rotatingText';
-import Ferrofluid from '../components/Ferrofluid/ferrofluid';
+import FluidFlow from '../components/Ferrofluid/ferrofluid';
 import CardNav from '../components/NavBar/navBar';
-import logo from '../../../public/logo/android-chrome-192x192.png';
+import logo from '../../../public/logo-01/android-chrome-192x192.png';
 import './style.css';
-
-import { Link } from 'react-router-dom'
-import RotatingText from '../components/RotatingText/RotatingText'
-import Ferrofluid from '../components/Ferrofluid/Ferrofluid';
-import CardNav from '../components/NavBar/navbar'
-import logo from '../../../public/logo/android-chrome-192x192.png';
-import './landing.css'
 const items = [
     {
         label: "Sobre",
@@ -51,36 +44,32 @@ function Landing() {
                 logo={logo}
                 logoAlt="Company Logo"
                 items={items}
-                baseColor="#24282e"
+                baseColor={"var(--cinza-escuro)"}
                 menuColor={"var(--branco-azulado)"}
                 buttonBgColor="var(--azul-ceu)"
                 buttonTextColor="var(--branco-azulado)"
                 ease="circ.out"
                 theme="dark"
+                onclick={()=>{
+                    const background = document.getElementsByClassName("landing-hero")[0];
+                    background.style.filter = "blur(5px)"
+                }}
             />
 
             <section className="landing-hero">
-                <Ferrofluid
-                    className="ferrofluid"
+                <FluidFlow
+                    className="landing-bg"
                     colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
-                    speed={0.1}
-                    scale={1.6}
-                    turbulence={1}
-                    fluidity={0.15}
-                    rimWidth={0.2}
-                    sharpness={2.5}
-                    shimmer={1.5}
-                    glow={3}
-                    flowDirection="down"
-                    opacity={1}
-                    mouseInteraction={false}
+                    speed={0.35}
+                    waveCount={4}
+                    particleCount={35}
                 />
                 <div className='content'>
                     <h1>Fluid
                         <span>
                             <RotatingText
                                 texts={[' é inovação', ' é controle', ' é gestão', 'MES']}
-                                mainClassName="px-2 sm:px-2 md:px-3 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+                                mainClassName="px-2 sm:px-2 md:px-3 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 flex items-center justify-center rounded-lg"
                                 style={{ backgroundColor: '#2E4E99' }}
                                 staggerFrom="center"
                                 initial={{ y: "100%" }}
@@ -98,11 +87,7 @@ function Landing() {
                 </div>
             </section>
 
-            <section className="ContentContainer">
-                <div className="Content">
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, aut ipsum exercitationem consectetur deserunt quas nulla libero possimus iure adipisci explicabo impedit eos beatae suscipit sed enim sit labore quam?</p>
-                </div>
-            </section>
+
             <section className="landing-content">
                 <div className="container">
                     <h2>Our Services</h2>

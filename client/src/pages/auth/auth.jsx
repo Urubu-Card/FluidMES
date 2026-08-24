@@ -78,9 +78,9 @@ export default function Auth() {
         <div className='auth-page container-fluid p-0'>
             <div className={`${isLogin ? 'login-active' : 'login-inactive'}`}>
                 {<Particles 
-                    quantity={65}
+                    quantity={35}
                     color="#3E7DFF"
-                    speed={2.5}
+                    speed={5.5}
                     lineDistance={200}
                 />}
             </div>

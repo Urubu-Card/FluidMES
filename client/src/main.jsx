@@ -7,21 +7,22 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import './index.css'
 
-import LandingPage from './pages/landing/landing.jsx'
-import Auth from './pages/auth/auth.jsx'
-import ForgotPassword from './pages/forgot/forgot.jsx'
+import LandingPage from './pages/Landing/landing.jsx'
+import Auth from './pages/Auth/auth.jsx'
+import ForgotPassword from './pages/Forgot/forgot.jsx'
 import App from './pages/app/app.jsx'
+import Otp from './pages/otp/otp.jsx'
 
 
 // PAGINAS INTERNAS
-import Home from './pages/app/home/home.jsx'
-import Pedidos from './pages/app/pedidos/pedidos.jsx'
-import Rendimento from './pages/app/rendimentos/rendimentos.jsx'
-import Funcionarios from './pages/app/funcionarios/funcionarios.jsx'
-import Plantas from './pages/app/plantas/plantas.jsx'
-import Receitas from './pages/app/receitas/receitas.jsx'
-import Configuracoes from './pages/app/configuracoes/config.jsx'
-import Profile from './pages/app/profile/profile.jsx'
+import Home from './pages/app/Home/home.jsx'
+import Pedidos from './pages/app/Pedidos/pedidos.jsx'
+import Rendimento from './pages/app/Rendimentos/rendimentos.jsx'
+import Funcionarios from './pages/app/Funcionarios/funcionarios.jsx'
+import Plantas from './pages/app/Plantas/plantas.jsx'
+import Receitas from './pages/app/Receitas/receitas.jsx'
+import Configuracoes from './pages/app/Configuracoes/config.jsx'
+import Profile from './pages/app/Profile/profile.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/auth' element={<Auth />} />
         {/* ESQUECI MINHA SENHA */}
         <Route path='/auth/forgot-password' element={<ForgotPassword />} />
+        <Route path='/auth/otp' element={<Otp />} />
 
         {/* PAINEL DO SISTEMA (Agrupado sob a rota /app) */}
         <Route path='/app' element={<App />}>

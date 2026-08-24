@@ -113,6 +113,7 @@ form {
         top: 50%;
         transform: translateY(-50%);
         display: flex;
+        color: var(--branco-azulado);
 
         svg {
             color: var(--branco-azulado);
@@ -227,5 +228,5 @@ form {
 }
 
 .secret {
-    display: none;
+    display: flex;
 }

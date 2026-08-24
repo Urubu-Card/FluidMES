@@ -1,0 +1,137 @@
+.forgot-page {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: var(--azul-petroleo);
+}
+
+.forgot-form {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--full-white);
+    background-color: rgba(13, 17, 23, .5);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--cinza-escuro);
+}
+
+.forgot-form h2 {
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.forgot-form .subtitle {
+    max-width: 320px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.forgot-form .user-pass {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.forgot-form .user-pass input {
+    width: 100%;
+    height: 50px;
+    padding: 0 42px 0 14px;
+    color: var(--full-white);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(56, 130, 230, 0.35);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.forgot-form .user-pass input::placeholder {
+    color: #7a90b0;
+}
+
+.forgot-form .user-pass input:focus {
+    border-color: rgba(56, 130, 230, 0.85);
+    box-shadow: 0 0 0 3px rgba(58, 130, 246, 0.18);
+}
+
+.forgot-form .user-pass input:-webkit-autofill,
+.forgot-form .user-pass input:-webkit-autofill:hover,
+.forgot-form .user-pass input:-webkit-autofill:focus,
+.forgot-form .user-pass input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 100px rgba(0, 0, 0, 0.3) inset !important;
+    -webkit-text-fill-color: var(--branco-azulado) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.forgot-form .user-pass i {
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    display: flex;
+    transform: translateY(-50%);
+    color: var(--branco-azulado);
+}
+
+.forgot-form .btn-submit {
+    width: 100%;
+    margin-top: 25px;
+}
+
+.error-text,
+.success-text {
+    width: 100%;
+    margin: 10px 0 5px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.error-text {
+    color: #ff8f8f;
+    background: rgba(255, 0, 0, 0.08);
+}
+
+.success-text {
+    color: #8fffa8;
+    background: rgba(0, 255, 100, 0.08);
+}
+
+.back-login {
+    margin-top: 10px;
+}
+
+.back-login a {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--azul-ceu) !important;
+    font-size: 13px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.back-login a:hover {
+    opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+    .forgot-form {
+        width: 90%;
+        margin-top: 60px;
+        padding: 1.5rem;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .forgot-form .btn-submit {
+        width: 100%;
+    }
+}

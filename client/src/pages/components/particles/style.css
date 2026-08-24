@@ -16,9 +16,3 @@ body {
 canvas {
     display: block;
 }
-
-@media (max-width: 650px) {
-    #particles-js {
-        display: none;
-    }
-}
