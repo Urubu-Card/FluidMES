@@ -1,57 +1,57 @@
-body {
-    background-color: var(--cinza-escuro);
-    color: var(--full-white);
-    margin: 0;
-}
+.landing-page {
+    body {
+        background-color: var(--cinza-escuro);
+        color: var(--full-white);
+        margin: 0;
+    }
 
-section {
-    min-width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
+    section {
+        min-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
 
-.landing-hero {
-    position: relative;
-    align-items: center;
-    justify-content: center;
-}
+    .landing-hero {
+        position: relative;
+        align-items: center;
+        justify-content: center;
+    }
 
+    .content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 
-.content {
-    position: relative;
-    z-index: 1;
+    .landing-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        filter: blur();
+    }
+    .content h1 {
+        font-size: 10rem;
+        margin: 0;
+        display: flex;  
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        
+    }
 
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.landing-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    filter: blur();
-}
-.content h1 {
-  font-size: 10rem;
-    margin: 0;
-    display: flex;  
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    
-}
-
-.content h1 span {
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--branco-azulado);
+    .content h1 span {
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--branco-azulado);
+    }
 }

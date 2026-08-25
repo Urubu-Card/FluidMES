@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import './fluidFlow.css';
+import './style.css';
 
 function FluidFlow({
     className = '',

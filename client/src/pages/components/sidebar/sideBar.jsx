@@ -8,8 +8,8 @@ export default function Sidebar() {
     const sidebarRef = useRef(null); // Referência para a sidebar
     const indicadorRef = useRef(null); // Referência para a barra verde
 
-    const [dropdown, setDropdown] = useState(false);
     const [userExit, setUserExit] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Controle do offcanvas (telas pequenas)
 
     // ESTADO INICIAL COM VALORES DE CARREGAMENTO
     const [usuario, setUsuario] = useState({
@@ -22,25 +22,22 @@ export default function Sidebar() {
     useEffect(() => {
         async function carregarDadosUsuario() {
             try {
-                // Recupera o token salvo no localStorage para autenticar a chamada
                 const token = localStorage.getItem('@api:token');
-                console.log(localStorage.getItem('@api:refresh'));
-                console.log(localStorage.getItem('@api:token'));
-                // Mantida a URL completa para evitar erros de rota no Front-end
+
                 const response = await api.get('/api/me/', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
-                if ( response.status !== 200) {
+                if (response.status !== 200) {
                     throw new Error('Não foi possível carregar os dados do perfil.');
                 }
 
                 const dados = await response.data;
-                
+
                 setUsuario({
                     primeiroNome: dados.first_name || 'Usuário',
                     segundoNome: dados.last_name || '',
@@ -61,10 +58,11 @@ export default function Sidebar() {
         carregarDadosUsuario();
     }, []);
 
+    // Move o indicador animado para o link ativo
     useEffect(() => {
         if (!sidebarRef.current || !indicadorRef.current) return;
 
-        const linkAtivo = sidebarRef.current.querySelector('aside a.active');
+        const linkAtivo = sidebarRef.current.querySelector('a.active');
 
         if (linkAtivo) {
             const topo = linkAtivo.offsetTop;
@@ -78,90 +76,116 @@ export default function Sidebar() {
         }
     }, [location.pathname]);
 
+    // Fecha o menu (mobile) automaticamente ao trocar de rota
     useEffect(() => {
-        if (userExit) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
+        setSidebarOpen(false);
+    }, [location.pathname]);
+
+    // Trava o scroll do body quando o modal de saída ou o menu mobile estão abertos
+    useEffect(() => {
+        document.body.style.overflow = (userExit || sidebarOpen) ? 'hidden' : 'auto';
 
         return () => {
             document.body.style.overflow = 'auto';
         };
-    }, [userExit]);
+    }, [userExit, sidebarOpen]);
 
     const primeiroNome = usuario.primeiroNome || 'Usuário';
     const segundoNome = usuario.segundoNome || '';
 
     return (
         <>
-            <aside ref={sidebarRef}>
-                <div>
-                    <NavLink to='/app/profile' className='profile'>
-                        <div className='avatar-container'>
+            {/* ALÇA / SETA - visível apenas em telas pequenas (< lg) */}
+            <button
+                type='button'
+                className={`sidebar-handle d-lg-none btn p-0 ${sidebarOpen ? 'is-open' : ''}`}
+                onClick={() => setSidebarOpen(prev => !prev)}
+                aria-expanded={sidebarOpen}
+                aria-controls='mainSidebar'
+                aria-label={sidebarOpen ? 'Fechar menu' : 'Abrir menu'}
+            >
+                <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+            </button>
+
+            {/* BACKDROP - apenas mobile, quando o menu está aberto */}
+            {sidebarOpen && (
+                <div
+                    className='offcanvas-backdrop fade show d-lg-none'
+                    onClick={() => setSidebarOpen(false)}
+                ></div>
+            )}
+
+            <aside
+                id='mainSidebar'
+                ref={sidebarRef}
+                className={`sidebar offcanvas-lg offcanvas-start d-flex flex-column justify-content-between align-items-center py-3 ${sidebarOpen ? 'show' : ''}`}
+                tabIndex='-1'
+            >
+                <div className='w-100 d-flex flex-column align-items-center px-0'>
+                    <NavLink to='/app/profile' className='profile d-flex align-items-center gap-2 p-2 rounded-3 mb-2'>
+                        <div className='avatar-container flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center overflow-hidden'>
                             {usuario.fotoUrl ? (
                                 <img src={usuario.fotoUrl} alt='Foto do usuário' className='avatar-img' />
                             ) : (
-                                <span className='avatar-placeholder'>
+                                <span className='fw-bold fs-5'>
                                     {usuario.primeiroNome ? usuario.primeiroNome.charAt(0).toUpperCase() : 'U'}
                                 </span>
                             )}
                         </div>
-                        <div>
-                            <p className='cargo'>{usuario.cargo}</p>
-                            <h2 className='name'>{primeiroNome} {segundoNome}</h2>
+                        <div className='text-truncate'>
+                            <p className='cargo text-uppercase mb-0'>{usuario.cargo}</p>
+                            <h2 className='name mb-0 text-truncate'>{primeiroNome} {segundoNome}</h2>
                         </div>
                     </NavLink>
-                    <p className='welcome'>Bem Vindo, {primeiroNome}!</p>
-                    <nav>
-                        {/* HOME */}
-                        <NavLink to='/app/home'>
+
+                    <p className='welcome w-100 mb-4'>Bem Vindo, {primeiroNome}!</p>
+
+                    <nav className='w-100 d-flex flex-column align-items-center gap-1'>
+                        <NavLink to='/app/home' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-house'></i>
-                            <p>Home</p>
+                            <p className='mb-0'>Home</p>
                         </NavLink>
 
-                        {/* PEDIDOS */}
-                        <NavLink to='/app/pedidos'>
+                        <NavLink to='/app/pedidos' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-file-earmark'></i>
-                            <p>Pedidos</p>
+                            <p className='mb-0'>Pedidos</p>
                         </NavLink>
 
-                        {/* RENDIMENTO */}
-                        <NavLink to='/app/rendimento'>
+                        <NavLink to='/app/rendimento' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-graph-up-arrow'></i>
-                            <p>Rendimento</p>
+                            <p className='mb-0'>Rendimento</p>
                         </NavLink>
 
-                        {/* FUNCIONÁRIOS */}
-                        <NavLink to='/app/funcionarios'>
+                        <NavLink to='/app/funcionarios' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-person-vcard'></i>
-                            <p>Funcionários</p>
+                            <p className='mb-0'>Funcionários</p>
                         </NavLink>
 
-                        {/* PLANTAS */}
-                        <NavLink to='/app/plantas'>
+                        <NavLink to='/app/plantas' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-cpu'></i>
-                            <p>Plantas</p>
+                            <p className='mb-0'>Plantas</p>
                         </NavLink>
 
-                        {/* RECEITAS */}
-                        <NavLink to='/app/receitas'>
+                        <NavLink to='/app/receitas' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-flask'></i>
-                            <p>Receitas</p>
+                            <p className='mb-0'>Receitas</p>
                         </NavLink>
                     </nav>
                 </div>
-                <nav>
-                    {/* CONFIGURAÇÕES */}
-                    <NavLink to='/app/configuracoes' className='config-btn'>
+
+                <nav className='w-100 d-flex flex-column align-items-center gap-1'>
+                    <NavLink to='/app/configuracoes' className='sidebar-link config-btn d-flex align-items-center gap-2 w-100 rounded-3'>
                         <i className='bi bi-gear'></i>
-                        <p>Configurações</p>
+                        <p className='mb-0'>Configurações</p>
                     </NavLink>
 
-                    {/* SAIR */}
-                    <button className='logout-btn' onClick={() => setUserExit(true)}>
+                    <button
+                        type='button'
+                        className='sidebar-link logout-btn d-flex align-items-center gap-2 w-100 rounded-3 border-0 bg-transparent'
+                        onClick={() => setUserExit(true)}
+                    >
                         <i className='bi bi-box-arrow-left'></i>
-                        <p>Sair da conta</p>
+                        <p className='mb-0'>Sair da conta</p>
                     </button>
                 </nav>
 
@@ -169,16 +193,32 @@ export default function Sidebar() {
             </aside>
 
             {userExit && (
-                <div className='bg-modal'>
-                    <div className='modal-content'>
-                        <p>Tem certeza que deseja sair da conta?</p>
-                        <button onClick={() => setUserExit(false)}>Cancelar</button>
-                        <NavLink to='/auth' onClick={() => {
-                            localStorage.removeItem('@api:token');
-                            localStorage.removeItem('@api:refresh');
-                            localStorage.removeItem('@api:user');
-                            setUserExit(false);
-                        }}>Sair</NavLink>
+                <div className='modal fade show d-block' tabIndex='-1' role='dialog'>
+                    <div className='modal-dialog modal-dialog-centered'>
+                        <div className='modal-content sidebar-modal-content text-center p-4'>
+                            <p className='mb-4'>Tem certeza que deseja sair da conta?</p>
+                            <div className='d-flex justify-content-center gap-2'>
+                                <button
+                                    type='button'
+                                    className='btn btn-cancel px-4'
+                                    onClick={() => setUserExit(false)}
+                                >
+                                    Cancelar
+                                </button>
+                                <NavLink
+                                    to='/auth'
+                                    className='btn btn-danger px-4'
+                                    onClick={() => {
+                                        localStorage.removeItem('@api:token');
+                                        localStorage.removeItem('@api:refresh');
+                                        localStorage.removeItem('@api:user');
+                                        setUserExit(false);
+                                    }}
+                                >
+                                    Sair
+                                </NavLink>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

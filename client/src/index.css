@@ -5,6 +5,7 @@
     padding: 0rem;
     box-sizing: border-box;
     font-family: "Exo 2", sans-serif;
+    color: var(--branco-azulado);
 }
 
 :root {

@@ -87,7 +87,6 @@ function Landing() {
                 </div>
             </section>
 
-
             <section className="landing-content">
                 <div className="container">
                     <h2>Our Services</h2>
