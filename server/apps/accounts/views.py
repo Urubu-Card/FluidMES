@@ -25,6 +25,54 @@ class CadastroView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PasswordResetRequestView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        serializer = PasswordRestRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            reset_token =PasswordResetToken.objects.create(user=user)
+            link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token.token}"
+            send_mail(
+                subject="Redefinição de senha - FluidMES",
+                message=f"Clique no link para redefinir sua senha: {link}\nExpira em 1 hora.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+
+            )
+        return Response(
+            {"detail":"Se o email existir,enviamos as instruções para o redefinimento da senha"},
+            status=status.HTTP_200_OK
+        )   
+    
+class PasswordRestConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request,):
+        serializer = PasswordRestConfirmSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        token_value = serializer.validated_data['token']
+        nova_senha = serializer.validated_data['nova_senha']
+        
+        reset_token = PasswordResetToken.objects.filter(token=token_value).first()
+        
+        if not reset_token or not reset_token.is_valid():
+            return Response({"detail":"Token espirado ou invalido"},status=status.HTTP_400_BAD_REQUEST)
+        
+        user = reset_token.user
+        user.set_password(nova_senha)
+        user.save()
+        
+        reset_token.used =True
+        reset_token.save()
+        
+        PasswordResetToken.objects.filter(user=user, used=False).exclude(id=reset_token.id).update(used=True)
+        
+        return Response({"detail": "Senha Redefina com sucesso"},status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     
@@ -54,8 +102,7 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
             
         except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(status=status.HTTP_400_BAD_REQUEST)   
         
 class MeView(APIView):
     
