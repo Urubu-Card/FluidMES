@@ -1,10 +1,15 @@
-from rest_framework import serializers
-from django.contrib.auth import authenticate
-from apps.accounts.models import Usuarios , Empresa
 from validate_docbr import CPF, CNPJ
+from rest_framework import serializers
+from apps.accounts.models import Usuarios , Empresa
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+
+User = get_user_model()
 
 validator_cpf = CPF()
 validator_cnpj = CNPJ()
+
 
 
 class EmpresaSerializer(serializers.ModelSerializer):

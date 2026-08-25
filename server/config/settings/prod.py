@@ -15,3 +15,14 @@ DATABASES = {
         'PORT':     os.environ.get('DB_PORT', '5432'),
     }
 }
+
+
+# config/settings/prod.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  
+EMAIL_HOST_PASSWORD = os.environ('SENDGRID_API_KEY')  
+DEFAULT_FROM_EMAIL = 'noreply@fluidmes.com'
+FRONTEND_URL = 'https://fluidmes.com'

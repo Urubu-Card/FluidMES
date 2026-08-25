@@ -1,8 +1,14 @@
 from rest_framework.views                     import APIView
 from rest_framework.response                  import Response
-from rest_framework                           import status
+from rest_framework                           import status , permissions
 from rest_framework_simplejwt.tokens          import RefreshToken
-from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer
+from apps.accounts.models                     import PasswordResetToken
+from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer
+from django.contrib.auth                      import get_user_model
+from django.core.mail                         import send_mail
+from django.conf                              import settings
+
+User = get_user_model()
 
 class CadastroView(APIView):
     
@@ -35,7 +41,6 @@ class LoginView(APIView):
                 'usuario': UsuarioSerializer(user).data,
             })
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
     
 class LogoutView(APIView):
     
