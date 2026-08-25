@@ -5,8 +5,9 @@ from rest_framework_simplejwt.tokens          import RefreshToken
 from apps.accounts.models                     import PasswordResetToken
 from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer
 from django.contrib.auth                      import get_user_model
-from django.core.mail                         import send_mail
+from django.core.mail                         import EmailMultiAlternatives
 from django.conf                              import settings
+from django.template.loader                   import render_to_string
 
 User = get_user_model()
 
@@ -37,13 +38,21 @@ class PasswordResetRequestView(APIView):
         if user:
             reset_token =PasswordResetToken.objects.create(user=user)
             link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token.token}"
-            send_mail(
+            context = {
+                'username':user.first_name,
+                'reset_url':link
+            }
+            html_content = render_to_string('registration/password_reset_email.html', context)
+            text_content = render_to_string('registration/password_reset_email.txt', context)
+            msg = EmailMultiAlternatives(
                 subject="Redefinição de senha - FluidMES",
-                message=f"Clique no link para redefinir sua senha: {link}\nExpira em 1 hora.",
+                body=text_content,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
+                to=[user.email],
 
             )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
         return Response(
             {"detail":"Se o email existir,enviamos as instruções para o redefinimento da senha"},
             status=status.HTTP_200_OK
