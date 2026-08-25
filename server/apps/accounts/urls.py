@@ -8,5 +8,6 @@ urlpatterns = [
     path('api/me/',                         views.MeView.as_view(),                                  ),
     path('api/logout/',                     views.LogoutView.as_view(),                              ),
     path('api/token/refresh/',              TokenRefreshView.as_view(),                              ),
-    
+    path('api/password-reset/',             views.PasswordResetRequestView.as_view(),                ),
+    path('api/password-reset/confirm/',     views.PasswordRestConfirmView.as_view(),                 ),
 ]
