@@ -10,7 +10,13 @@ User = get_user_model()
 validator_cpf = CPF()
 validator_cnpj = CNPJ()
 
+class PasswordRestRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
 
+class PasswordRestConfirmSerializer(serializers.Serializer):
+    token = serializers.UUIDField()
+    nova_senha = serializers.CharField(write_only= True,validators= [validate_password])
 
 class EmpresaSerializer(serializers.ModelSerializer):
      
