@@ -3,7 +3,7 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
-import axios from 'axios';
+//import axios from 'axios';
 import './style.css';
 
 export default function Auth() {
@@ -16,6 +16,7 @@ export default function Auth() {
     // Estados dos inputs compartilhados e específicos
     const [cpf, setCpf] = useState('');
     const [password, setPassword] = useState('');
+    const [usuario,setUsuario]= useState('')
 
     // Estados exclusivos do cadastro
     const [nomeEmpresa, setNomeEmpresa] = useState('');
@@ -49,6 +50,7 @@ export default function Auth() {
                     usuario: cpf, email,
                     password
                 });
+                console.log(response)
                 /*
                 localStorage.setItem('@api:token', response.data.acess);
                 localStorage.setItem('@api:refresh', response.data.refresh);
@@ -193,13 +195,12 @@ export default function Auth() {
                         <div className='row g-4'>
                             <div>
                             <div className='user-pass'>
-                                <PatternFormat
+                                <input
                                         type='text'
-                                        format='##.###.###/####-##'
-                                        placeholder='CNPJ'
+                                        placeholder='Email/CPF'
                                         required
-                                        value={cnpj}
-                                        onValueChange={(values) => setCnpj(values.value)}
+                                        value={usuario}
+                                        onChange={e => setUsuario(e.target.value)}
                                     />
                                     <i className='bi bi-person-vcard'></i>
                             </div>

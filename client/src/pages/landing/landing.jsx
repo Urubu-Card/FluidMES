@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+//import { useState, useRef ,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import RotatingText from '../components/RotatingText/rotatingText';
 import FluidFlow from '../components/Ferrofluid/ferrofluid';
 import CardNav from '../components/NavBar/navBar';
-import logo from '../../../public/logo-01/android-chrome-192x192.png';
+import logo from '/logo-01/android-chrome-192x192.png?url';
 import './style.css';
 const items = [
     {
@@ -57,13 +57,7 @@ function Landing() {
             />
 
             <section className="landing-hero">
-                <FluidFlow
-                    className="landing-bg"
-                    colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
-                    speed={0.35}
-                    waveCount={4}
-                    particleCount={35}
-                />
+                
                 <div className='content'>
                     <h1>Fluid
                         <span>
@@ -108,5 +102,6 @@ function Landing() {
         </div>
     )
 }
+
 
 export default Landing

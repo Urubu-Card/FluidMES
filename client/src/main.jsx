@@ -7,15 +7,15 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import './index.css'
 
-import LandingPage from './pages/Landing/landing.jsx'
-import Auth from './pages/Auth/auth.jsx'
+import LandingPage from './pages/landing/landing.jsx'
+import Auth from './pages/auth/auth.jsx'
 import ForgotPassword from './pages/Forgot/forgot.jsx'
 import App from './pages/app/app.jsx'
 import Otp from './pages/otp/otp.jsx'
 
 
 // PAGINAS INTERNAS
-import Home from './pages/app/Home/home.jsx'
+//import Home from './pages/app/Home/home.jsx'
 import Pedidos from './pages/app/Pedidos/pedidos.jsx'
 import Rendimento from './pages/app/Rendimentos/rendimentos.jsx'
 import Funcionarios from './pages/app/Funcionarios/funcionarios.jsx'
@@ -43,7 +43,7 @@ createRoot(document.getElementById('root')).render(
           <Route index element={<Navigate to='/app/home' replace />} />
           
           {/* SUB-ROTAS */}
-          <Route path='home' element={<Home />} />
+          {/*<Route path='home' element={<Home />} />*/}
           <Route path='profile' element={<Profile />} />
           <Route path='pedidos' element={<Pedidos />} />
           <Route path='rendimento' element={<Rendimento />} />
