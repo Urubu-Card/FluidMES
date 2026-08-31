@@ -1,0 +1,42 @@
+.spinner {
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--azul-petroleo);
+    
+    /* Centraliza o texto e as bolinhas na tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; /* Ajuste a cor do texto se necessário */
+    font-family: sans-serif;
+    font-size: 3rem;
+}
+
+/* Aplica a animação em todas as bolinhas */
+.spinner span {
+    display: inline-block;
+    animation: pular 0.6s infinite alternate;
+}
+
+/* Cria o atraso (delay) para o efeito de onda */
+.spinner span:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.spinner span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.spinner span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Define o movimento de pulo */
+@keyframes pular {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-10px); /* Altura do pulo */
+    }
+}

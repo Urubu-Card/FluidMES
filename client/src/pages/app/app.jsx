@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/sideBar.jsx';
 import api from '../../services/api.js';
+import './style.css'
 
 export default function App() {
     const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function App() {
     }, [navigate]);
 
     if (isLoading) {
-        return <div className="spinner">Verificando permissão...</div>; 
+        return <div className="spinner">Verificando permissão<span>.</span><span>.</span><span>.</span></div>; 
     }
 
     return (
