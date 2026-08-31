@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './style.css';
+import api from '../../../services/api.js';
+
 
 export default function Sidebar({ dados }) {
     const location = useLocation();
@@ -12,7 +14,7 @@ export default function Sidebar({ dados }) {
 
     const primeiroNome = dados?.first_name || 'Usuário';
     const segundoNome = dados?.last_name || '';
-    const cargo = dados?.cargo || 'Não informado';
+    const cargo = dados?.role || 'Não informado';
     const fotoUrl = dados?.fotoUrl || null;
 
     useEffect(() => {
@@ -154,9 +156,9 @@ export default function Sidebar({ dados }) {
                                     to='/auth'
                                     className='btn btn-danger px-4'
                                     onClick={() => {
-                                        localStorage.removeItem('@api:token');
-                                        localStorage.removeItem('@api:refresh');
-                                        setUserExit(false);
+                                        const response = api.post("/api/logout/")
+                                        console.log(response)
+                                        
                                     }}
                                 >
                                     Sair

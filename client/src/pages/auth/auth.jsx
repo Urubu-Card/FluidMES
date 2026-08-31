@@ -3,7 +3,6 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
-//import axios from 'axios';
 import './style.css';
 
 export default function Auth() {
@@ -16,7 +15,7 @@ export default function Auth() {
     // Estados dos inputs compartilhados e específicos
     const [cpf, setCpf] = useState('');
     const [password, setPassword] = useState('');
-    const [usuario,setUsuario]= useState('')
+    const [usuario, setUsuario] = useState('');
 
     // Estados exclusivos do cadastro
     const [nomeEmpresa, setNomeEmpresa] = useState('');
@@ -25,13 +24,17 @@ export default function Auth() {
     const [ultimoNome, setUltimoNome] = useState('');
     const [email, setEmail] = useState('');
 
-    useEffect(()=>{
-        const token = localStorage.getItem("@api:token");
-        if (token) {
-            
-            navigate("/app");
-        }
-    },[navigate])
+    useEffect(() => {
+
+        api.get('/api/me/')
+            .then(() => {
+                navigate("/app");
+            })
+            .catch(() => {
+                // Se der erro (ex: 401), significa que não há sessão ativa. 
+                // O usuário continua na tela de autenticação tranquilamente.
+            });
+    }, [navigate]);
 
     // Limpa os estados para esvaziar os inputs controlados da tela
     function limparCampos() {
@@ -54,14 +57,13 @@ export default function Auth() {
 
         try {
             if (isLogin) {
+                console.log("RESPOSTA")
                 const response = await api.post('/api/login/', {
                     usuario: usuario,
                     password
                 });
-                //console.log(response)
-                localStorage.setItem('@api:token', response.data.acess);
-                localStorage.setItem('@api:refresh', response.data.refresh);
-                
+                console.log("RESPOSTA"+response)
+
                 navigate('/app');
             } else {
                 await api.post('/api/cadastro/', {
@@ -79,14 +81,16 @@ export default function Auth() {
                 limparCampos();
             }
         } catch (error) {
-            setErro(error.response?.data?.erro || 'Erro ao processar a requisição.');
+            // Garante capturar os erros vindos da validação do serializer do Django
+            setErro(error.response?.data?.erro || error.response?.data?.detail || 'Erro ao processar a requisição.');
         }
     }
+
 
     return (
         <div className='auth-page container-fluid p-0'>
             <div className={`${isLogin ? 'login-active' : 'login-inactive'}`}>
-                {<Particles 
+                {<Particles
                     quantity={35}
                     color="#3E7DFF"
                     speed={5.5}
@@ -100,9 +104,9 @@ export default function Auth() {
                         FluidMES
                     </NavLink>
                 </header>
-                
+
                 <form ref={formRef} onSubmit={enviarSubmit} className={`w-100 mx-auto ${isLogin ? 'auth-login' : 'auth-register'}`}>
-                    <h2>{isLogin ? 'Entrar':'Cadastrar-se'}</h2>
+                    <h2>{isLogin ? 'Entrar' : 'Cadastrar-se'}</h2>
                     <p className='subtitle'>{isLogin ? 'Faça login para acessar sua conta' : 'Crie sua conta para começar'}</p>
                     {erro && <p className='error-text'>{erro}</p>}
 
@@ -136,7 +140,7 @@ export default function Auth() {
                                 </div>
                             </div>
 
-                            
+
 
                             {/* Coluna Pessoal */}
                             <div className=' col-12 col-md-6'>
@@ -198,11 +202,11 @@ export default function Auth() {
 
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
-                    
+
                         <div className='row g-4'>
                             <div>
-                            <div className='user-pass'>
-                                <input
+                                <div className='user-pass'>
+                                    <input
                                         type='text'
                                         placeholder='Email/CPF'
                                         required
@@ -210,9 +214,9 @@ export default function Auth() {
                                         onChange={e => setUsuario(e.target.value)}
                                     />
                                     <i className='bi bi-person-vcard'></i>
-                            </div>
+                                </div>
 
-                            
+
                                 <div className='user-pass'>
                                     <input
                                         type='password'

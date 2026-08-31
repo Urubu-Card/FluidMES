@@ -9,7 +9,7 @@ import './index.css'
 
 import LandingPage from './pages/landing/landing.jsx'
 import Auth from './pages/auth/auth.jsx'
-import ForgotPassword from './pages/Forgot/forgot.jsx'
+import ForgotPassword from './pages/forgot/forgot.jsx'
 import App from './pages/app/app.jsx'
 import Otp from './pages/otp/otp.jsx'
 

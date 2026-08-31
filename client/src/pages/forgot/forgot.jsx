@@ -19,8 +19,8 @@ export default function ForgotPassword() {
         setSucesso('');
 
         try {
-            await api.post('/api/forgot-password/', {
-                email
+            await api.post("/api/password-reset/", {
+                "email":email
             });
 
             setSucesso(
