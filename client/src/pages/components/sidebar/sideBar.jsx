@@ -18,7 +18,7 @@ export default function Sidebar({ dados }) {
     useEffect(() => {
         if (!sidebarRef.current || !indicadorRef.current) return;
 
-        // 3. setTimeout(..., 0) garante que o React Router já aplicou a classe "active" no DOM
+        
         setTimeout(() => {
             const linkAtivo = sidebarRef.current.querySelector('a.active');
 

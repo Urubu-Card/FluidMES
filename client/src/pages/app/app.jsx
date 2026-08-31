@@ -13,7 +13,6 @@ export default function App() {
             try {
                 const token = localStorage.getItem('@api:token');
 
-                // 2. Removido o method: 'POST' de dentro do api.get
                 const response = await api.get('/api/me/', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -21,19 +20,17 @@ export default function App() {
                     }
                 });
 
-                // 3. Atualiza o estado com os dados recebidos (sem await)
                 setDadosUsuario(response.data);
                 setIsLoading(false);
 
             } catch (error) {
                 console.error('Erro ao buscar dados do usuário:', error);
                 
-                // 4. A checagem do 401 Unauthorized agora fica no catch
+                //Se estiver em test retirar o navigate
                 if (error.response && error.response.status === 401) {
                     navigate('/auth');
                 }
-                
-                // Opcional: tirar o loading mesmo se falhar
+
                 setIsLoading(false); 
             }
         }

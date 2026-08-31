@@ -76,7 +76,7 @@
 }
 
 .caixinha{
-    background: var(--branco-azulado);
+    color: var(--branco-azulado);
     height: 40px;
     width: 20px;
     border-radius: 10px;

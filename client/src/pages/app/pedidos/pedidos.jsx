@@ -13,7 +13,7 @@ function Home() {
                 </div>
                 <div className='stsPedidos'>
                     <div className='totalPedidos'>
-                        <div classname="caixinha"><i class="bi bi-card-checklist"></i></div>
+                        <div className="caixinha"><i className="bi bi-card-checklist"></i></div>
                         <div>
                             <h3>Total pedidos:</h3>
                             <p>numero legal em porcentagem</p>
