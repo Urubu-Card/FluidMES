@@ -11,6 +11,27 @@ from django.template.loader                   import render_to_string
 
 User = get_user_model()
 
+
+def set_jwt_cookies(response, access_token, refresh_token):
+    response.set_cookie(
+        key=settings.AUTH_COOKIE_ACCESS,
+        value=str(access_token),
+        expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+        secure=settings.AUTH_COOKIE_SECURE,
+        httponly=settings.AUTH_COOKIE_HTTPONLY,
+        samesite=settings.AUTH_COOKIE_SAMESITE,
+    )
+    response.set_cookie(
+        key=settings.AUTH_COOKIE_REFRESH,
+        value=str(refresh_token),
+        expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
+        secure=settings.AUTH_COOKIE_SECURE,
+        httponly=settings.AUTH_COOKIE_HTTPONLY,
+        samesite=settings.AUTH_COOKIE_SAMESITE,
+    )
+    return response
+
+
 class CadastroView(APIView):
     
     def post(self, request ):
@@ -86,33 +107,74 @@ class PasswordRestConfirmView(APIView):
 class LoginView(APIView):
     
     def post(self,request):
-        serializer = LoginSerializer(data=request.data,context={'request': request})
-        
+        serializer = LoginSerializer(data=request.data, context={'request': request})
         
         if serializer.is_valid():
-            user    = serializer.validated_data['user']
+            user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'acess'  : str(refresh.access_token),
-                'refresh': str(refresh),
+            
+            response = Response({
                 'usuario': UsuarioSerializer(user).data,
-            })
+            }, status=status.HTTP_200_OK)
+            
+    
+            return set_jwt_cookies(response, refresh.access_token, refresh)
+        
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
     
     
     def post(self,request):
+        response = Response({"detail": "Logout efetuado com sucesso!"}, status=status.HTTP_200_OK)
         
         try:
-            refresh = request.data['refresh']
-            token   = RefreshToken(refresh)
-            token.blacklist()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            refresh_token = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH)
+            if refresh_token:
+                token   = RefreshToken(refresh_token)
+                token.blacklist()
+                return Response(status=status.HTTP_204_NO_CONTENT)
             
         except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)   
+            pass
+
+        response.delete_cookie(settings.AUTH_COOKIE_ACCESS, samesite=settings.AUTH_COOKIE_SAMESITE)
+        response.delete_cookie(settings.AUTH_COOKIE_REFRESH, samesite=settings.AUTH_COOKIE_SAMESITE)
+
+        return response
+
+
+class TokenRefreshCookieView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH)
         
+        if not refresh_token:
+            return Response({"detail": "Refresh token não encontrado nos cookies."}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        try:
+           
+            refresh = RefreshToken(refresh_token)
+            new_access_token = refresh.access_token
+            
+            response = Response({"detail": "Token atualizado com sucesso!"}, status=status.HTTP_200_OK)
+            
+            response.set_cookie(
+                key=settings.AUTH_COOKIE_ACCESS,
+                value=str(new_access_token),
+                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure=settings.AUTH_COOKIE_SECURE,
+                httponly=settings.AUTH_COOKIE_HTTPONLY,
+                samesite=settings.AUTH_COOKIE_SAMESITE,
+            )
+            return response
+            
+        except Exception:
+            return Response({"detail": "Refresh token inválido ou expirado."}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
 class MeView(APIView):
     
     def get(self,request):
