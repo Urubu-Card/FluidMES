@@ -15,14 +15,14 @@ import Otp from './pages/otp/otp.jsx'
 
 
 // PAGINAS INTERNAS
-//import Home from './pages/app/Home/home.jsx'
-import Pedidos from './pages/app/Pedidos/pedidos.jsx'
-import Rendimento from './pages/app/Rendimentos/rendimentos.jsx'
-import Funcionarios from './pages/app/Funcionarios/funcionarios.jsx'
-import Plantas from './pages/app/Plantas/plantas.jsx'
-import Receitas from './pages/app/Receitas/receitas.jsx'
-import Configuracoes from './pages/app/Configuracoes/config.jsx'
-import Profile from './pages/app/Profile/profile.jsx'
+import Home from './pages/app/home/home.jsx'
+import Pedidos from './pages/app/pedidos/pedidos.jsx'
+import Rendimento from './pages/app/rendimentos/rendimentos.jsx'
+import Funcionarios from './pages/app/funcionarios/funcionarios.jsx'
+import Plantas from './pages/app/plantas/plantas.jsx'
+import Receitas from './pages/app/receitas/receitas.jsx'
+import Configuracoes from './pages/app/configuracoes/config.jsx'
+import Profile from './pages/app/profile/profile.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -41,9 +41,9 @@ createRoot(document.getElementById('root')).render(
         <Route path='/app' element={<App />}>
           {/* apenas '/app', direto para a Home */}
           <Route index element={<Navigate to='/app/home' replace />} />
-          
+
           {/* SUB-ROTAS */}
-          {/*<Route path='home' element={<Home />} />*/}
+          <Route path='home' element={<Home />} />
           <Route path='profile' element={<Profile />} />
           <Route path='pedidos' element={<Pedidos />} />
           <Route path='rendimento' element={<Rendimento />} />

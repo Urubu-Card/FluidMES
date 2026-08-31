@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
 import Particles from '../components/Particles/particles.jsx';
@@ -25,6 +25,14 @@ export default function Auth() {
     const [ultimoNome, setUltimoNome] = useState('');
     const [email, setEmail] = useState('');
 
+    useEffect(()=>{
+        const token = localStorage.getItem("@api:token");
+        if (token) {
+            
+            navigate("/app");
+        }
+    },[navigate])
+
     // Limpa os estados para esvaziar os inputs controlados da tela
     function limparCampos() {
         if (formRef.current) {
@@ -47,14 +55,13 @@ export default function Auth() {
         try {
             if (isLogin) {
                 const response = await api.post('/api/login/', {
-                    usuario: cpf, email,
+                    usuario: usuario,
                     password
                 });
-                console.log(response)
-                /*
+                //console.log(response)
                 localStorage.setItem('@api:token', response.data.acess);
                 localStorage.setItem('@api:refresh', response.data.refresh);
-                */
+                
                 navigate('/app');
             } else {
                 await api.post('/api/cadastro/', {

@@ -1,87 +1,41 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import api from '../../../services/api.js';
 import './style.css';
 
-export default function Sidebar() {
-    const location = useLocation(); // Escuta as mudanças de rota
-    const sidebarRef = useRef(null); // Referência para a sidebar
-    const indicadorRef = useRef(null); // Referência para a barra verde
+export default function Sidebar({ dados }) {
+    const location = useLocation();
+    const sidebarRef = useRef(null);
+    const indicadorRef = useRef(null);
 
     const [userExit, setUserExit] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(false); // Controle do offcanvas (telas pequenas)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // ESTADO INICIAL COM VALORES DE CARREGAMENTO
-    const [usuario, setUsuario] = useState({
-        nome: 'Carregando...',
-        cargo: 'Carregando...',
-        fotoUrl: null
-    });
+    const primeiroNome = dados?.first_name || 'Usuário';
+    const segundoNome = dados?.last_name || '';
+    const cargo = dados?.cargo || 'Não informado';
+    const fotoUrl = dados?.fotoUrl || null;
 
-    // REQUISIÇÃO REAL PARA A SUA API
-    useEffect(() => {
-        async function carregarDadosUsuario() {
-            try {
-                const token = localStorage.getItem('@api:token');
-
-                const response = await api.get('/api/me/', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.status !== 200) {
-                    throw new Error('Não foi possível carregar os dados do perfil.');
-                }
-
-                const dados = await response.data;
-
-                setUsuario({
-                    primeiroNome: dados.first_name || 'Usuário',
-                    segundoNome: dados.last_name || '',
-                    cargo: dados.cargo || 'Não informado',
-                    fotoUrl: dados.fotoUrl || null
-                });
-
-            } catch (error) {
-                console.error('Erro ao buscar dados do usuário:', error);
-                setUsuario({
-                    nome: 'Erro ao carregar',
-                    cargo: 'Verifique a conexão',
-                    fotoUrl: null
-                });
-            }
-        }
-
-        carregarDadosUsuario();
-    }, []);
-
-    // Move o indicador animado para o link ativo
     useEffect(() => {
         if (!sidebarRef.current || !indicadorRef.current) return;
 
-        const linkAtivo = sidebarRef.current.querySelector('a.active');
+        // 3. setTimeout(..., 0) garante que o React Router já aplicou a classe "active" no DOM
+        setTimeout(() => {
+            const linkAtivo = sidebarRef.current.querySelector('a.active');
 
-        if (linkAtivo) {
-            const topo = linkAtivo.offsetTop;
-            const altura = linkAtivo.offsetHeight;
+            if (linkAtivo) {
+                const topo = linkAtivo.offsetTop;
+                const altura = linkAtivo.offsetHeight;
 
-            indicadorRef.current.style.top = `${topo}px`;
-            indicadorRef.current.style.height = `${altura}px`;
-            indicadorRef.current.style.opacity = '1';
-        } else {
-            indicadorRef.current.style.opacity = '0';
-        }
+                indicadorRef.current.style.top = `${topo}px`;
+                indicadorRef.current.style.height = `${altura}px`;
+                indicadorRef.current.style.opacity = '1';
+            } else {
+                indicadorRef.current.style.opacity = '0';
+            }
+        }, 0);
     }, [location.pathname]);
 
-    // Fecha o menu (mobile) automaticamente ao trocar de rota
-    useEffect(() => {
-        setSidebarOpen(false);
-    }, [location.pathname]);
 
-    // Trava o scroll do body quando o modal de saída ou o menu mobile estão abertos
     useEffect(() => {
         document.body.style.overflow = (userExit || sidebarOpen) ? 'hidden' : 'auto';
 
@@ -90,12 +44,8 @@ export default function Sidebar() {
         };
     }, [userExit, sidebarOpen]);
 
-    const primeiroNome = usuario.primeiroNome || 'Usuário';
-    const segundoNome = usuario.segundoNome || '';
-
     return (
         <>
-            {/* ALÇA / SETA - visível apenas em telas pequenas (< lg) */}
             <button
                 type='button'
                 className={`sidebar-handle d-lg-none btn p-0 ${sidebarOpen ? 'is-open' : ''}`}
@@ -107,7 +57,6 @@ export default function Sidebar() {
                 <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
             </button>
 
-            {/* BACKDROP - apenas mobile, quando o menu está aberto */}
             {sidebarOpen && (
                 <div
                     className='offcanvas-backdrop fade show d-lg-none'
@@ -124,16 +73,16 @@ export default function Sidebar() {
                 <div className='w-100 d-flex flex-column align-items-center px-0'>
                     <NavLink to='/app/profile' className='profile d-flex align-items-center gap-2 p-2 rounded-3 mb-2'>
                         <div className='avatar-container flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center overflow-hidden'>
-                            {usuario.fotoUrl ? (
-                                <img src={usuario.fotoUrl} alt='Foto do usuário' className='avatar-img' />
+                            {fotoUrl ? (
+                                <img src={fotoUrl} alt='Foto do usuário' className='avatar-img' />
                             ) : (
                                 <span className='fw-bold fs-5'>
-                                    {usuario.primeiroNome ? usuario.primeiroNome.charAt(0).toUpperCase() : 'U'}
+                                    {primeiroNome ? primeiroNome.charAt(0).toUpperCase() : 'U'}
                                 </span>
                             )}
                         </div>
                         <div className='text-truncate'>
-                            <p className='cargo text-uppercase mb-0'>{usuario.cargo}</p>
+                            <p className='cargo text-uppercase mb-0'>{cargo}</p>
                             <h2 className='name mb-0 text-truncate'>{primeiroNome} {segundoNome}</h2>
                         </div>
                     </NavLink>
@@ -145,27 +94,23 @@ export default function Sidebar() {
                             <i className='bi bi-house'></i>
                             <p className='mb-0'>Home</p>
                         </NavLink>
-
+                        {/* Outros links de navegação mantidos ... */}
                         <NavLink to='/app/pedidos' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-file-earmark'></i>
                             <p className='mb-0'>Pedidos</p>
                         </NavLink>
-
                         <NavLink to='/app/rendimento' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-graph-up-arrow'></i>
                             <p className='mb-0'>Rendimento</p>
                         </NavLink>
-
                         <NavLink to='/app/funcionarios' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-person-vcard'></i>
                             <p className='mb-0'>Funcionários</p>
                         </NavLink>
-
                         <NavLink to='/app/plantas' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-cpu'></i>
                             <p className='mb-0'>Plantas</p>
                         </NavLink>
-
                         <NavLink to='/app/receitas' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-flask'></i>
                             <p className='mb-0'>Receitas</p>
@@ -211,7 +156,6 @@ export default function Sidebar() {
                                     onClick={() => {
                                         localStorage.removeItem('@api:token');
                                         localStorage.removeItem('@api:refresh');
-                                        localStorage.removeItem('@api:user');
                                         setUserExit(false);
                                     }}
                                 >
@@ -220,7 +164,7 @@ export default function Sidebar() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div >
             )}
         </>
     );
