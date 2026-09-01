@@ -25,16 +25,21 @@ export default function Auth() {
     const [email, setEmail] = useState('');
 
     useEffect(() => {
+        let ativo = true;
 
         api.get('/api/me/')
             .then(() => {
-                navigate("/app");
+                if (ativo) console.log("/app");
             })
             .catch(() => {
-                // Se der erro (ex: 401), significa que não há sessão ativa. 
+                // Se der erro (ex: 401), significa que não há sessão ativa.
                 // O usuário continua na tela de autenticação tranquilamente.
             });
-    }, [navigate]);
+
+        return () => {
+            ativo = false;
+        };
+    }, []);
 
     // Limpa os estados para esvaziar os inputs controlados da tela
     function limparCampos() {
@@ -57,12 +62,11 @@ export default function Auth() {
 
         try {
             if (isLogin) {
-                console.log("RESPOSTA")
                 const response = await api.post('/api/login/', {
                     usuario: usuario,
                     password
                 });
-                console.log("RESPOSTA"+response)
+                console.log("RESPOSTA", response);
 
                 navigate('/app');
             } else {
@@ -86,7 +90,6 @@ export default function Auth() {
         }
     }
 
-
     return (
         <div className='auth-page container-fluid p-0'>
             <div className={`${isLogin ? 'login-active' : 'login-inactive'}`}>
@@ -101,7 +104,7 @@ export default function Auth() {
             <div className='content w-100'>
                 <header className='d-flex align-items-center px-3 px-md-4'>
                     <NavLink to="/">
-                        FluidMES
+                        <img src="../../../public/logo-01/android-chrome-192x192.png" alt="Logo" className='logo'/>
                     </NavLink>
                 </header>
 

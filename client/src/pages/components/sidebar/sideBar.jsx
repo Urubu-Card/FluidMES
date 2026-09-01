@@ -37,7 +37,6 @@ export default function Sidebar({ dados }) {
         }, 0);
     }, [location.pathname]);
 
-
     useEffect(() => {
         document.body.style.overflow = (userExit || sidebarOpen) ? 'hidden' : 'auto';
 
@@ -135,7 +134,6 @@ export default function Sidebar({ dados }) {
                         <p className='mb-0'>Sair da conta</p>
                     </button>
                 </nav>
-
                 <div className='indicador-animado' ref={indicadorRef}></div>
             </aside>
 

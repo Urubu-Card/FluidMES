@@ -14,6 +14,8 @@ export default function App() {
             try {
 
                 const response = await api.get('/api/me/');
+                console.log(response);
+
 
                 setDadosUsuario(response.data);
                 setIsLoading(false);
@@ -25,11 +27,9 @@ export default function App() {
                 if (error.response && error.response.status === 401) {
                     navigate('/auth');
                 }
-
                 setIsLoading(false); 
             }
         }
-
         carregarDadosUsuario();
     }, [navigate]);
 
