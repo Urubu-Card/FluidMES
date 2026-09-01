@@ -39,7 +39,7 @@ MIDDLEWARE = [
 #CORS_ALLOW_ALL_ORIGINS = True #Nao utilizar em prod XD
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://10.85.198.137:5173",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -117,3 +117,4 @@ AUTH_COOKIE_REFRESH = 'refresh_token'
 AUTH_COOKIE_HTTPONLY = True
 AUTH_COOKIE_SAMESITE = 'Lax'
 AUTH_COOKIE_SECURE = False   #! True em PROD
+CSRF_COOKIE_SECURE = False

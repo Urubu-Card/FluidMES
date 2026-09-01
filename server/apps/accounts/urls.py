@@ -9,6 +9,6 @@ urlpatterns = [
     path('api/logout/',                     views.LogoutView.as_view(),                              ),                       
     path('api/password-reset/',             views.PasswordResetRequestView.as_view(),                ),
     path('api/password-reset/confirm/',     views.PasswordRestConfirmView.as_view(),                 ),
-    path('api/token/refresh',               views.TokenRefreshCookieView.as_view(),                  ),
+    path('api/token/refresh/',               views.TokenRefreshCookieView.as_view(),                  ),
 
 ]
