@@ -12,14 +12,8 @@ export default function App() {
     useEffect(() => {
         async function carregarDadosUsuario() {
             try {
-                const token = localStorage.getItem('@api:token');
 
-                const response = await api.get('/api/me/', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const response = await api.get('/api/me/');
 
                 setDadosUsuario(response.data);
                 setIsLoading(false);
