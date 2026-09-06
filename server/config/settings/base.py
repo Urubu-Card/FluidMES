@@ -10,6 +10,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','django-insecure-kf)h_nohacd_nnh
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'background_task',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -108,7 +109,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'assets']
+#STATICFILES_DIRS = [BASE_DIR / 'static']
 
 LOGIN_URL = 'login'
 

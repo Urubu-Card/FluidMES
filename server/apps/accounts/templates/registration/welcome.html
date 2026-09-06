@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Redefinir senha — FluidMES</title>
+<title>Bem-vindo à FluidMES</title>
 
 <!-- Google Fonts: carregado por clientes que suportam CSS externo/@import
      (Apple Mail, Outlook.com, AOL, Yahoo). Gmail e Outlook desktop ignoram
@@ -37,7 +37,7 @@
   .font-heading { font-family: 'Exo 2', Arial, Helvetica, sans-serif; }
   .font-body { font-family: 'Inter', Arial, Helvetica, sans-serif; }
 
-  .btn-reset {
+  .btn-welcome {
     background-color: #3E7DFF;
     border-radius: 8px;
     color: #FFFFFF !important;
@@ -51,6 +51,8 @@
     padding: 14px 36px;
     mso-padding-alt: 0;
   }
+
+  .info-row td { font-family: 'Inter', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 22px; color: #4A5568; }
 
   @media screen and (max-width: 600px) {
     .email-content { width: 100% !important; }
@@ -67,7 +69,7 @@
 
   <!-- Preheader (texto de pré-visualização, invisível no corpo) -->
   <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#F2F4F7;">
-    Recebemos um pedido para redefinir a senha da sua conta FluidMES. O link expira em 30 minutos.
+    Sua conta na FluidMES foi criada com sucesso. Veja seus dados de acesso e comece agora.
     &#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;
   </div>
 
@@ -93,45 +95,17 @@
                 <tr>
                   <td class="fluid-padding" style="padding: 40px 40px 32px 40px;">
 
-                    <!-- Ícone de cadeado feito à mão em HTML/CSS puro (sem imagem, sem SVG) -->
+                    <!-- Logo FluidMES (gota d'água) -->
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto 20px auto;">
                       <tr>
-                        <td width="56" height="56" align="center" valign="middle" style="background-color:#EAF0FF; border-radius:50%; mso-border-alt: none;">
-                          <!--[if !mso]><!-->
-                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
-                            <tr>
-                              <td align="center" style="padding-bottom:0; line-height:0; font-size:0;">
-                                <!-- arco do cadeado -->
-                                <div style="width:16px; height:12px; border:3px solid #3E7DFF; border-bottom:none; border-radius:10px 10px 0 0; margin:0 auto;">&nbsp;</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="center" style="line-height:0; font-size:0;">
-                                <!-- corpo do cadeado -->
-                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
-                                  <tr>
-                                    <td width="26" height="20" align="center" valign="middle" style="background-color:#3E7DFF; border-radius:5px; line-height:0; font-size:0;">
-                                      <div style="width:5px; height:5px; background-color:#EAF0FF; border-radius:50%; margin:0 auto;">&nbsp;</div>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                          </table>
-                          <!--<![endif]-->
-                          <!--[if mso]>
-                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
-                            <tr>
-                              <td align="center" style="font-family:Arial,sans-serif; font-size:22px; color:#3E7DFF; font-weight:bold;">&#128274;</td>
-                            </tr>
-                          </table>
-                          <![endif]-->
+                        <td align="center" valign="middle">
+                          <img src="cid:logo_fluidmes" width="72" height="72" alt="FluidMES" style="display:block; width:72px; height:72 px;">
                         </td>
                       </tr>
                     </table>
 
                     <h1 style="margin:0 0 12px 0; font-family: 'Exo 2', Arial, Helvetica, sans-serif; font-size: 22px; line-height: 28px; color: #10151B; text-align:center; font-weight: 700;">
-                      Redefinir sua senha
+                      Bem-vindo(a) à FluidMES!
                     </h1>
 
                     <p style="margin:0 0 8px 0; font-family: 'Inter', Arial, Helvetica, sans-serif; font-size: 15px; line-height: 24px; color: #4A5568; text-align:center;">
@@ -139,20 +113,38 @@
                     </p>
 
                     <p style="margin:0 0 28px 0; font-family: 'Inter', Arial, Helvetica, sans-serif; font-size: 15px; line-height: 24px; color: #4A5568; text-align:center;">
-                      Recebemos uma solicitação para redefinir a senha da sua conta no <strong style="color:#10151B;">FluidMES</strong>. Clique no botão abaixo para criar uma nova senha. Este link é válido por <strong style="color:#10151B;">30 minutos</strong>.
+                      Sua conta foi criada com sucesso. Agora você tem acesso ao sistema de execução de manufatura da <strong style="color:#10151B;">{{nome_empresa}}</strong> — monitoramento de plantas em tempo real, OEE por turno e controle completo das suas ordens de produção.
                     </p>
+
+                    <!-- Cartão de dados de acesso -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F7F9FC; border-radius:8px; margin-bottom:28px;">
+                      <tr>
+                        <td style="padding:20px 24px;">
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="info-row">
+                            <tr>
+                              <td style="padding-bottom:8px; color:#8A94A6;">Empresa</td>
+                              <td style="padding-bottom:8px; text-align:right; font-weight:600; color:#10151B;">{{nome_empresa}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color:#8A94A6;">Login</td>
+                              <td style="text-align:right; font-weight:600; color:#10151B;">{{email_usuario}}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
 
                     <!-- Botão CTA -->
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
                       <tr>
                         <td align="center" style="border-radius:8px; background-color:#3E7DFF;">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{link_redefinicao}}" style="height:48px;v-text-anchor:middle;width:260px;" arcsize="16%" fillcolor="#3E7DFF" stroke="f">
-                          <center style="color:#ffffff;font-family:'Exo 2',Arial,sans-serif;font-size:16px;font-weight:bold;">Redefinir senha</center>
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{login_url}}" style="height:48px;v-text-anchor:middle;width:260px;" arcsize="16%" fillcolor="#3E7DFF" stroke="f">
+                          <center style="color:#ffffff;font-family:'Exo 2',Arial,sans-serif;font-size:16px;font-weight:bold;">Acessar minha conta</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="{{link_redefinicao}}" target="_blank" class="btn-reset">Redefinir senha</a>
+                          <a href="{{login_url}}" target="_blank" class="btn-welcome">Acessar minha conta</a>
                           <!--<![endif]-->
                         </td>
                       </tr>
@@ -162,7 +154,7 @@
                       Se o botão não funcionar, copie e cole o link abaixo no seu navegador:
                     </p>
                     <p style="margin:6px 0 0 0; font-family: 'Inter', Arial, Helvetica, sans-serif; font-size: 13px; line-height: 20px; color: #3E7DFF; text-align:center; word-break: break-all;">
-                      <a href="{{reset_url}}" target="_blank" style="color:#3E7DFF; text-decoration:underline;">{{reset_url}}</a>
+                      <a href="{{login_url}}" target="_blank" style="color:#3E7DFF; text-decoration:underline;">{{login_url}}</a>
                     </p>
 
                   </td>
@@ -175,11 +167,11 @@
                   </td>
                 </tr>
 
-                <!-- Aviso de segurança -->
+                <!-- Aviso -->
                 <tr>
                   <td class="fluid-padding" style="padding: 24px 40px 32px 40px;">
                     <p style="margin:0; font-family: 'Inter', Arial, Helvetica, sans-serif; font-size: 13px; line-height: 20px; color: #8A94A6; text-align:center;">
-                      Se você não solicitou a redefinição de senha, pode ignorar este email com segurança. Sua senha atual continuará funcionando normalmente.
+                      Se você não reconhece esta conta, entre em contato com o suporte da sua empresa. Não é necessário nenhuma ação caso não tenha solicitado este acesso.
                     </p>
                   </td>
                 </tr>

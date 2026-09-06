@@ -23,7 +23,6 @@ class JWTAuthMiddleware:
         query = scope['query_string'].decode('utf-8')
         dict_query = parse_qs(query)
         token = dict_query['token']
-        print(token)
         
         try:
             validated_token = UntypedToken(token)

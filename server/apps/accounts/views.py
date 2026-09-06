@@ -1,3 +1,4 @@
+import os
 from rest_framework.views                     import APIView
 from rest_framework.response                  import Response
 from rest_framework                           import status , permissions
@@ -8,6 +9,8 @@ from django.contrib.auth                      import get_user_model
 from django.core.mail                         import EmailMultiAlternatives
 from django.conf                              import settings
 from django.template.loader                   import render_to_string
+from background_task                          import background
+from email.mime.image                         import MIMEImage
 
 User = get_user_model()
 
@@ -32,6 +35,57 @@ def set_jwt_cookies(response, access_token, refresh_token):
     return response
 
 
+@background(schedule=1)
+def welcome(username,empresa,email):
+    contexto = {
+        'username': username,
+        'nome_empresa': empresa,
+        'email_usuario': email,
+        'login_url': f"{settings.FRONTEND_URL}/login",
+    }
+    html_content = render_to_string('registration/welcome.html', contexto)
+    text_content = render_to_string('registration/welcome.html', contexto)
+
+    email = EmailMultiAlternatives(
+        subject="Bem-vindo à FluidMES!",
+        body=text_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[email],
+    )
+    email.attach_alternative(html_content, "text/html")
+
+    logo_path = os.path.join(settings.BASE_DIR, 'assets/images/logo.png')
+    with open(logo_path, 'rb') as f:
+        logo = MIMEImage(f.read())
+        logo.add_header('Content-ID', '<logo_fluidmes>')
+        logo.add_header('Content-Disposition', 'inline', filename='logo_fluidmes.png')
+        email.attach(logo)
+
+    email.send()
+
+@background(schedule=0)
+def forgotEmail(primeiro_nome,link,user_email):
+
+    context = {
+                    'username':primeiro_nome,
+                    'reset_url':link
+                }
+    
+    
+    html_content = render_to_string('registration/password_forgot_email.html', context)
+    text_content = render_to_string('registration/password_forgot_email.txt', context)
+    msg = EmailMultiAlternatives(
+        subject="Redefinição de senha - FluidMES",
+        body=text_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user_email],
+
+    )
+
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+
 class CadastroView(APIView):
     
     def post(self, request ):
@@ -39,9 +93,12 @@ class CadastroView(APIView):
         serializer = CadastroSerializer(data=request.data)
         
         if serializer.is_valid():
-            usuario = serializer.save()
+            serializer.save()
+            username = request.data.get("first_name")
+            empresa  = request.data.get("nomeEmpresa")
+            email    = request.data.get("email")
+            welcome(username,empresa,email)
             return Response(
-                UsuarioSerializer(usuario).data,
                 status= status.HTTP_201_CREATED
                 )
         
@@ -58,22 +115,13 @@ class PasswordResetRequestView(APIView):
         user = User.objects.filter(email__iexact=email).first()
         if user:
             reset_token =PasswordResetToken.objects.create(user=user)
-            link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token.token}"
-            context = {
-                'username':user.first_name,
-                'reset_url':link
-            }
-            html_content = render_to_string('registration/password_reset_email.html', context)
-            text_content = render_to_string('registration/password_reset_email.txt', context)
-            msg = EmailMultiAlternatives(
-                subject="Redefinição de senha - FluidMES",
-                body=text_content,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[user.email],
+            username=user.first_name
+            link = f"{settings.FRONTEND_URL}/api/password-reset/confirm/?token={reset_token.token}"
+            user_email = user.email
 
-            )
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            forgotEmail(username[0],link,user_email)
+            
+            
         return Response(
             {"detail":"Se o email existir,enviamos as instruções para o redefinimento da senha"},
             status=status.HTTP_200_OK
@@ -172,7 +220,6 @@ class TokenRefreshCookieView(APIView):
             
         except Exception:
             return Response({"detail": "Refresh token inválido ou expirado."}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 class MeView(APIView):

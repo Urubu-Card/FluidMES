@@ -1,0 +1,31 @@
+Sua conta na FluidMES foi criada com sucesso. Veja seus dados de acesso e comece agora.
+
+FluidMES
+
+==================================================
+Bem-vindo(a) à FluidMES!
+==================================================
+
+Olá, {{username}}.
+
+Sua conta foi criada com sucesso. Agora você tem acesso ao sistema de execução de manufatura da {{nome_empresa}} — monitoramento de plantas em tempo real, OEE por turno e controle completo das suas ordens de produção.
+
+--------------------------------------------------
+DADOS DE ACESSO
+--------------------------------------------------
+Empresa: {{nome_empresa}}
+Login: {{email_usuario}}
+--------------------------------------------------
+
+[ Acessar minha conta ]
+Link: {{login_url}}
+
+Se o botão acima não funcionar, copie e cole o link abaixo no seu navegador:
+{{login_url}}
+
+--------------------------------------------------
+Se você não reconhece esta conta, entre em contato com o suporte da sua empresa. Não é necessário nenhuma ação caso não tenha solicitado este acesso.
+--------------------------------------------------
+
+FluidMES · Sistema de Execução de Manufatura para produção de fluidos
+Este é um email automático, por favor não responda.
