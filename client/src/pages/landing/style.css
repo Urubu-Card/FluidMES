@@ -18,48 +18,65 @@ body:has(.landing-page) {
 }
 
 .landing-page {
-    section {
-        min-width: 100%;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        background-color: var(--cinza-escuro);
-    }
+  .background-fluid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  justify-content: center;
+  align-items: center;
+  }
+  
+  section {
+      min-width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-color: var(--cinza-escuro);
+  }
 
-    .landing-hero {
-        position: relative;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle, var(--cinza-escuro) 0%, var(--azul-petroleo) 50%);
-    }
+  .landing-hero {
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, var(--cinza-escuro) 0%, var(--azul-petroleo) 50%);
+  }
 
-    .content {
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
 
-    .landing-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        filter: blur();
-    }
+  .landing-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      filter: blur();
+  }
 
+  .content h1 {
+      font-size: 10rem;
+      display: flex;
+  }
+
+  .content h1 span {
+      border-radius: 15px;
+      display: flex;
+      color: var(--branco-azulado);
+  }
+
+  @media(max-width: 1024px), (pointer: coarse) {
     .content h1 {
-        font-size: 10rem;
-        display: flex;
+      font-size: 55px;
     }
-
-    .content h1 span {
-        border-radius: 15px;
-        display: flex;
-        color: var(--branco-azulado);
-    }
+  }
 }

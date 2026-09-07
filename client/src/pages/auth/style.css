@@ -197,37 +197,42 @@
         text-decoration: none;
     }
 
-    @media (max-width:767px) {
-        form {
-            margin-top: 60px;
-            width: 90%;
-            height: 100%;
-            padding: 1rem;
-        }
-
-        .coline {
-            border: none;
-        }
-
-        .login-active {
-            display: block;
-        }
-
-        .login-inactive {
-            display: none;
-        }
-
-        .auth-register,
-        .auth-login {
-            background: transparent;
-            box-shadow: none;
-        }
-
-        .btn-submit {
-            width: 50%;
-        }
-    }
-
+/* Ativa se a tela for menor que 1024px OU se o dispositivo for touch (celular/tablet) */
+      @media (max-width: 1024px), (pointer: coarse) {
+          header {
+            display: none !important;
+          }
+          
+          form {
+              margin-top: 20px;
+              width: 92% !important;
+              max-width: 420px !important;
+              padding: 1.5rem 1rem;
+              background: transparent;
+              box-shadow: none;
+          }
+      
+          .auth-register {
+              max-width: 100% !important;
+          }
+      
+          .columns {
+              flex-direction: column !important; 
+              gap: 24px 0 !important;
+              width: 100% !important;
+          }
+      
+          .coline {
+              border-right: none !important;
+              border-bottom: 1px solid rgba(219, 243, 255, 0.2) !important;
+              padding-bottom: 20px;
+          }
+      
+          .btn-submit {
+              width: 80% !important;
+              margin: 20px auto 1rem;
+          }
+      }
     .secret {
         display: none;
     }

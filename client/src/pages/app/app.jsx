@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import Sidebar from '../components/sidebar/sideBar.jsx';
+import Sidebar from '../components/Sidebar/sideBar.jsx';
 import api from '../../services/api.js';
 import './style.css'
 

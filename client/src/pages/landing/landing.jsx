@@ -1,10 +1,11 @@
-//import { useState, useRef ,useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import RotatingText from '../components/RotatingText/rotatingText';
-import FluidFlow from '../components/Ferrofluid/ferrofluid';
-import CardNav from '../components/NavBar/navBar';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import RotatingText from '../components/RotatingText/RotatingText.jsx';
+import FerroFluid from '../components/Ferrofluid/ferrofluid.jsx';
+import CardNav from '../components/NavBar/navbar.jsx';
 import logo from '/logo-01/android-chrome-192x192.png?url';
 import './style.css';
+
 const items = [
     {
         label: "Sobre",
@@ -36,8 +37,29 @@ const items = [
     }
 ];
 
-
 function Landing() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // esconde a Landing Page e joga o usuário para o Login/App
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isPWA) {
+            navigate('/login');
+            return;
+        }
+      
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault(); 
+            console.log('Instalação desativada na Landing Page.');
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+    }, [navigate]);
+
     return (
         <div className="landing-page">
             <CardNav
@@ -50,14 +72,28 @@ function Landing() {
                 buttonTextColor="var(--branco-azulado)"
                 ease="circ.out"
                 theme="dark"
-                onclick={()=>{
+                onclick={() => {
                     const background = document.getElementsByClassName("landing-hero")[0];
-                    background.style.filter = "blur(5px)"
+                    if (background) background.style.filter = "blur(5px)";
                 }}
             />
 
             <section className="landing-hero">
-                
+              <FerroFluid
+                className = 'background-fluid'
+                colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
+                scale={1.6}
+                speed={.1}
+                turbulence={1}
+                fluidity={0.15}
+                rimWidth={0.2}
+                sharpness={2.5}
+                shimmer={1.5}
+                glow={2.8}
+                flowDirection="down"
+                opacity={.67}
+                mouseInteraction={false}
+              />
                 <div className='content'>
                     <h1>Fluid
                         <span>
@@ -100,8 +136,7 @@ function Landing() {
                 </div>
             </section>
         </div>
-    )
+    );
 }
 
-
-export default Landing
+export default Landing;
