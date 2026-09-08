@@ -5,6 +5,7 @@ import api from '../../../services/api.js';
 
 
 export default function Sidebar({ dados }) {
+    const cargos = {3: 'Funcionário', 2: 'Chefe', 1: 'Preposto'};
     const location = useLocation();
     const sidebarRef = useRef(null);
     const indicadorRef = useRef(null);
@@ -14,13 +15,12 @@ export default function Sidebar({ dados }) {
 
     const primeiroNome = dados?.first_name || 'Usuário';
     const segundoNome = dados?.last_name || '';
-    const cargo = dados?.role == 1 ? 'Funcionário' : dados?.role == 2 ? 'Chefe' : dados?.role == 3 ? 'Preposto' : 'Cargo Desconhecido';
-    const fotoUrl = dados?.fotoUrl || null;
+    const cargo = cargos[dados?.role] || 'Cargo Desconhecido'; const fotoUrl = dados?.fotoUrl || null;
 
     useEffect(() => {
         if (!sidebarRef.current || !indicadorRef.current) return;
 
-        
+
         setTimeout(() => {
             const linkAtivo = sidebarRef.current.querySelector('a.active');
 
@@ -154,9 +154,7 @@ export default function Sidebar({ dados }) {
                                     to='/auth'
                                     className='btn btn-danger px-4'
                                     onClick={() => {
-                                        const response = api.post("/api/logout/")
-                                        console.log(response)
-                                        
+                                        api.post("/api/logout/")
                                     }}
                                 >
                                     Sair

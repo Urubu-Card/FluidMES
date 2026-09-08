@@ -133,14 +133,10 @@
         width: 100%;
         height: 50px;
         margin-top: 14px;
-
         background: rgba(255, 255, 255, 0.05);
-
         border: 1px solid rgba(56, 130, 230, 0.35);
         border-radius: 8px;
-
         overflow: hidden;
-
         transition: border-color .2s, box-shadow .2s;
 
         &:focus-within {
@@ -161,17 +157,12 @@
         input {
             width: 100%;
             height: 100%;
-
             padding: 0 38px 0 14px;
-
             color: var(--full-white);
             background: transparent;
-
             border: none;
             outline: none;
-
             font-size: 14px;
-
             &::placeholder {
                 color: #7a90b0;
             }
@@ -179,12 +170,9 @@
 
         i {
             position: absolute;
-
             right: 13px;
             top: 50%;
-
             transform: translateY(-50%);
-
             color: var(--branco-azulado);
             pointer-events: none;
         }
@@ -206,22 +194,18 @@
         width: 100%;
         height: 48px;
         margin: 20px 0 1rem;
-
         color: var(--full-white);
         font-size: 15px;
         font-weight: 500;
         letter-spacing: 0.5px;
-
         background: linear-gradient(90deg,
                 var(--azul-ceu-escuro) 0%,
                 var(--azul-ceu) 60%,
                 var(--azul-ceu-escuro) 100%);
         background-size: 200% auto;
-
         border: none;
         border-radius: 8px;
         box-shadow: 0 0 18px rgba(58, 130, 246, 0.35);
-
         cursor: pointer;
         transition:
             background-position .9s,
@@ -254,11 +238,9 @@
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-
         margin: 0 0 24px auto;
         height: 20px;
         width: 108px;
-
         color: var(--azul-ceu) !important;
         font-size: 14px;
         text-decoration: none;

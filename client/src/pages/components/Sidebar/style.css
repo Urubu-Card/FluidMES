@@ -138,16 +138,16 @@
     align-items: center;
     justify-content: center;
     z-index: 1046;
-    /* acima do offcanvas do Bootstrap (1045) */
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
     transition: left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 
     &:hover,
     &:focus,
     &:active {
-        background: transparent !important;
+        background-color: var(--cinza-escuro) !important;
+        color: var(--branco-azulado) !important;
         border: none !important;
-        box-shadow: none !important;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25) !important;
         opacity: 1 !important;
     }
 }

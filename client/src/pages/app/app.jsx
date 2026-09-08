@@ -14,8 +14,6 @@ export default function App() {
             try {
 
                 const response = await api.get('/api/me/');
-                console.log(response);
-
 
                 setDadosUsuario(response.data);
                 setIsLoading(false);

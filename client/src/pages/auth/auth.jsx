@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
+import axios from 'axios';
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
 import './style.css';
@@ -28,13 +29,14 @@ export default function Auth() {
     useEffect(() => {
         let ativo = true;
 
-        api.get('/api/me/')
+        // Usa axios diretamente para não passar pelo interceptor de refresh
+        // (aqui só queremos checar se já há sessão ativa, sem tentar renovar token)
+        axios.get('/api/me/', { withCredentials: true })
             .then(() => {
-                if (ativo) console.log("/app");
+                if (ativo) navigate('/app');
             })
             .catch(() => {
-                // Se der erro (ex: 401), significa que não há sessão ativa.
-                // O usuário continua na tela de autenticação tranquilamente.
+                // Sem sessão ativa — usuário fica na tela de auth normalmente
             });
 
         return () => {
@@ -69,7 +71,7 @@ export default function Auth() {
 
         try {
             if (isLogin) {
-                const response = await api.post('/api/login/', {
+                await api.post('/api/login/', {
                     usuario: usuario,
                     password
                 });
@@ -83,7 +85,7 @@ export default function Auth() {
                     cpf,
                     password,
                     nomeEmpresa,
-                    cnpj,
+                    cnpj    
                 });
 
                 alert('Cadastro realizado com sucesso! Faça seu login.');
@@ -92,11 +94,25 @@ export default function Auth() {
             }
 
         } catch (error) {
-            setErro(
-                error.response?.data?.erro ||
-                error.response?.data?.detail ||
-                'Erro ao processar a requisição.'
-            );
+            const data = error.response?.data;
+            let mensagem = 'Erro ao processar a requisição.';
+
+            if (data?.erro) {
+                mensagem = data.erro;
+            } else if (data?.detail) {
+                mensagem = data.detail;
+            } else if (data?.message) {
+                mensagem = data.message;
+            } else if (typeof data === 'string') {
+                mensagem = data;
+            } else if (data && typeof data === 'object') {
+                // Pega todas as mensagens dos campos
+                mensagem = Object.values(data)
+                    .flat()
+                    .join(' - ');
+            }
+
+            setErro(mensagem);
         }
     }
 
@@ -134,7 +150,6 @@ export default function Auth() {
                                         type='text'
                                         placeholder='Nome da Empresa'
                                         required
-                                        className=''
                                         value={nomeEmpresa}
                                         onChange={e => setNomeEmpresa(e.target.value)}
                                     />
@@ -154,7 +169,7 @@ export default function Auth() {
                             </div>
 
                             {/* Coluna Pessoal */}
-                            <div className=' col-12 col-md-6'>
+                            <div className='col-12 col-md-6'>
                                 <p className='col-title'>Pessoal :</p>
                                 <div className='user-pass'>
                                     <PatternFormat
@@ -168,7 +183,6 @@ export default function Auth() {
                                     <i className='bi bi-person-vcard'></i>
                                 </div>
                                 <div className='name-group'>
-
                                     <div className='name-field'>
                                         <input
                                             type='text'
@@ -178,7 +192,6 @@ export default function Auth() {
                                             onChange={e => setPrimeiroNome(e.target.value)}
                                         />
                                     </div>
-
                                     <div className='name-field'>
                                         <input
                                             type='text'
@@ -187,10 +200,8 @@ export default function Auth() {
                                             value={ultimoNome}
                                             onChange={e => setUltimoNome(e.target.value)}
                                         />
-
                                         <i className='bi bi-person'></i>
                                     </div>
-
                                 </div>
                                 <div className='user-pass'>
                                     <input
@@ -209,7 +220,6 @@ export default function Auth() {
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-
                                         onCopy={(e) => e.preventDefault()}
                                         onCut={(e) => e.preventDefault()}
                                         onPaste={(e) => e.preventDefault()}
@@ -228,13 +238,11 @@ export default function Auth() {
                                         required
                                         value={confirmarSenha}
                                         onChange={e => setConfirmarSenha(e.target.value)}
-
                                         onCopy={(e) => e.preventDefault()}
                                         onCut={(e) => e.preventDefault()}
                                         onPaste={(e) => e.preventDefault()}
                                         onContextMenu={(e) => e.preventDefault()}
                                     />
-
                                     <i className='bi bi-lock-fill'></i>
                                 </div>
                             </div>
@@ -243,7 +251,6 @@ export default function Auth() {
 
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
-
                         <div className='row g-4'>
                             <div>
                                 <div className='user-pass'>
@@ -256,8 +263,6 @@ export default function Auth() {
                                     />
                                     <i className='bi bi-person-vcard'></i>
                                 </div>
-
-
                                 <div className='user-pass'>
                                     <input
                                         type='password'
@@ -265,7 +270,6 @@ export default function Auth() {
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-
                                         onCopy={(e) => e.preventDefault()}
                                         onCut={(e) => e.preventDefault()}
                                         onPaste={(e) => e.preventDefault()}
