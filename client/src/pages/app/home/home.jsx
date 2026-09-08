@@ -1,8 +1,7 @@
 import React from 'react';
 import './style.css';
 
-
-const MinhaPagina = () => {
+const Home = () => {
     return (
         <div>
             {/* O conteúdo da página vai aqui */}
@@ -10,4 +9,4 @@ const MinhaPagina = () => {
     );
 };
 
-export default MinhaPagina;
+export default Home;

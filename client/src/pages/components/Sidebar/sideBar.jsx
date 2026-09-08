@@ -14,7 +14,7 @@ export default function Sidebar({ dados }) {
 
     const primeiroNome = dados?.first_name || 'Usuário';
     const segundoNome = dados?.last_name || '';
-    const cargo = dados?.role || 'Não informado';
+    const cargo = dados?.role == 1 ? 'Funcionário' : dados?.role == 2 ? 'Chefe' : dados?.role == 3 ? 'Preposto' : 'Cargo Desconhecido';
     const fotoUrl = dados?.fotoUrl || null;
 
     useEffect(() => {

@@ -7,7 +7,6 @@ import './style.css';
 
 export default function Auth() {
     const formRef = useRef(null);
-    // true = Tela de Login | false = Tela de Cadastro
     const [isLogin, setIsLogin] = useState(true);
     const [erro, setErro] = useState('');
     const navigate = useNavigate();
@@ -18,6 +17,8 @@ export default function Auth() {
     const [usuario, setUsuario] = useState('');
 
     // Estados exclusivos do cadastro
+    const [confirmarSenha, setConfirmarSenha] = useState('');
+    const [mostrarSenha, setMostrarSenha] = useState(false);
     const [nomeEmpresa, setNomeEmpresa] = useState('');
     const [cnpj, setCnpj] = useState('');
     const [primeiroNome, setPrimeiroNome] = useState('');
@@ -48,6 +49,7 @@ export default function Auth() {
         }
         setCpf('');
         setPassword('');
+        setConfirmarSenha('');
         setNomeEmpresa('');
         setCnpj('');
         setPrimeiroNome('');
@@ -60,15 +62,19 @@ export default function Auth() {
         e.preventDefault();
         setErro('');
 
+        if (!isLogin && password !== confirmarSenha) {
+            setErro('As senhas não coincidem.');
+            return;
+        }
+
         try {
             if (isLogin) {
                 const response = await api.post('/api/login/', {
                     usuario: usuario,
                     password
                 });
-                console.log("RESPOSTA", response);
-
                 navigate('/app');
+
             } else {
                 await api.post('/api/cadastro/', {
                     first_name: primeiroNome,
@@ -84,9 +90,13 @@ export default function Auth() {
                 setIsLogin(true);
                 limparCampos();
             }
+
         } catch (error) {
-            // Garante capturar os erros vindos da validação do serializer do Django
-            setErro(error.response?.data?.erro || error.response?.data?.detail || 'Erro ao processar a requisição.');
+            setErro(
+                error.response?.data?.erro ||
+                error.response?.data?.detail ||
+                'Erro ao processar a requisição.'
+            );
         }
     }
 
@@ -104,7 +114,7 @@ export default function Auth() {
             <div className='content w-100'>
                 <header className='d-flex align-items-center px-3 px-md-4'>
                     <NavLink to="/">
-                        <img src="../../../public/logo-01/android-chrome-192x192.png" alt="Logo" className='logo'/>
+                        <i className='bi bi-arrow-left'></i>
                     </NavLink>
                 </header>
 
@@ -143,8 +153,6 @@ export default function Auth() {
                                 </div>
                             </div>
 
-
-
                             {/* Coluna Pessoal */}
                             <div className=' col-12 col-md-6'>
                                 <p className='col-title'>Pessoal :</p>
@@ -159,25 +167,30 @@ export default function Auth() {
                                     />
                                     <i className='bi bi-person-vcard'></i>
                                 </div>
-                                <div className='user-pass'>
-                                    <input
-                                        type='text'
-                                        placeholder='Primeiro Nome'
-                                        required
-                                        value={primeiroNome}
-                                        onChange={e => setPrimeiroNome(e.target.value)}
-                                    />
-                                    <i className='bi bi-person'></i>
-                                </div>
-                                <div className='user-pass'>
-                                    <input
-                                        type='text'
-                                        placeholder='Último Nome'
-                                        required
-                                        value={ultimoNome}
-                                        onChange={e => setUltimoNome(e.target.value)}
-                                    />
-                                    <i className='bi bi-person'></i>
+                                <div className='name-group'>
+
+                                    <div className='name-field'>
+                                        <input
+                                            type='text'
+                                            placeholder='Primeiro Nome'
+                                            required
+                                            value={primeiroNome}
+                                            onChange={e => setPrimeiroNome(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className='name-field'>
+                                        <input
+                                            type='text'
+                                            placeholder='Último Nome'
+                                            required
+                                            value={ultimoNome}
+                                            onChange={e => setUltimoNome(e.target.value)}
+                                        />
+
+                                        <i className='bi bi-person'></i>
+                                    </div>
+
                                 </div>
                                 <div className='user-pass'>
                                     <input
@@ -191,13 +204,38 @@ export default function Auth() {
                                 </div>
                                 <div className='user-pass'>
                                     <input
-                                        type='password'
+                                        type={mostrarSenha ? 'text' : 'password'}
                                         placeholder='Senha'
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
+
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
                                     />
-                                    <i className='bi bi-lock'></i>
+                                    <i
+                                        className={mostrarSenha ? 'bi bi-lock' : 'bi bi-lock-fill'}
+                                        onClick={() => setMostrarSenha(!mostrarSenha)}
+                                        style={{ cursor: 'pointer', padding: '10px', right: '3px' }}
+                                    ></i>
+                                </div>
+                                <div className='user-pass'>
+                                    <input
+                                        type='password'
+                                        placeholder='Confirmar Senha'
+                                        required
+                                        value={confirmarSenha}
+                                        onChange={e => setConfirmarSenha(e.target.value)}
+
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    />
+
+                                    <i className='bi bi-lock-fill'></i>
                                 </div>
                             </div>
                         </div>
@@ -227,6 +265,11 @@ export default function Auth() {
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
+
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
                                     />
                                     <i className='bi bi-lock'></i>
                                 </div>
