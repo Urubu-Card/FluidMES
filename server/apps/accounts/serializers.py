@@ -1,9 +1,9 @@
-from validate_docbr import CPF, CNPJ
-from rest_framework import serializers
-from apps.accounts.models import Usuarios , Empresa
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
+from validate_docbr                             import CPF, CNPJ
+from rest_framework                             import serializers
+from apps.accounts.models                       import Usuarios , Empresa
+from django.contrib.auth                        import authenticate
+from django.contrib.auth                        import get_user_model
+from django.contrib.auth.password_validation    import validate_password
 
 User = get_user_model()
 
@@ -39,9 +39,10 @@ class CadastroSerializer(serializers.Serializer):
     last_name           = serializers.CharField(max_length=256)
     email               = serializers.EmailField()
     cpf                 = serializers.CharField(max_length=14)
-    password            = serializers.CharField(write_only=True)
+    password            = serializers.CharField(write_only=True,validators = [validate_password])
     nomeEmpresa         = serializers.CharField(max_length=256)
     cnpj                = serializers.CharField(max_length=18)
+    
     
     def validate_cpf(self, value):
         if not validator_cpf.validate(value):
@@ -52,6 +53,7 @@ class CadastroSerializer(serializers.Serializer):
         if not validator_cnpj.validate(value):
             raise serializers.ValidationError("CNPJ Invalido")
         return value
+
     
     def create(self, validated_data):
         empresa = Empresa.objects.create(

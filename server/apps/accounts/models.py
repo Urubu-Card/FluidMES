@@ -1,9 +1,9 @@
 import uuid
-from django.db import models
-from django.conf import settings
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils import timezone
-from datetime import timedelta
+from django.db                          import models
+from django.conf                        import settings
+from django.contrib.auth.models         import AbstractUser, BaseUserManager
+from django.utils                       import timezone
+from datetime                           import timedelta
 
 
 
@@ -16,7 +16,7 @@ class UsuariosManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 

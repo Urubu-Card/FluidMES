@@ -5,6 +5,7 @@ from rest_framework                           import status , permissions
 from rest_framework_simplejwt.tokens          import RefreshToken
 from apps.accounts.models                     import PasswordResetToken
 from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer
+from django.contrib.auth.models               import update_last_login
 from django.contrib.auth                      import get_user_model
 from django.core.mail                         import EmailMultiAlternatives
 from django.conf                              import settings
@@ -13,7 +14,6 @@ from background_task                          import background
 from email.mime.image                         import MIMEImage
 
 User = get_user_model()
-
 
 def set_jwt_cookies(response, access_token, refresh_token):
     response.set_cookie(
@@ -34,57 +34,56 @@ def set_jwt_cookies(response, access_token, refresh_token):
     )
     return response
 
+class Emails:
+    @background(schedule=1)
+    def welcome(username,empresa,email):
+        contexto = {
+            'username': username,
+            'nome_empresa': empresa,
+            'email_usuario': email,
+            'login_url': f"{settings.FRONTEND_URL}/login",
+        }
+        html_content = render_to_string('registration/welcome.html', contexto)
+        text_content = render_to_string('registration/welcome.html', contexto)
 
-@background(schedule=1)
-def welcome(username,empresa,email):
-    contexto = {
-        'username': username,
-        'nome_empresa': empresa,
-        'email_usuario': email,
-        'login_url': f"{settings.FRONTEND_URL}/login",
-    }
-    html_content = render_to_string('registration/welcome.html', contexto)
-    text_content = render_to_string('registration/welcome.html', contexto)
+        email = EmailMultiAlternatives(
+            subject="Bem-vindo à FluidMES!",
+            body=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[email],
+        )
+        email.attach_alternative(html_content, "text/html")
 
-    email = EmailMultiAlternatives(
-        subject="Bem-vindo à FluidMES!",
-        body=text_content,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[email],
-    )
-    email.attach_alternative(html_content, "text/html")
+        logo_path = os.path.join(settings.BASE_DIR, 'assets/images/logo.png')
+        with open(logo_path, 'rb') as f:
+            logo = MIMEImage(f.read())
+            logo.add_header('Content-ID', '<logo_fluidmes>')
+            logo.add_header('Content-Disposition', 'inline', filename='logo_fluidmes.png')
+            email.attach(logo)
 
-    logo_path = os.path.join(settings.BASE_DIR, 'assets/images/logo.png')
-    with open(logo_path, 'rb') as f:
-        logo = MIMEImage(f.read())
-        logo.add_header('Content-ID', '<logo_fluidmes>')
-        logo.add_header('Content-Disposition', 'inline', filename='logo_fluidmes.png')
-        email.attach(logo)
+        email.send()
 
-    email.send()
+    @background(schedule=0)
+    def forgotEmail(primeiro_nome,link,user_email):
 
-@background(schedule=0)
-def forgotEmail(primeiro_nome,link,user_email):
+        context = {
+                        'username':primeiro_nome,
+                        'reset_url':link
+                    }
+        
+        
+        html_content = render_to_string('registration/password_forgot_email.html', context)
+        text_content = render_to_string('registration/password_forgot_email.txt', context)
+        msg = EmailMultiAlternatives(
+            subject="Redefinição de senha - FluidMES",
+            body=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[user_email],
 
-    context = {
-                    'username':primeiro_nome,
-                    'reset_url':link
-                }
-    
-    
-    html_content = render_to_string('registration/password_forgot_email.html', context)
-    text_content = render_to_string('registration/password_forgot_email.txt', context)
-    msg = EmailMultiAlternatives(
-        subject="Redefinição de senha - FluidMES",
-        body=text_content,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email],
+        )
 
-    )
-
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
 class CadastroView(APIView):
     
@@ -97,7 +96,7 @@ class CadastroView(APIView):
             username = request.data.get("first_name")
             empresa  = request.data.get("nomeEmpresa")
             email    = request.data.get("email")
-            welcome(username,empresa,email)
+            Emails.welcome(username,empresa,email)
             return Response(
                 status= status.HTTP_201_CREATED
                 )
@@ -119,7 +118,7 @@ class PasswordResetRequestView(APIView):
             link = f"{settings.FRONTEND_URL}/api/password-reset/confirm/?token={reset_token.token}"
             user_email = user.email
 
-            forgotEmail(username[0],link,user_email)
+            Emails.forgotEmail(username[0],link,user_email)
             
             
         return Response(
@@ -160,14 +159,12 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
-            
-            response = Response({
-                'usuario': UsuarioSerializer(user).data,
-            }, status=status.HTTP_200_OK)
+            update_last_login(None,user)
+            response = Response(status=status.HTTP_200_OK)
             
     
             return set_jwt_cookies(response, refresh.access_token, refresh)
-        
+
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
@@ -181,7 +178,6 @@ class LogoutView(APIView):
             if refresh_token:
                 token   = RefreshToken(refresh_token)
                 token.blacklist()
-                return Response(status=status.HTTP_204_NO_CONTENT)
             
         except Exception:
             pass
