@@ -158,21 +158,21 @@ export default function Funcionarios() {
                 <h1>
                     Funcionários:
                 </h1>
-                <div className='search-container'>
-                    <i className='bi bi-search'></i>
-                    <input
-                        type='text'
-                        placeholder='Buscar Funcionário'
-                        value={busca}
-                        onChange={(e) =>
-                            setBusca(e.target.value)
-                        }
-                    />
-                    <button
-                        className='filter-button'
-                    >
-                        <i className='bi bi-sliders'></i>
-                    </button>
+                <div className='col-md-6'>
+                    <form>
+                        <div className='input-group mb-3'>
+                            <select className='filter-button form-select'>
+                                <option selected>Filtrar por</option>
+                                <option value="1">Category 1</option>
+                                <option value="2">Category 2</option>
+                                <option value="3">Category 3</option>
+                            </select>
+                            <input type="text" className='form-control' placeholder="Achar  funcionário..." />
+                            <button className='btn btn-primary' type="submit">
+                                Buscar
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

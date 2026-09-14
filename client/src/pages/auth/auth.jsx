@@ -28,15 +28,11 @@ export default function Auth() {
 
     useEffect(() => {
         let ativo = true;
-
-        // Usa axios diretamente para não passar pelo interceptor de refresh
-        // (aqui só queremos checar se já há sessão ativa, sem tentar renovar token)
         axios.get('/api/me/', { withCredentials: true })
             .then(() => {
                 if (ativo) navigate('/app');
             })
             .catch(() => {
-                // Sem sessão ativa — usuário fica na tela de auth normalmente
             });
 
         return () => {
@@ -44,7 +40,6 @@ export default function Auth() {
         };
     }, []);
 
-    // Limpa os estados para esvaziar os inputs controlados da tela
     function limparCampos() {
         if (formRef.current) {
             formRef.current.reset();
@@ -71,6 +66,7 @@ export default function Auth() {
 
         try {
             if (isLogin) {
+                console.log('Login:', { usuario, password });
                 await api.post('/api/login/', {
                     usuario: usuario,
                     password
@@ -106,7 +102,6 @@ export default function Auth() {
             } else if (typeof data === 'string') {
                 mensagem = data;
             } else if (data && typeof data === 'object') {
-                // Pega todas as mensagens dos campos
                 mensagem = Object.values(data)
                     .flat()
                     .join(' - ');

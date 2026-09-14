@@ -1,16 +1,16 @@
 body:has(#root) {
-        &::-webkit-scrollbar {
-            width: 12px;
-        }
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
 
-        &::-webkit-scrollbar-track {
-            background-color: transparent;
-            border: none;
-        }
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+        border: none;
+    }
 
-        &::-webkit-scrollbar-thumb {
-            background-color: var(--azul-ceu-escuro);
-        }
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--azul-ceu-escuro);
+    }
 }
 
 .funcionarios-page {
@@ -35,43 +35,27 @@ body:has(#root) {
     }
 
     /* ================= BUSCA ================= */
-    .search-container {
-        width: 315px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        padding: 0 12px;
-        background: #aeb9c5;
-        border-radius: 10px;
-        color: #283447;
-    }
-
-    .search-container input {
-        width: 100%;
-        margin-left: 8px;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 11px;
-        color: #283447;
-    }
-
-    .search-container input::placeholder {
-        color: #536170;
-    }
-
     .filter-button {
-        border: none;
-        background: transparent;
         cursor: pointer;
-        color: #536170;
+        max-width: 124px;
+
+        &,
+        .form-control {
+            background-color: var(--full-white);
+            color: var(--cinza-escuro);
+
+        }
     }
+
+    .form-control::placeholder {
+        color: #8a94a6;
+    }
+
 
     /* ================= TABELA ================= */
     .funcionarios-table {
         width: 100%;
     }
-
 
     /* HEADER DA TABELA */
     .table-header,
