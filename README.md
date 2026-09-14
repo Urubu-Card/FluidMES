@@ -31,3 +31,13 @@ Para a utilização base ira precisar baixar o Redis via docker
 ```docker 
 docker run -d --name my-redis -p 6379:6379 redis:latest
 ```
+
+
+Celery worker 
+```celery
+celery -A config worker -l info -P solo
+```
+Celery
+```celery
+beat celery -A config beat -l info
+```

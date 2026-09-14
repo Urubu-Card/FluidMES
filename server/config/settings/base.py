@@ -11,6 +11,7 @@ INSTALLED_APPS = [
     'daphne',
     'channels',
     'background_task',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -95,6 +96,10 @@ CHANNEL_LAYERS = {
     },
 }
 
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
+USE_I18N = True
+USE_TZ = True
 
 #* Configurações do tempo do token
 SIMPLE_JWT = {
@@ -103,10 +108,9 @@ SIMPLE_JWT = {
 
 }
 
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_TZ = True
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'#? O "/1" especifica o namespace
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_TIMEZONE = TIME_ZONE
 
 STATIC_URL = '/static/'
 #STATICFILES_DIRS = [BASE_DIR / 'static']

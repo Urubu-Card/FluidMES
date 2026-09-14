@@ -191,7 +191,6 @@ class LogoutView(APIView):
 
         return response
 
-
 class TokenRefreshCookieView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -220,7 +219,6 @@ class TokenRefreshCookieView(APIView):
             
         except Exception:
             return Response({"detail": "Refresh token inválido ou expirado."}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 class MeView(APIView):
     
