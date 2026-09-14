@@ -1,0 +1,237 @@
+/* ==============================================
+   PALETA OFICIAL
+   =============================================== */
+:root {
+    --azul-petroleo: #101629;
+    --cinza-escuro: #2D3645;
+    --azul-ceu: #3E7DFF;
+    --azul-ceu-escuro: #2E4E99;
+    --branco-azulado: #DBF3FF;
+    --black: #000000;
+    --full-white: #FFFFFF;
+
+    /* apelidos usados só neste componente */
+    --sb-width: 250px;
+    --sb-handle-w: 26px;
+}
+
+/* ==============================================
+   SIDEBAR (usa o componente offcanvas do Bootstrap)
+   .offcanvas-lg => abaixo de "lg" funciona como offcanvas
+   (escondida, exige .show); em "lg" e acima vira uma
+   coluna estática, sempre visível.
+   =============================================== */
+.sidebar.offcanvas-lg {
+    --bs-offcanvas-width: var(--sb-width);
+    background-color: var(--cinza-escuro);
+    color: var(--branco-azulado);
+    border: none;
+    box-sizing: border-box;
+}
+
+.btn:hover {
+    background-color: var(--azul-escuro) !important;
+}
+
+/*
+   CORREÇÃO DO BUG "a sidebar cresce sozinha depois de um tempo":
+   a partir de "lg" o próprio Bootstrap transforma o offcanvas em
+   position:static + flex-grow:1 e zera o background (com !important),
+   para ele se comportar como uma coluna comum dentro de um layout
+   flex. Como o <aside> normalmente fica ao lado do conteúdo da
+   página dentro de um container flex, esse "flex-grow: 1" faz a
+   sidebar esticar e tomar todo o espaço horizontal disponível assim
+   que o navegador termina de resolver a media query — é isso que
+   parecia um "crescimento" alguns instantes após o carregamento.
+   A correção trava largua/flex e reforça o background aqui, com
+   prioridade maior que a regra responsiva do Bootstrap.
+*/
+@media (min-width: 992px) {
+    .sidebar.offcanvas-lg {
+        position: relative;
+        flex: 0 0 var(--sb-width) !important;
+        width: var(--sb-width) !important;
+        max-width: var(--sb-width);
+        min-width: var(--sb-width);
+        height: 100vh;
+        background-color: var(--cinza-escuro) !important;
+    }
+}
+
+.sidebar nav {
+    width: 100%;
+}
+
+.sidebar a,
+.sidebar button {
+    color: var(--branco-azulado);
+    text-decoration: none !important;
+    font-size: 14px;
+    opacity: 0.8;
+    padding: 10px 0 10px 16px;
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.sidebar a p,
+.sidebar button p {
+    font-size: 14px;
+}
+
+.sidebar a i,
+.sidebar button i {
+    font-size: 16px;
+}
+
+.sidebar-link:hover {
+    opacity: 1;
+    background-color: rgba(219, 243, 255, 0.1);
+    font-weight: 600;
+}
+
+.config-btn {
+    color: var(--branco-azulado) !important;
+    opacity: 0.6;
+}
+
+.config-btn i {
+    font-size: 18px;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.config-btn:hover i {
+    transform: rotate(90deg);
+}
+
+.logout-btn {
+    color: #e05a5a !important;
+}
+
+/* Indicador animado atrás do link ativo */
+.indicador-animado {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    background-color: var(--azul-ceu-escuro);
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: top 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s ease, opacity 0.2s ease;
+    z-index: 1;
+}
+
+/* ==============================================
+   ALÇA / SETA (mobile) — o "puxador" da porta
+   =============================================== */
+.sidebar-handle {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: var(--sb-handle-w);
+    height: 56px;
+    background-color: var(--cinza-escuro);
+    color: var(--branco-azulado);
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1046;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+    transition: left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: var(--cinza-escuro) !important;
+        color: var(--branco-azulado) !important;
+        border: none !important;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25) !important;
+        opacity: 1 !important;
+    }
+}
+
+.sidebar-handle.is-open {
+    left: var(--sb-width);
+}
+
+/* ==============================================
+   CARD PERFIL DO USUÁRIO
+   =============================================== */
+.profile {
+    background-color: rgba(255, 255, 255, 0.03);
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+}
+
+.avatar-container {
+    width: 44px;
+    height: 44px;
+    background-color: var(--azul-ceu);
+    color: var(--full-white);
+    flex-shrink: 0;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cargo {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--branco-azulado);
+    opacity: 0.65;
+}
+
+.name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--branco-azulado);
+    max-width: 150px;
+}
+
+.welcome {
+    font-size: 13px;
+    color: var(--branco-azulado);
+    opacity: 0.65;
+    padding-left: 12px;
+}
+
+/* ==============================================
+   MODAL DE CONFIRMAÇÃO DE SAÍDA (Bootstrap .modal)
+   =============================================== */
+.modal.show {
+    background-color: rgba(16, 22, 41, 0.7);
+    /* --azul-petroleo com transparência */
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-modal-content {
+    background-color: var(--cinza-escuro);
+    color: var(--branco-azulado);
+    border: 1px solid rgba(219, 243, 255, 0.1);
+    border-radius: 16px;
+}
+
+.btn-cancel {
+    background-color: rgba(219, 243, 255, 0.1);
+    color: var(--branco-azulado);
+}
+
+.btn-cancel:hover {
+    background-color: rgba(219, 243, 255, 0.18);
+    color: var(--branco-azulado);
+}
+
+.sidebar-modal-content .btn-danger {
+    background-color: #ba2929;
+    border-color: #ba2929;
+}
+
+.sidebar-modal-content .btn-danger:hover {
+    background-color: #c12828;
+    border-color: #c12828;
+}

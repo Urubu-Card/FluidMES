@@ -1,0 +1,75 @@
+body {
+    background-color: #0f172a;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Customizações do tema escuro */
+.card-dark-blue {
+    background-color: #2E4E99;
+    color: #ffffff;
+}
+
+.card-light-gray {
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+.card-gauge-container {
+    background-color: rgba(30, 58, 138, 0.2);
+    border: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+.card-icon-bg {
+    width: 42px;
+    height: 42px;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.custom-select {
+    background-color: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+}
+
+.custom-select:focus {
+    background-color: #1e293b;
+    color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: none;
+}
+
+/* Animações e Gráficos */
+.gauge-svg {
+    transform: rotate(-90deg);
+}
+
+.chart-container {
+    height: 200px;
+    position: relative;
+}
+
+.chart-grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.bar {
+    width: 32px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    z-index: 2;
+    transition: height 0.5s ease;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.hover-white:hover {
+    color: #ffffff !important;
+}
+.sair:hover{
+    background-color: rgba(239, 68, 68,89%) !important;
+}

@@ -1,0 +1,209 @@
+.oc-wrapper {
+    --oc-bg-page: #12161f;
+    --oc-bg-card: #232c3f;
+    --oc-bg-pill: #2f3a52;
+    --oc-text-heading: #eef1f6;
+    --oc-text-body: #c7cdd9;
+    --oc-text-muted: #838da2;
+    --oc-border-dashed: #45506a;
+    --oc-green-bg: #2f6b48;
+    --oc-green-text: #b7f0c9;
+    --oc-blue-btn: #3f6fd1;
+    --oc-blue-btn-hover: #3560bb;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--oc-bg-page);
+    padding: 48px 16px;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.oc-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--oc-bg-card);
+    color: var(--oc-text-body);
+    padding: 34px 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* ---------- Divisor tracejado ---------- */
+
+.oc-divider {
+    border-top: 2px dashed var(--oc-border-dashed);
+    margin: 2px 0;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.oc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.oc-header-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.oc-header-title {
+    color: var(--oc-text-heading);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.oc-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--oc-text-heading);
+    flex-shrink: 0;
+}
+
+.oc-icon-muted {
+    color: var(--oc-text-muted);
+}
+
+/* ---------- Emissor ---------- */
+
+.oc-issuer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.oc-issuer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.oc-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.oc-pill {
+    background: var(--oc-bg-pill);
+    color: var(--oc-text-muted);
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 8px;
+}
+
+.oc-status-badge {
+    background: var(--oc-green-bg);
+    color: var(--oc-green-text);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 26px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+/* ---------- Colunas: Pedido por / Aprovado por / Observação ---------- */
+
+.oc-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr;
+    gap: 12px;
+    text-align: center;
+}
+
+.oc-col-label {
+    color: var(--oc-text-heading);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.oc-col-value {
+    color: var(--oc-text-body);
+    font-size: 13px;
+}
+
+.oc-note-text {
+    color: var(--oc-text-muted);
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+/* ---------- Tabela de itens ---------- */
+
+.oc-table {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.oc-table-head,
+.oc-table-row {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 1.3fr 0.7fr;
+    gap: 8px;
+}
+
+.oc-table-head span {
+    color: var(--oc-text-heading);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.oc-table-row span {
+    color: var(--oc-text-muted);
+    font-size: 13px;
+}
+
+/* ---------- Rodapé ---------- */
+
+.oc-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.oc-close-btn {
+    background: var(--oc-blue-btn);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 26px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.oc-close-btn:hover {
+    background: var(--oc-blue-btn-hover);
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (max-width: 420px) {
+    .oc-card {
+        padding: 26px 18px;
+    }
+
+    .oc-columns {
+        grid-template-columns: 1fr;
+        text-align: left;
+    }
+
+    .oc-table-head,
+    .oc-table-row {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 4px;
+    }
+
+    .oc-status-badge {
+        padding: 10px 18px;
+    }
+}
