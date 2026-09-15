@@ -1,97 +1,327 @@
-.cimaSts{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+.pedidos-page {
+    width: 100%;
+    padding: 30px 40px;
+    position: relative;
+
+
+    /* ================= HEADER ================= */
+    .pedidos-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .pedidos-header h1 {
+        color: var(--branco-azulado);
+        font-size: 32px;
+        margin: 0;
+    }
+
+    .pedidos-header .input-group {
+        background-color: var(--branco-azulado);
+        height: 50px;
+        width: 350px;
+        display: flex;
+        align-items: center;
+        border-radius: 10px;
+        padding: 0 15px;
+        margin-bottom: 0 !important;
+    }
+
+    .pedidos-header .search-icon {
+        color: var(--azul-ceu-escuro);
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+    }
+
+    .pedidos-header .form-control {
+        background: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: var(--azul-ceu-escuro);
+        font-size: 14px;
+        padding: 0;
+    }
+
+    .pedidos-header .form-control::placeholder {
+        color: var(--azul-ceu-escuro);
+        opacity: 0.6;
+    }
+
+    .pedidos-header .filter-button {
+        background: transparent;
+        border: none;
+        color: var(--azul-ceu-escuro);
+        font-size: 18px;
+        padding: 0;
+        margin-left: 10px;
+    }
+
+    /* ================= CARDS DE STATUS ================= */
+    .status-cards {
+        display: flex;
+        flex-direction: row;
+        gap: 25px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .status-card {
+        flex: 1;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-radius: 10px;
+        padding: 0 25px;
+        color: var(--branco-azulado);
+    }
+
+    .status-card h3 {
+        font-size: 13px;
+        font-weight: 400;
+        opacity: 0.85;
+        margin: 0;
+    }
+
+    .status-card p {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .status-card.escuro {
+        background-color: var(--azul-ceu-escuro);
+    }
+
+    .status-card.claro {
+        background-color: var(--azul-ceu);
+    }
+
+    .status-card-icon {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: var(--branco-azulado);
+        height: 45px;
+        width: 45px;
+        min-width: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    /* ================= TABELA ================= */
+    .pedidos-table {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-header {
+        background-color: var(--branco-azulado);
+        color: var(--azul-ceu-escuro);
+        height: 55px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 0 20px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .table-header i {
+        font-size: 11px;
+        margin-left: 4px;
+    }
+
+    .table-row {
+        width: 100%;
+        min-height: 65px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 0 20px;
+        margin-bottom: 10px;
+        color: var(--branco-azulado);
+        background-color: var(--azul-ceu);
+    }
+
+    .table-row:nth-child(odd) {
+        background-color: var(--cinza-escuro);
+    }
+
+    /* ================= COLUNAS ================= */
+    .check-column {
+        width: 25px;
+        display: flex;
+        align-items: center;
+    }
+
+    .ordem-column {
+        color: var(--azul-ceu-escuro);
+        width: 100px;
+    }
+
+    .receita-column {
+        color: var(--azul-ceu-escuro);
+        flex: 1;
+        display: flex;
+    }
+
+    .data-column {
+        color: var(--azul-ceu-escuro);
+        width: 110px;
+    }
+
+    .quantidade-column {
+        color: var(--azul-ceu-escuro);
+        width: 110px;
+    }
+
+    .status-column {
+        color: var(--azul-ceu-escuro);
+        width: 110px;
+    }
+
+    .editar-column {
+        color: var(--azul-ceu-escuro);
+        width: 80px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    /* ================= RECEITA (NOME + IMAGEM) ================= */
+    .pedido-receita {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pedido-avatar {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.15);
+        color: var(--branco-azulado);
+        font-size: 18px;
+    }
+
+    .pedido-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .pedido-receita-info strong {
+        font-size: 14px;
+        display: block;
+    }
+
+    .pedido-receita-info p {
+        font-size: 12px;
+        opacity: 0.7;
+        margin: 0;
+    }
+
+    /* ================= STATUS BADGE ================= */
+    .status {
+        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .status-feito {
+        background-color: #2ecc71;
+        color: #0b3d1c;
+    }
+
+    .status-cancelado {
+        background-color: #e74c3c;
+        color: #4a0c07;
+    }
+
+    .status-fazendo {
+        background-color: #f1c40f;
+        color: #4d3c00;
+    }
+
+    .status-nafila {
+        background-color: #7f8c9a;
+        color: #1c2530;
+    }
+
+    .status-offline {
+        background-color: #7f8c9a;
+        color: #1c2530;
+    }
+
+    /* ================= AÇÕES ================= */
+    .action-button {
+        background: transparent;
+        border: none;
+        color: var(--branco-azulado);
+        opacity: 0.8;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .action-button:hover {
+        opacity: 1;
+    }
+
+    .delete-button {
+        color: #e74c3c;
+    }
+
+    /* ================= MENSAGENS ================= */
+    .table-message {
+        text-align: center;
+        padding: 30px;
+        color: var(--branco-azulado);
+        opacity: 0.7;
+    }
+
+    .table-message.error {
+        color: #e74c3c;
+    }
+
+    /* ================= BOTÃO ADICIONAR ================= */
+    .add-pedido {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: var(--azul-ceu);
+        color: #fff;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        border: none;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .add-pedido:hover {
+        filter: brightness(1.1);
+    }
 }
-
-.pesquisaPedidos{
-    background-color: var(--branco-azulado);
-    color: var(--azul-ceu);
-    height: 50px;
-    width: 350px;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 25px;
-
-    font-size: 14px;
-    border-radius: 10px;
-}
-
-.stsPedidos{
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-.totalPedidos{
-    background-color: var(--azul-ceu-escuro);
-    height: 150px;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.totalRealizados{
-    background-color: var(--azul-ceu);
-    height: 150px;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.totalCancelados{
-    background-color: var(--azul-ceu-escuro);
-    height: 150px;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.filtroPedidos{
-    background-color: var(--branco-azulado);
-    color: var(--azul-ceu);
-    height: 60px;
-    width: 1300px;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    border-radius: 10px;
-}
-
-.caixinha{
-    color: var(--branco-azulado);
-    height: 40px;
-    width: 20px;
-    border-radius: 10px;
-}
-
-.linha{
-    width: 1300px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-.azul{background-color: var(--azul-ceu);}
-.escuro{background-color: var(--cinza-escuro);}

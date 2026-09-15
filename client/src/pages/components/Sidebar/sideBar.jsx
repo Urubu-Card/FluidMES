@@ -5,7 +5,7 @@ import api from '../../../services/api.js';
 
 
 export default function Sidebar({ dados }) {
-    const cargos = {3: 'Funcionário', 2: 'Chefe', 1: 'Preposto'};
+    const cargos = { 3: 'Funcionário', 2: 'Chefe', 1: 'Preposto' };
     const location = useLocation();
     const sidebarRef = useRef(null);
     const indicadorRef = useRef(null);
@@ -15,7 +15,8 @@ export default function Sidebar({ dados }) {
 
     const primeiroNome = dados?.first_name || 'Usuário';
     const segundoNome = dados?.last_name || '';
-    const cargo = cargos[dados?.role] || 'Cargo Desconhecido'; const fotoUrl = dados?.fotoUrl || null;
+    const cargo = cargos[dados?.role] || 'Cargo Desconhecido';
+    const fotoUrl = dados?.fotoUrl || null;
 
     useEffect(() => {
         if (!sidebarRef.current || !indicadorRef.current) return;
@@ -95,19 +96,24 @@ export default function Sidebar({ dados }) {
                             <i className='bi bi-house'></i>
                             <p className='mb-0'>Home</p>
                         </NavLink>
-                        {/* Outros links de navegação mantidos ... */}
                         <NavLink to='/app/pedidos' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-file-earmark'></i>
                             <p className='mb-0'>Pedidos</p>
                         </NavLink>
-                        <NavLink to='/app/rendimento' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
-                            <i className='bi bi-graph-up-arrow'></i>
-                            <p className='mb-0'>Rendimento</p>
-                        </NavLink>
-                        <NavLink to='/app/funcionarios' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
-                            <i className='bi bi-person-vcard'></i>
-                            <p className='mb-0'>Funcionários</p>
-                        </NavLink>
+                        {(dados?.role !== 3) && (
+                            <>
+                                {(dados?.role !== 2) && (
+                                    <NavLink to='/app/rendimento' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
+                                        <i className='bi bi-graph-up-arrow'></i>
+                                        <p className='mb-0'>Rendimento</p>
+                                    </NavLink>
+                                )}
+                                <NavLink to='/app/funcionarios' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
+                                    <i className='bi bi-person-vcard'></i>
+                                    <p className='mb-0'>Funcionários</p>
+                                </NavLink>
+                            </>
+                        )}
                         <NavLink to='/app/plantas' className='sidebar-link d-flex align-items-center gap-2 w-100 rounded-3'>
                             <i className='bi bi-cpu'></i>
                             <p className='mb-0'>Plantas</p>

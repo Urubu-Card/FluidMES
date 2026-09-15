@@ -79,6 +79,7 @@ body:has(#root) {
         min-height: 53px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.01);
         font-size: 12px;
+        margin-bottom: 12px;
         transition: background 0.2s;
     }
 
@@ -91,14 +92,15 @@ body:has(#root) {
         width: 15px;
         height: 15px;
         appearance: none;
-        border: 1px solid #3e7dff;
+        border: 1px solid var(--azul-ceu);
         border-radius: 4px;
         background: transparent;
         cursor: pointer;
     }
 
     .check-column input:checked {
-        background: #3e7dff;
+        background: var(--azul-ceu);
+        border: 2px solid var(--azul-ceu-escuro);
     }
 
     /* ================= NOME ================= */

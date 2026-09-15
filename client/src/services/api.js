@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
+    /*baseURL: 'https://serverfluidmes.vercel.app',*/
     baseURL: '',
-    withCredentials: true
-});
+    withCredentials: true,
+})
 
 const ROTAS_PUBLICAS = [
     '/api/login/',
@@ -49,9 +50,7 @@ api.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }
-
         return Promise.reject(error);
     }
 );
-
 export default api;

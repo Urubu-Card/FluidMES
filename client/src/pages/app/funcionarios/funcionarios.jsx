@@ -2,20 +2,20 @@ import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 
-export default function Funcionarios() {
-
+export default function Funcionarios({ dados }) {
     const [funcionarios, setFuncionarios] = useState([]);
     const [busca, setBusca] = useState('');
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState('');
 
-    // IDs dos funcionários selecionados
     const [selecionados, setSelecionados] = useState([]);
+
+    const cargos = { 3: 'Funcionário', 2: 'Chefe', 1: 'Preposto' };
+
 
     // ================================
     // BUSCAR FUNCIONÁRIOS DO BACKEND
     // ================================
-
     useEffect(() => {
         buscarFuncionarios();
     }, []);
@@ -24,7 +24,6 @@ export default function Funcionarios() {
         try {
             setCarregando(true);
             const response = await api.get('/api/funcionarios/');
-            console.log(response.data);
             setFuncionarios(response.data);
         } catch (error) {
             console.error(error);
@@ -50,13 +49,10 @@ export default function Funcionarios() {
     // ================================
     // SELECIONAR FUNCIONÁRIO
     // ================================
-
     function selecionarFuncionario(id) {
         setSelecionados((atual) => {
             if (atual.includes(id)) {
-                return atual.filter((funcionarioId) =>
-                    funcionarioId !== id
-                );
+                return atual.filter((funcionarioId) => funcionarioId !== id);
             }
             return [...atual, id];
         });
@@ -65,7 +61,6 @@ export default function Funcionarios() {
     // ================================
     // SELECIONAR TODOS
     // ================================
-
     function selecionarTodos() {
         if (
             selecionados.length === funcionariosFiltrados.length &&
@@ -74,9 +69,7 @@ export default function Funcionarios() {
             setSelecionados([]);
         } else {
             setSelecionados(
-                funcionariosFiltrados.map(
-                    (funcionario) => funcionario.id
-                )
+                funcionariosFiltrados.map((funcionario) => funcionario.id)
             );
         }
     }
@@ -84,11 +77,9 @@ export default function Funcionarios() {
     // ================================
     // EDITAR
     // ================================
-
     function editarFuncionario(funcionario) {
         console.log('Editar:', funcionario);
-        // Futuramente:
-        // abrir modal de edição
+        // Futuramente: abrir modal de edição
     }
 
     // ================================
@@ -99,27 +90,17 @@ export default function Funcionarios() {
             'Deseja realmente excluir este funcionário?'
         );
         if (!confirmar) return;
+        
         try {
-            await api.delete(
-                `/api/funcionarios/${id}/`
-            );
+            await api.delete(`/api/funcionarios/${id}/`);
 
-            // Remove da tela sem precisar recarregar
             setFuncionarios((atual) =>
-                atual.filter(
-                    (funcionario) =>
-                        funcionario.id !== id
-                )
+                atual.filter((funcionario) => funcionario.id !== id)
             );
 
-            // Remove dos selecionados
             setSelecionados((atual) =>
-                atual.filter(
-                    (funcionarioId) =>
-                        funcionarioId !== id
-                )
+                atual.filter((funcionarioId) => funcionarioId !== id)
             );
-
         } catch (error) {
             console.error(error);
             alert('Erro ao excluir funcionário.');
@@ -129,46 +110,44 @@ export default function Funcionarios() {
     // ================================
     // ADICIONAR FUNCIONÁRIO
     // ================================
-
     function adicionarFuncionario() {
         console.log('Adicionar funcionário');
-        // Futuramente:
-        // abrir modal
+        // Futuramente: abrir modal
     }
 
     // ================================
     // STATUS
     // ================================
-
     function getStatusClass(status) {
         const statusLower = status?.toLowerCase();
-        if (statusLower === 'online') {
-            return 'status-online';
-        }
-        if (statusLower === 'ausente') {
-            return 'status-ausente';
-        }
+        if (statusLower === 'ativo') return 'status-online';
+        if (statusLower === 'inativo') return 'status-ausente';
         return 'status-offline';
     }
+
     return (
         <div className='funcionarios-page'>
 
             {/* ================= HEADER ================= */}
             <div className='funcionarios-header'>
-                <h1>
-                    Funcionários:
-                </h1>
+                <h1>Funcionários:</h1>
                 <div className='col-md-6'>
-                    <form>
+                    <form onSubmit={(e) => e.preventDefault()}>
                         <div className='input-group mb-3'>
-                            <select className='filter-button form-select'>
-                                <option selected>Filtrar por</option>
+                            <select className='filter-button form-select' defaultValue="">
+                                <option value="" disabled>Filtrar por</option>
                                 <option value="1">Category 1</option>
                                 <option value="2">Category 2</option>
                                 <option value="3">Category 3</option>
                             </select>
-                            <input type="text" className='form-control' placeholder="Achar  funcionário..." />
-                            <button className='btn btn-primary' type="submit">
+                            <input 
+                                type='text' 
+                                className='form-control' 
+                                placeholder='Achar funcionário...' 
+                                value={busca}
+                                onChange={(e) => setBusca(e.target.value)}
+                            />
+                            <button className='btn btn-primary' type='button'>
                                 Buscar
                             </button>
                         </div>
@@ -190,85 +169,58 @@ export default function Funcionarios() {
                             onChange={selecionarTodos}
                         />
                     </div>
-                    <div className='nome-column'>
-                        Nome
-                    </div>
-                    <div className='cargo-column'>
-                        Cargo
-                    </div>
-                    <div className='contato-column'>
-                        Contato
-                    </div>
-                    <div className='status-column'>
-                        Status
-                    </div>
-                    <div className='editar-column'>
-                        Editar
-                    </div>
+                    <div className='nome-column'>Nome</div>
+                    <div className='cargo-column'>Cargo</div>
+                    <div className='contato-column'>Contato</div>
+                    <div className='status-column'>Status</div>
+                    <div className='editar-column'>Editar</div>
                 </div>
 
-                {/* ================= LOADING ================= */}
+                {/* LOADING */}
                 {carregando && (
                     <div className='table-message'>
                         Carregando funcionários...
                     </div>
                 )}
 
-                {/* ================= ERRO ================= */}
+                {/* ERRO */}
                 {erro && (
                     <div className='table-message error'>
                         {erro}
                     </div>
                 )}
 
-                {/* ================= FUNCIONÁRIOS ================= */}
+                {/* FUNCIONÁRIOS */}
                 {!carregando &&
                     funcionariosFiltrados.map((funcionario) => (
-                        <div
-                            className='table-row'
-                            key={funcionario.id}
-                        >
+                        <div className='table-row' key={funcionario.id}>
                             {/* CHECKBOX */}
                             <div className='check-column'>
                                 <input
                                     type='checkbox'
-                                    checked={
-                                        selecionados.includes(
-                                            funcionario.id
-                                        )
-                                    }
-                                    onChange={() =>
-                                        selecionarFuncionario(
-                                            funcionario.id
-                                        )
-                                    }
+                                    checked={selecionados.includes(funcionario.id)}
+                                    onChange={() => selecionarFuncionario(funcionario.id)}
                                 />
                             </div>
+                            
                             {/* NOME */}
                             <div className='nome-column funcionario-nome'>
-                                {/* SETA */}
                                 <i className='bi bi-chevron-down'></i>
-                                {/* FOTO */}
                                 <div className='funcionario-avatar'>
                                     {funcionario.foto ? (
-                                        <img
-                                            src={funcionario.foto}
-                                            alt={funcionario.first_name}
-                                        />
+                                        <img src={funcionario.foto} alt={funcionario.first_name} />
                                     ) : (
                                         <i className='bi bi-person-fill'></i>
                                     )}
                                 </div>
-                                {/* NOME */}
                                 <span>
-                                    {funcionario.first_name}{' '}
-                                    {funcionario.last_name}
+                                    {funcionario.first_name} {funcionario.last_name}
                                 </span>
                             </div>
 
-                            {/* CARGO */}
+                            {/* CARGO (Corrigido o acento na variável) */}
                             <div className='cargo-column'>
-                                {funcionario.cargo || 'Funcionário'}
+                                {cargos[funcionario.role]}
                             </div>
 
                             {/* EMAIL */}
@@ -278,39 +230,22 @@ export default function Funcionarios() {
 
                             {/* STATUS */}
                             <div className='status-column'>
-                                <span
-                                    className={`
-                                        status
-                                        ${getStatusClass(funcionario.status)}
-                                    `}
-                                >
-                                    {funcionario.status || 'Offline'}
+                                <span className={`status ${getStatusClass(funcionario.is_active ? 'Ativo' : 'Inativo')}`}>
+                                    {funcionario.is_active ? 'Ativo' : 'Inativo'}
                                 </span>
                             </div>
 
                             {/* AÇÕES */}
                             <div className='editar-column'>
-
-                                {/* EDITAR */}
                                 <button
                                     className='action-button edit-button'
-                                    onClick={() =>
-                                        editarFuncionario(
-                                            funcionario
-                                        )
-                                    }
+                                    onClick={() => editarFuncionario(funcionario)}
                                 >
                                     <i className='bi bi-pencil-fill'></i>
                                 </button>
-
-                                {/* EXCLUIR */}
                                 <button
                                     className='action-button delete-button'
-                                    onClick={() =>
-                                        excluirFuncionario(
-                                            funcionario.id
-                                        )
-                                    }
+                                    onClick={() => excluirFuncionario(funcionario.id)}
                                 >
                                     <i className='bi bi-trash-fill'></i>
                                 </button>
@@ -319,21 +254,16 @@ export default function Funcionarios() {
                     ))
                 }
 
-                {/* ================= VAZIO ================= */}
-                {!carregando &&
-                    funcionariosFiltrados.length === 0 && (
-                        <div className='table-message'>
-                            Nenhum funcionário encontrado.
-                        </div>
-                    )
-                }
+                {/* VAZIO */}
+                {!carregando && funcionariosFiltrados.length === 0 && (
+                    <div className='table-message'>
+                        Nenhum funcionário encontrado.
+                    </div>
+                )}
             </div>
 
             {/* ================= BOTÃO ADICIONAR ================= */}
-            <button
-                className='add-funcionario'
-                onClick={adicionarFuncionario}
-            >
+            <button className='add-funcionario' onClick={adicionarFuncionario}>
                 <i className='bi bi-plus-lg'></i>
             </button>
         </div>
