@@ -88,3 +88,10 @@ class LoginSerializer(serializers.Serializer):
         return data
     
     
+class FuncionarioSerializer(serializers.ModelSerializer):
+    empresa = EmpresaSerializer(read_only=True)
+    
+    class Meta:
+        model  = Usuarios
+        fields = ['id', 'email', 'first_name','last_name', 'cpf', 'role', 'empresa']
+        read_only_fields = fields

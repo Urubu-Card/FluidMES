@@ -1,10 +1,12 @@
 import os
 from rest_framework.views                     import APIView
+from rest_framework.generics                  import ListAPIView
 from rest_framework.response                  import Response
+from rest_framework.permissions               import IsAuthenticated
 from rest_framework                           import status , permissions
 from rest_framework_simplejwt.tokens          import RefreshToken
 from apps.accounts.models                     import PasswordResetToken
-from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer
+from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer ,FuncionarioSerializer
 from django.contrib.auth.models               import update_last_login
 from django.contrib.auth                      import get_user_model
 from django.core.mail                         import EmailMultiAlternatives
@@ -188,6 +190,7 @@ class LogoutView(APIView):
         return response
 
 class TokenRefreshCookieView(APIView):
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
@@ -213,7 +216,7 @@ class TokenRefreshCookieView(APIView):
             )
             return response
             
-        except Exception:
+        except Exception :
             return Response({"detail": "Refresh token inválido ou expirado."}, status=status.HTTP_401_UNAUTHORIZED)
 
 class MeView(APIView):
@@ -223,4 +226,16 @@ class MeView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         return Response(UsuarioSerializer(request.user).data)
 
+class FuncionariosView(ListAPIView):
+    serializer_class = FuncionarioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role != 1:
+            return User.objects.none()
         
+        return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
+
+    
+
+
