@@ -7,6 +7,7 @@ from rest_framework                           import status , permissions
 from rest_framework_simplejwt.tokens          import RefreshToken
 from apps.accounts.models                     import PasswordResetToken
 from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer ,FuncionarioSerializer
+from django.db.models                         import Q
 from django.contrib.auth.models               import update_last_login
 from django.contrib.auth                      import get_user_model
 from django.core.mail                         import EmailMultiAlternatives
@@ -231,10 +232,39 @@ class FuncionariosView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role != 1:
+        if self.request.user.role == 3:
             return User.objects.none()
+
+        queryset = User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
         
-        return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
+        termo_busca = self.request.query_params.get('busca')
+        cargo = self.request.query_params.get('cargo')
+        status = self.request.query_params.get('status')
+
+        
+        if termo_busca:
+            queryset = queryset.filter(
+                Q(first_name__icontains=termo_busca) | 
+                Q(last_name__icontains=termo_busca) | 
+                Q(email__icontains=termo_busca)
+            )
+            
+        if cargo:
+            queryset = queryset.filter(cargo__iexact=cargo)
+        if self.request.user.role ==2:
+            return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id).exclude(role=1)
+            
+        if status is not None:
+            is_active = status.lower() in ['true', '1', 'yes']
+            queryset = queryset.filter(is_active=is_active)
+        
+        return queryset
+
+        
+            
+
+
+        
 
     
 
