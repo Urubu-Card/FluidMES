@@ -1,6 +1,6 @@
 import os
 from rest_framework.views                     import APIView
-from rest_framework.generics                  import ListAPIView
+from rest_framework.generics                  import ListCreateAPIView
 from rest_framework.response                  import Response
 from rest_framework.permissions               import IsAuthenticated
 from rest_framework                           import status , permissions
@@ -227,7 +227,7 @@ class MeView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         return Response(UsuarioSerializer(request.user).data)
 
-class FuncionariosView(ListAPIView):
+class FuncionariosView(ListCreateAPIView):
     serializer_class = FuncionarioSerializer
     permission_classes = [IsAuthenticated]
 
@@ -241,6 +241,8 @@ class FuncionariosView(ListAPIView):
         cargo = self.request.query_params.get('cargo')
         status = self.request.query_params.get('status')
 
+        if self.request.user.role ==2:
+            queryset = queryset.exclude(role=1)
         
         if termo_busca:
             queryset = queryset.filter(
@@ -250,17 +252,15 @@ class FuncionariosView(ListAPIView):
             )
             
         if cargo:
-            queryset = queryset.filter(cargo__iexact=cargo)
-        if self.request.user.role ==2:
-            return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id).exclude(role=1)
+            queryset = queryset.filter(role__iexact=int(cargo))
+
             
         if status is not None:
-            is_active = status.lower() in ['true', '1', 'yes']
+            is_active = status.lower() in ['true', '1', 'yes']  
             queryset = queryset.filter(is_active=is_active)
         
         return queryset
 
-        
             
 
 
