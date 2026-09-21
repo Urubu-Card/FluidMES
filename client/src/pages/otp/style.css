@@ -1,4 +1,5 @@
 .otp-page {
+    & {
     position: relative;
     width: 100vw;
     min-height: 100vh;
@@ -220,5 +221,7 @@
         height: 50px;
         font-size: 20px;
     }
+}
+
 }
 

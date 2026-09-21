@@ -1,6 +1,6 @@
-body {
+.home-page {
+    & {
     background-color: #0f172a;
-    font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* Customizações do tema escuro */
@@ -70,6 +70,7 @@ body {
 .hover-white:hover {
     color: #ffffff !important;
 }
-.sair:hover{
+    .sair:hover{
     background-color: rgba(239, 68, 68,89%) !important;
+    }
 }

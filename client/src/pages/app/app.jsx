@@ -32,16 +32,16 @@ export default function App() {
     }, [navigate]);
 
     if (isLoading) {
-        return <div className="spinner">Verificando permissão<span>.</span><span>.</span><span>.</span></div>; 
+        return <div className="app-loading"><div className="spinner">Verificando permissão<span>.</span><span>.</span><span>.</span></div></div>;
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
+        <div className='app-shell d-flex min-vh-100 vw-100'>
             {/* SIDEBAR */}
             <Sidebar dados={dadosUsuario} />
 
             {/* CONTENT */}
-            <main style={{ flex: 1, overflowY: 'auto', padding: '24px', backgroundColor: '#101629' }}>
+            <main className='app-main flex-grow-1 overflow-y-auto p-3 p-lg-4'>
                 <Outlet />
             </main>
         </div>

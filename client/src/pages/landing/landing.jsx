@@ -47,9 +47,8 @@ function Landing() {
             navigate('/login');
             return;
         }
-      
         const handleBeforeInstallPrompt = (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
             console.log('Instalação desativada na Landing Page.');
         };
 
@@ -65,6 +64,7 @@ function Landing() {
             <CardNav
                 logo={logo}
                 logoAlt="Company Logo"
+                logoHref="#inicio"
                 items={items}
                 baseColor={"var(--cinza-escuro)"}
                 menuColor={"var(--branco-azulado)"}
@@ -78,22 +78,22 @@ function Landing() {
                 }}
             />
 
-            <section className="landing-hero">
-              <FerroFluid
-                className = 'background-fluid'
-                colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
-                scale={1.6}
-                speed={.1}
-                turbulence={1}
-                fluidity={0.15}
-                rimWidth={0.2}
-                sharpness={2.5}
-                shimmer={1.5}
-                glow={2.8}
-                flowDirection="down"
-                opacity={.67}
-                mouseInteraction={false}
-              />
+            <section className="landing-hero" id='inicio'>
+                <FerroFluid
+                    className='background-fluid'
+                    colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
+                    scale={1.6}
+                    speed={.1}
+                    turbulence={1}
+                    fluidity={0.15}
+                    rimWidth={0.2}
+                    sharpness={2.5}
+                    shimmer={1.5}
+                    glow={2.8}
+                    flowDirection="down"
+                    opacity={.67}
+                    mouseInteraction={false}
+                />
                 <div className='content'>
                     <h1>Fluid
                         <span>

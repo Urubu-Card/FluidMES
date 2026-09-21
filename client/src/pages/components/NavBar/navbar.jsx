@@ -8,6 +8,7 @@ import './style.css';
 const CardNav = ({
   logo,
   logoAlt = 'Logo',
+  logoHref = '',
   items,
   className = '',
   ease = 'power3.out',
@@ -134,6 +135,13 @@ const CardNav = ({
     if (el) cardsRef.current[i] = el;
   };
 
+  const handleLogoClick = event => {
+    if (!logoHref?.startsWith('#')) return;
+
+    event.preventDefault();
+    document.querySelector(logoHref)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className={`card-nav-container ${className}`}>
       <nav ref={navRef} className={`card-nav ${isExpanded ? 'open' : ''}`} style={{ backgroundColor: baseColor }}>
@@ -158,7 +166,9 @@ const CardNav = ({
           </div>
 
           <div className="logo-container">
-            <img src={logo} alt={logoAlt} className="logo" />
+            <a href={logoHref || undefined} onClick={handleLogoClick} aria-label="Voltar ao início">
+              <img src={logo} alt={logoAlt} className="logo" />
+            </a>
           </div>
 
           <Link

@@ -325,3 +325,18 @@
         filter: brightness(1.1);
     }
 }
+
+/* O grupo de busca usa os controles Bootstrap compartilhados. */
+.pedidos-page .pedidos-header .app-search-group {
+    width: min(100%, 520px);
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+}
+
+.pedidos-page .pedidos-header .app-search-group .form-control {
+    padding: .375rem .75rem;
+    background-color: var(--full-white);
+    color: #1d2b3d;
+}

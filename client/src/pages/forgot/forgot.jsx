@@ -1,12 +1,11 @@
 import { useState, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
 import './style.css';
 
 export default function ForgotPassword() {
     const formRef = useRef(null);
-    const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [erro, setErro] = useState('');

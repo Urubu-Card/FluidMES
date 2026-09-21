@@ -1,4 +1,5 @@
-.spinner {
+.app-loading {
+    .spinner {
     width: 100vw;
     height: 100vh;
     background-color: var(--azul-petroleo);
@@ -8,35 +9,33 @@
     justify-content: center;
     align-items: center;
     color: white; /* Ajuste a cor do texto se necessário */
-    font-family: sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 3rem;
+    }
+
+}
+
+.app-shell {
+    background-color: var(--azul-petroleo);
+
+    .app-main { min-width: 0; background-color: var(--azul-petroleo); }
 }
 
 /* Aplica a animação em todas as bolinhas */
-.spinner span {
+.app-loading .spinner span {
     display: inline-block;
     animation: pular 0.6s infinite alternate;
 }
 
 /* Cria o atraso (delay) para o efeito de onda */
-.spinner span:nth-child(1) {
+.app-loading .spinner span:nth-child(1) {
     animation-delay: 0.1s;
 }
 
-.spinner span:nth-child(2) {
+.app-loading .spinner span:nth-child(2) {
     animation-delay: 0.2s;
 }
 
-.spinner span:nth-child(3) {
+.app-loading .spinner span:nth-child(3) {
     animation-delay: 0.3s;
-}
-
-/* Define o movimento de pulo */
-@keyframes pular {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(-10px); /* Altura do pulo */
-    }
 }

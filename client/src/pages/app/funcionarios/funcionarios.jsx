@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 
-export default function Funcionarios({ dados }) {
+export default function Funcionarios() {
     const [funcionarios, setFuncionarios] = useState([]);
     const [busca, setBusca] = useState('');
     const [carregando, setCarregando] = useState(true);
@@ -133,12 +133,11 @@ export default function Funcionarios({ dados }) {
                 <h1>Funcionários:</h1>
                 <div className='col-md-6'>
                     <form onSubmit={(e) => e.preventDefault()}>
-                        <div className='input-group mb-3'>
-                            <select className='filter-button form-select' defaultValue="">
-                                <option value="" disabled>Filtrar por</option>
-                                <option value="1">Category 1</option>
-                                <option value="2">Category 2</option>
-                                <option value="3">Category 3</option>
+                        <div className='input-group app-search-group'>
+                            <select className='form-select' defaultValue="">
+                                <option value="">Filtrar por</option>
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
                             </select>
                             <input 
                                 type='text' 
@@ -147,8 +146,8 @@ export default function Funcionarios({ dados }) {
                                 value={busca}
                                 onChange={(e) => setBusca(e.target.value)}
                             />
-                            <button className='btn btn-primary' type='button'>
-                                Buscar
+                            <button className='btn btn-primary' type='submit'>
+                                <i className='bi bi-search me-2' aria-hidden='true'></i>Buscar
                             </button>
                         </div>
                     </form>

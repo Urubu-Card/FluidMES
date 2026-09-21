@@ -38,7 +38,7 @@ export default function Auth() {
         return () => {
             ativo = false;
         };
-    }, []);
+    }, [navigate]);
 
     function limparCampos() {
         if (formRef.current) {

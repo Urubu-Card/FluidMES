@@ -1,4 +1,5 @@
-body:has(.landing-page) {
+.landing-page {
+    & {
     background-color: var(--cinza-escuro);
     color: var(--full-white);
     margin: 0;
@@ -17,7 +18,7 @@ body:has(.landing-page) {
     }
 }
 
-.landing-page {
+& {
     .background-fluid {
         position: absolute;
         top: 0;
@@ -79,4 +80,6 @@ body:has(.landing-page) {
             font-size: 55px;
         }
     }
+}
+
 }

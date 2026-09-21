@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 
-export default function Pedidos({ dados }) {
+export default function Pedidos() {
     const [pedidos, setPedidos] = useState([]);
     const [busca, setBusca] = useState('');
     const [carregando, setCarregando] = useState(true);
@@ -140,10 +140,13 @@ export default function Pedidos({ dados }) {
                 <h1>Pedidos:</h1>
                 <div className='col-md-6'>
                     <form onSubmit={(e) => e.preventDefault()}>
-                        <div className='input-group mb-3'>
-                            <span className='search-icon'>
-                                <i className='bi bi-search'></i>
-                            </span>
+                        <div className='input-group app-search-group'>
+                            <select className='form-select' defaultValue="">
+                                <option value="">Filtrar por</option>
+                                <option value="feito">Realizado</option>
+                                <option value="fazendo">Em produção</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
                             <input
                                 type='text'
                                 className='form-control'
@@ -151,8 +154,8 @@ export default function Pedidos({ dados }) {
                                 value={busca}
                                 onChange={(e) => setBusca(e.target.value)}
                             />
-                            <button className='filter-button' type='button'>
-                                <i className='bi bi-sliders'></i>
+                            <button className='btn btn-primary' type='submit'>
+                                <i className='bi bi-search me-2' aria-hidden='true'></i>Buscar
                             </button>
                         </div>
                     </form>

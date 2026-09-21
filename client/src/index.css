@@ -1,19 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-* {
-    margin: 0rem;
-    padding: 0rem;
-    box-sizing: border-box;
-    font-family: "Exo 2", sans-serif;
-    color: var(--branco-azulado);
-}
+* { box-sizing: border-box; }
 
 :root {
     --azul-petroleo: #101629;
-    --cinza-escuro: #2D3645;    
+    --cinza-escuro: #2D3645;
     --azul-ceu: #3E7DFF;
     --azul-ceu-escuro: #2E4E99;
     --branco-azulado: #DBF3FF;
     --black: #000000;
     --full-white: #FFFFFF;
+    --bs-body-font-family: "Inter", sans-serif;
+    --bs-body-bg: #101629;
+    --bs-body-color: #DBF3FF;
+    --bs-primary: #3E7DFF;
+    --bs-primary-rgb: 62, 125, 255;
+    --bs-secondary: #2D3645;
+    --bs-border-color: #526276;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    background: var(--azul-petroleo);
+    color: var(--branco-azulado);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-family: "Exo 2", sans-serif;
+}
+
+button, input, select, textarea { font: inherit; }
+
+.app-search-group { max-width: 520px; }
+.app-search-group .form-select,
+.app-search-group .form-control {
+    min-height: 46px;
+    background-color: var(--full-white);
+    border-color: #a9bdcf;
+    color: #1d2b3d;
+}
+
+.app-search-group .form-select { max-width: 148px; }
+.app-search-group .form-control::placeholder { color: #53657a; opacity: 1; }
+.app-search-group .form-select:focus,
+.app-search-group .form-control:focus {
+    border-color: var(--azul-ceu);
+    box-shadow: 0 0 0 .25rem rgba(62, 125, 255, .25);
+}
+.app-search-group .btn { min-width: 104px; }
+
+.text-on-light { color: #1d2b3d !important; }
+
+@keyframes pular {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
 }
