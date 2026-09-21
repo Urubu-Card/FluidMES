@@ -158,7 +158,6 @@ class LoginView(APIView):
     
     def post(self,request):
         serializer = LoginSerializer(data=request.data, context={'request': request})
-        
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
@@ -168,6 +167,7 @@ class LoginView(APIView):
     
             return set_jwt_cookies(response, refresh.access_token, refresh)
 
+        
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
