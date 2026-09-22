@@ -3,22 +3,36 @@
     width: 100vw;
     height: 100vh;
     background-color: var(--azul-petroleo);
-    
-    /* Centraliza o texto e as bolinhas na tela */
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Ajuste a cor do texto se necessário */
+    color: white;
     font-family: "Inter", sans-serif;
     font-size: 3rem;
     }
-
 }
 
 .app-shell {
+    width: 100%;
+    height: 100dvh;
+    max-width: 100%;
+    overflow: hidden;
     background-color: var(--azul-petroleo);
 
-    .app-main { min-width: 0; background-color: var(--azul-petroleo); }
+    .app-main {
+        min-width: 0;
+        max-width: 100%;
+        height: 100dvh;
+        overflow-x: clip;
+        background-color: var(--azul-petroleo);
+    }
+
+    @media (min-width: 992px) {
+        .app-main {
+            margin-left: var(--sb-width, 250px);
+            max-width: calc(100% - var(--sb-width, 250px));
+        }
+    }
 }
 
 /* Aplica a animação em todas as bolinhas */

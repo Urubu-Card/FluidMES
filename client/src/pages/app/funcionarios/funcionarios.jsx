@@ -131,7 +131,7 @@ export default function Funcionarios() {
             {/* ================= HEADER ================= */}
             <div className='funcionarios-header'>
                 <h1>Funcionários:</h1>
-                <div className='col-md-6'>
+                <div className='col-md-4'>
                     <form onSubmit={(e) => e.preventDefault()}>
                         <div className='input-group app-search-group'>
                             <select className='form-select' defaultValue="">

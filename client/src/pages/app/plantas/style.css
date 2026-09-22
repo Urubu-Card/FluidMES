@@ -1,258 +1,252 @@
 .plantas-page {
     & {
-    min-height: 100%;
-    padding: 28px 20px 110px;
-    color: var(--branco-azulado);
-    position: relative
-}
+        min-height: 100%;
+        padding: 28px 20px 110px;
+        color: var(--branco-azulado);
+        position: relative
+    }
 
-.plantas-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 28px
-}
+    .plantas-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px
+    }
 
-.plantas-header h1 {
-    margin: 0;
-    font-size: 34px;
-    font-weight: 400
-}
-
-.plantas-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 24px
-}
-
-.plantas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 20px 48px;
-    align-items: start
-}
-
-.plant-card,
-.factory-summary {
-    overflow: hidden;
-    border-radius: 10px;
-    background: #2a374b;
-    min-height: 226px
-}
-
-.plant-card-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 56px;
-    padding: 4px 10px;
-    color: #fff;
-    font-size: 12px;
-    line-height: 1.18;
-    text-align: center
-}
-
-.plant-card-status strong {
-    font-size: 11px
-}
-
-.plant-card-status.produzindo {
-    background: #008716
-}
-
-.plant-card-status.parada {
-    background: #b39d00
-}
-
-.plant-card-status.manutencao {
-    background: #a51019
-}
-
-.plant-card-body {
-    padding: 9px 6px 10px;
-    font-size: 12px
-}
-
-.plant-card-body>p {
-    margin: 0 0 5px
-}
-
-.plant-card-body i {
-    margin-right: 5px
-}
-
-.plant-card-body em {
-    font-style: italic
-}
-
-.plant-quantity {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 5px 0 12px;
-    color: #bdd5e7;
-    font-size: 11px
-}
-
-.plant-quantity i,
-.factory-summary-metrics div {
-    display: block;
-    width: 100%;
-    height: 13px;
-    overflow: hidden;
-    border-radius: 10px;
-    background: #1e2b40
-}
-
-.plant-quantity i {
-    margin: 0
-}
-
-.plant-quantity b {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: #287cf1
-}
-
-.plant-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-around
-}
-
-.plant-card-footer>p {
-    margin: 0;
-    font-size: 27px;
-    line-height: 1;
-    color: #c7eafa
-}
-
-.plant-card-footer>p strong {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 13px
-}
-
-.plant-progress {
-    --progress: 0%;
-    width: 80px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    display: grid;
-    place-content: center;
-    text-align: center;
-    background: radial-gradient(closest-side, #2a374b 72%, transparent 73% 100%), conic-gradient(#3687fa var(--progress), #d6f4ff 0)
-}
-
-.plant-progress span {
-    font-size: 12px
-}
-
-.plant-progress small {
-    font-size: 10px
-}
-
-.factory-summary {
-    padding: 10px;
-    background: #2857a7
-}
-
-.factory-summary h2 {
-    margin: -10px -10px 12px;
-    padding: 7px;
-    border-radius: 4px 4px 0 0;
-    background: #c9f1ff;
-    color: #28539b;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700
-}
-
-.factory-summary>p {
-    margin: 0;
-    text-align: center;
-    font-size: 12px
-}
-
-.factory-summary>strong {
-    display: block;
-    color: #a9d4ff;
-    text-align: center;
-    font-size: 11px
-}
-
-.factory-summary-content {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-top: 12px
-}
-
-.factory-summary-metrics {
-    flex: 1
-}
-
-.factory-summary-metrics span {
-    display: block;
-    margin: 8px 0 3px;
-    text-align: center;
-    font-size: 10px
-}
-
-.factory-summary-metrics i {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: #18d09d
-}
-
-.plantas-message {
-    margin: 60px 0;
-    text-align: center;
-    color: #c9d9e7
-}
-
-.plantas-message.error {
-    color: #ff8080
-}
-
-.add-planta {
-    position: fixed;
-    right: 54px;
-    bottom: 30px;
-    width: 68px;
-    height: 68px;
-    border: 0;
-    border-radius: 20px;
-    background: #287cf1;
-    color: #fff;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, .25);
-    font-size: 25px;
-    cursor: pointer
-}
-
-.add-planta:hover {
-    filter: brightness(1.1);
-    transform: scale(1.04)
-}
-
-@media(max-width:850px) {
-
-    .plantas-header,
-    .plantas-toolbar {
-        flex-direction: column
+    .plantas-header h1 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 400
     }
 
     .plantas-toolbar {
-        width: 100%;
-        gap: 12px
+        display: flex;
+        align-items: center;
+        gap: 24px
     }
 
     .plantas-grid {
-        gap: 18px
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 20px 48px;
+        align-items: start
     }
-}
+
+    .plant-card,
+    .factory-summary {
+        overflow: hidden;
+        border-radius: 10px;
+        background: #2a374b;
+        min-height: 226px
+    }
+
+    .plant-card-status {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 56px;
+        padding: 4px 10px;
+        color: #fff;
+        font-size: 12px;
+        line-height: 1.18;
+        text-align: center
+    }
+
+    .plant-card-status strong {
+        font-size: 11px
+    }
+
+    .plant-card-status.produzindo {
+        background: #008716
+    }
+
+    .plant-card-status.parada {
+        background: #b39d00
+    }
+
+    .plant-card-status.manutencao {
+        background: #a51019
+    }
+
+    .plant-card-body {
+        padding: 9px 6px 10px;
+        font-size: 12px
+    }
+
+    .plant-card-body>p {
+        margin: 0 0 5px
+    }
+
+    .plant-card-body i {
+        margin-right: 5px
+    }
+
+    .plant-card-body em {
+        font-style: italic
+    }
+
+    .plant-quantity {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 5px 0 12px;
+        color: #bdd5e7;
+        font-size: 11px
+    }
+
+    .plant-quantity i,
+    .factory-summary-metrics div {
+        display: block;
+        width: 100%;
+        height: 13px;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #1e2b40
+    }
+
+    .plant-quantity i {
+        margin: 0
+    }
+
+    .plant-quantity b {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: #287cf1
+    }
+
+    .plant-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-around
+    }
+
+    .plant-card-footer>p {
+        margin: 0;
+        font-size: 27px;
+        line-height: 1;
+        color: #c7eafa
+    }
+
+    .plant-card-footer>p strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px
+    }
+
+    .plant-progress {
+        --progress: 0%;
+        width: 80px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        background: radial-gradient(closest-side, #2a374b 72%, transparent 73% 100%), conic-gradient(#3687fa var(--progress), #d6f4ff 0)
+    }
+
+    .plant-progress span {
+        font-size: 12px
+    }
+
+    .plant-progress small {
+        font-size: 10px
+    }
+
+    .factory-summary {
+        padding: 10px;
+        background: #2857a7
+    }
+
+    .factory-summary h2 {
+        margin: -10px -10px 12px;
+        padding: 7px;
+        border-radius: 4px 4px 0 0;
+        background: #c9f1ff;
+        color: #28539b;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700
+    }
+
+    .factory-summary>p {
+        margin: 0;
+        text-align: center;
+        font-size: 12px
+    }
+
+    .factory-summary>strong {
+        display: block;
+        color: #a9d4ff;
+        text-align: center;
+        font-size: 11px
+    }
+
+    .factory-summary-content {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 12px
+    }
+
+    .factory-summary-metrics {
+        flex: 1
+    }
+
+    .factory-summary-metrics span {
+        display: block;
+        margin: 8px 0 3px;
+        text-align: center;
+        font-size: 10px
+    }
+
+    .factory-summary-metrics i {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: #18d09d
+    }
+
+    .plantas-message {
+        margin: 60px 0;
+        text-align: center;
+        color: #c9d9e7
+    }
+
+    .plantas-message.error {
+        color: #ff8080
+    }
+
+    .add-planta {
+        position: fixed;
+        right: 54px;
+        bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .25);
+        font-size: 25px;
+        cursor: pointer
+    }
+
+    .add-planta:hover {
+        filter: brightness(1.1);
+        transform: scale(1.04)
+    }
+
+    @media(max-width:850px) {
+
+        .plantas-header,
+        .plantas-toolbar {
+            flex-direction: column
+        }
+
+        .plantas-toolbar {
+            width: 100%;
+            gap: 12px
+        }
+
+        .plantas-grid {
+            gap: 18px
+        }
+    }
 
 }

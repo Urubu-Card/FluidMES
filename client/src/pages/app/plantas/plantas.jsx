@@ -63,7 +63,7 @@ export default function Plantas() {
         <div className="plantas-page">
             <header className="plantas-header">
                 <h1>Plantas:</h1>
-                <div className="plantas-toolbar">
+                <div className=" col-md-4">
                     <form className="input-group app-search-group" onSubmit={(event) => event.preventDefault()}>
                         <select className="form-select" value={ordenacao} onChange={(event) => setOrdenacao(event.target.value)} aria-label="Ordenar plantas">
                             <option value="numero">Núm. planta</option><option value="status">Status</option>
@@ -84,7 +84,27 @@ export default function Plantas() {
                 {plantasFiltradas.map((planta) => <PlantCard key={planta.id ?? planta.numero ?? planta.numero_planta} planta={planta} />)}
             </section>}
             {!carregando && !erro && plantasFiltradas.length === 0 && <p className="plantas-message">Nenhuma planta encontrada.</p>}
-            <button className="add-planta" type="button" aria-label="Adicionar planta" onClick={() => console.log('Adicionar planta')}><i className="bi bi-plus-lg" aria-hidden="true" /></button>
+            <button className="add-planta btn btn-primary" type="button" aria-label="Adicionar planta" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <i className="bi bi-plus-lg" aria-hidden="true"/>
+                </button>
+
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Understood</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

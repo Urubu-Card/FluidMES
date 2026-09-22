@@ -1,6 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+html, body, #root {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+}
+
 * { box-sizing: border-box; }
+
+img, svg, video, canvas { max-width: 100%; }
 
 :root {
     --azul-petroleo: #101629;
