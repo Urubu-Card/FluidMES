@@ -7,7 +7,8 @@ class PlantaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model  = Planta
-        fields = ['nome','uuid','localizacao']
+        fields = ['nome','localizacao']
+
     
 
 class ClpSerializer(serializers.ModelSerializer):
