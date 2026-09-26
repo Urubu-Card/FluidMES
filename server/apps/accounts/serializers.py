@@ -94,4 +94,4 @@ class FuncionarioSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Usuarios
         fields = ['id', 'email', 'first_name','last_name', 'cpf', 'role','is_active' ,'empresa']
-        read_only_fields = fields
+        read_only_fields = ['id']

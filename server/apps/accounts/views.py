@@ -1,17 +1,18 @@
 import os
+from rest_framework                           import status , permissions
 from rest_framework.views                     import APIView
-from rest_framework.generics                  import ListCreateAPIView
+from rest_framework.viewsets                  import ModelViewSet
 from rest_framework.response                  import Response
 from rest_framework.permissions               import IsAuthenticated
-from rest_framework                           import status , permissions
 from rest_framework_simplejwt.tokens          import RefreshToken
 from apps.accounts.models                     import PasswordResetToken
 from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer ,FuncionarioSerializer
-from django.db.models                         import Q
 from django.contrib.auth.models               import update_last_login
 from django.contrib.auth                      import get_user_model
 from django.core.mail                         import EmailMultiAlternatives
+from rest_framework.exceptions                import NotFound, PermissionDenied
 from django.conf                              import settings
+from django.http                              import Http404
 from django.template.loader                   import render_to_string
 from background_task                          import background
 from email.mime.image                         import MIMEImage
@@ -22,7 +23,7 @@ def set_jwt_cookies(response, access_token, refresh_token):
     response.set_cookie(
         key=settings.AUTH_COOKIE_ACCESS,
         value=str(access_token),
-        expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+        max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
         secure=settings.AUTH_COOKIE_SECURE,
         httponly=settings.AUTH_COOKIE_HTTPONLY,
         samesite=settings.AUTH_COOKIE_SAMESITE,
@@ -30,7 +31,7 @@ def set_jwt_cookies(response, access_token, refresh_token):
     response.set_cookie(
         key=settings.AUTH_COOKIE_REFRESH,
         value=str(refresh_token),
-        expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
+        max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
         secure=settings.AUTH_COOKIE_SECURE,
         httponly=settings.AUTH_COOKIE_HTTPONLY,
         samesite=settings.AUTH_COOKIE_SAMESITE,
@@ -95,7 +96,7 @@ class CadastroView(APIView):
         serializer = CadastroSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(role=1)
             username = request.data.get("first_name")
             empresa  = request.data.get("nomeEmpresa")
             email    = request.data.get("email")
@@ -121,7 +122,7 @@ class PasswordResetRequestView(APIView):
             link = f"{settings.FRONTEND_URL}/api/password-reset/confirm/?token={reset_token.token}"
             user_email = user.email
 
-            Emails.forgotEmail(username[0],link,user_email)
+            Emails.forgotEmail(username,link,user_email)
             
             
         return Response(
@@ -158,6 +159,7 @@ class LoginView(APIView):
     
     def post(self,request):
         serializer = LoginSerializer(data=request.data, context={'request': request})
+        
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
@@ -167,7 +169,6 @@ class LoginView(APIView):
     
             return set_jwt_cookies(response, refresh.access_token, refresh)
 
-        
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
@@ -210,15 +211,18 @@ class TokenRefreshCookieView(APIView):
             response.set_cookie(
                 key=settings.AUTH_COOKIE_ACCESS,
                 value=str(new_access_token),
-                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
                 secure=settings.AUTH_COOKIE_SECURE,
                 httponly=settings.AUTH_COOKIE_HTTPONLY,
                 samesite=settings.AUTH_COOKIE_SAMESITE,
             )
             return response
             
-        except Exception :
-            return Response({"detail": "Refresh token inválido ou expirado."}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e :
+            response = Response({"detail": "Refresh token inválido ou expirado."+str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            response.delete_cookie(settings.AUTH_COOKIE_ACCESS)#! Se o cookie estiver expirado ou invalido remover dos cokkies
+            response.delete_cookie(settings.AUTH_COOKIE_REFRESH)
+            return response
 
 class MeView(APIView):
     
@@ -227,45 +231,31 @@ class MeView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         return Response(UsuarioSerializer(request.user).data)
 
-class FuncionariosView(ListCreateAPIView):
+class FuncionariosView(ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = FuncionarioSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self):     
         if self.request.user.role == 3:
             return User.objects.none()
-
-        queryset = User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
         
-        termo_busca = self.request.query_params.get('busca')
-        cargo = self.request.query_params.get('cargo')
-        status = self.request.query_params.get('status')
+        return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
 
-        if self.request.user.role ==2:
-            queryset = queryset.exclude(role=1)
+
+    def perform_create(self, serializer):
+        if self.request.user.role == 3:
+            raise PermissionDenied(detail="Apenas cargos expecificos podem adicionar usuarios")
         
-        if termo_busca:
-            queryset = queryset.filter(
-                Q(first_name__icontains=termo_busca) | 
-                Q(last_name__icontains=termo_busca) | 
-                Q(email__icontains=termo_busca)
-            )
-            
-        if cargo:
-            queryset = queryset.filter(role__iexact=int(cargo))
-
-            
-        if status is not None:
-            is_active = status.lower() in ['true', '1', 'yes']  
-            queryset = queryset.filter(is_active=is_active)
+        funcionario = serializer.save(empresa=self.request.user.empresa)
         
-        return queryset
+        Emails.welcome(funcionario.first_name,funcionario.empresa.nome,funcionario.email)
 
-            
-
-
-        
-
+    def get_object(self):
+        try:
+            return super().get_object()
+        except Http404:
+            raise NotFound(detail="Funcionário não encontrado ou você não tem permissão para acessá-lo.")
     
 
 
