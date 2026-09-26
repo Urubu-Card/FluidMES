@@ -18,12 +18,25 @@ class PlantasView(ModelViewSet):
             raise PermissionDenied("Funcionarios não podem criar plantas plantas")
         
         serializer.save(empresa=self.request.user.empresa) 
+    
+    def perform_update(self, serializer):
+        if self.request.user.role == 3:
+            raise PermissionDenied("Funcionarios não podem editar plantas")
         
+        serializer.save()
+    
+    def perform_destroy(self, instance):
+        if self.request.user.role == 3:
+            raise PermissionDenied("Funcionarios não são permitidos deletar plantas")
+        
+        instance.delete()
         
     
 class ClpListView(ModelViewSet):
+    queryset = Clp.objects.all()
     serializer_class = ClpSerializer
     permission_classes = [IsAuthenticated]
+    
     
     def get_queryset(self):
          user = self.request.user

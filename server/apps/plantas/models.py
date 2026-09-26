@@ -18,7 +18,7 @@ class Planta(models.Model):
         db_table = 'planta'
 
     def __str__(self):
-        return f"{self.nome} {self.empresa.nome}"
+        return f"{self.nome} de {self.empresa.nome}"
 
 
 class Clp(models.Model):
