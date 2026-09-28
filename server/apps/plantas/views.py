@@ -42,7 +42,7 @@ class ClpListView(ModelViewSet):
          user = self.request.user
          return Clp.objects.filter(planta__empresa=user.empresa)
      
-class SensoresListView(ModelViewSet):
+class SensoresView(ModelViewSet):
     serializer_class = SensorSerializer
     permission_classes = [IsAuthenticated]
     
