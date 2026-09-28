@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
+import BotaoModal from "../../components/ButtonAdd/button";
+
 
 export default function Pedidos() {
     const [pedidos, setPedidos] = useState([]);
@@ -307,9 +309,7 @@ export default function Pedidos() {
             </div>
 
             {/* ================= BOTÃO ADICIONAR ================= */}
-            <button className='add-pedido' onClick={adicionarPedido}>
-                <i className='bi bi-plus-lg'></i>
-            </button>
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
         </div>
     );
 }

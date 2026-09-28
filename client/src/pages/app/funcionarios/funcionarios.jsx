@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
+import BotaoModal from "../../components/ButtonAdd/button";
+
 
 export default function Funcionarios() {
     const [funcionarios, setFuncionarios] = useState([]);
@@ -262,9 +264,7 @@ export default function Funcionarios() {
             </div>
 
             {/* ================= BOTÃO ADICIONAR ================= */}
-            <button className='add-funcionario' onClick={adicionarFuncionario}>
-                <i className='bi bi-plus-lg'></i>
-            </button>
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
         </div>
     );
 }

@@ -1,10 +1,11 @@
 import React from 'react';
 import './style.css';
+import BotaoModal from "../../components/ButtonAdd/button";
 
 const MinhaPagina = () => {
     return (
         <div>
-            {/* O conteúdo da página vai aqui */}
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
         </div>
     );
 };

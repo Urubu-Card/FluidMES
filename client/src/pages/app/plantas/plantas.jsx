@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
+import BotaoModal from "../../components/ButtonAdd/button";
 
 const STATUS_CONFIG = {
     produzindo: { label: 'Produzindo', className: 'produzindo' },
@@ -84,23 +85,22 @@ export default function Plantas() {
                 {plantasFiltradas.map((planta) => <PlantCard key={planta.id ?? planta.numero ?? planta.numero_planta} planta={planta} />)}
             </section>}
             {!carregando && !erro && plantasFiltradas.length === 0 && <p className="plantas-message">Nenhuma planta encontrada.</p>}
-            <button className="add-planta btn btn-primary" type="button" aria-label="Adicionar planta" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                <i className="bi bi-plus-lg" aria-hidden="true"/>
-                </button>
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
 
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+            <div class="modal fade" id="modalAddPlanta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Adicionar planta:</h1>
+                            <button type="button" class="btn-close text-light" data-bs-theme="dark" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             ...
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Understood</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary">Criar</button>
                         </div>
                     </div>
                 </div>
