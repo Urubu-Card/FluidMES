@@ -14,25 +14,7 @@ body:has(#root) {
 }
 
 .funcionarios-page {
-    width: 100%;
     min-height: 100vh;
-    padding: 28px 26px;
-    position: relative;
-
-    /* ================= HEADER ================= */
-    .funcionarios-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 60px;
-    }
-
-    .funcionarios-header h1 {
-        margin: 0;
-        font-size: 34px;
-        font-weight: 400;
-        letter-spacing: 1px;
-    }
 
     /* ================= BUSCA ================= */
     .filter-button {

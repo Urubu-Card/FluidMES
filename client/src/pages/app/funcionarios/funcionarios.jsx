@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 import BotaoModal from "../../components/ButtonAdd/button";
+import TituloPagina from "../../components/Titulo/titulo";
+import SearchBar    from "../../components/SearchBar/searchbar";
 
 
 export default function Funcionarios() {
@@ -92,7 +94,7 @@ export default function Funcionarios() {
             'Deseja realmente excluir este funcionário?'
         );
         if (!confirmar) return;
-        
+
         try {
             await api.delete(`/api/funcionarios/${id}/`);
 
@@ -112,10 +114,6 @@ export default function Funcionarios() {
     // ================================
     // ADICIONAR FUNCIONÁRIO
     // ================================
-    function adicionarFuncionario() {
-        console.log('Adicionar funcionário');
-        // Futuramente: abrir modal
-    }
 
     // ================================
     // STATUS
@@ -128,33 +126,18 @@ export default function Funcionarios() {
     }
 
     return (
-        <div className='funcionarios-page'>
+        <div className='funcionarios-page app-page'>
 
             {/* ================= HEADER ================= */}
-            <div className='funcionarios-header'>
-                <h1>Funcionários:</h1>
-                <div className='col-md-4'>
-                    <form onSubmit={(e) => e.preventDefault()}>
-                        <div className='input-group app-search-group'>
-                            <select className='form-select' defaultValue="">
-                                <option value="">Filtrar por</option>
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
-                            </select>
-                            <input 
-                                type='text' 
-                                className='form-control' 
-                                placeholder='Achar funcionário...' 
-                                value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
-                            />
-                            <button className='btn btn-primary' type='submit'>
-                                <i className='bi bi-search me-2' aria-hidden='true'></i>Buscar
-                            </button>
-                        </div>
-                    </form>
+            <TituloPagina titulo="Funcionários:">
+                <div className='col-md-3'>
+                    <SearchBar
+                        value={busca}
+                        onChange={setBusca}
+                        placeholder="Buscar funcionario..."
+                    />
                 </div>
-            </div>
+            </TituloPagina>
 
             {/* ================= TABELA ================= */}
             <div className='funcionarios-table'>
@@ -203,7 +186,7 @@ export default function Funcionarios() {
                                     onChange={() => selecionarFuncionario(funcionario.id)}
                                 />
                             </div>
-                            
+
                             {/* NOME */}
                             <div className='nome-column funcionario-nome'>
                                 <i className='bi bi-chevron-down'></i>

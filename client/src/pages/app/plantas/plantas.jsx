@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 import BotaoModal from "../../components/ButtonAdd/button";
+import TituloPagina from "../../components/Titulo/titulo";
+import SearchBar from "../../components/SearchBar/searchbar";
 
 const STATUS_CONFIG = {
     produzindo: { label: 'Produzindo', className: 'produzindo' },
@@ -25,7 +27,7 @@ function formatarQuantidade(valor) {
 export default function Plantas() {
     const [plantas, setPlantas] = useState([]);
     const [busca, setBusca] = useState('');
-    const [ordenacao, setOrdenacao] = useState('numero');
+    const [ordenacao, ] = useState('numero');
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState('');
 
@@ -61,19 +63,16 @@ export default function Plantas() {
     const percentualGeral = quantidadePlanejada ? Math.min(quantidadeProduzida / quantidadePlanejada * 100, 100) : 0;
 
     return (
-        <div className="plantas-page">
-            <header className="plantas-header">
-                <h1>Plantas:</h1>
-                <div className=" col-md-4">
-                    <form className="input-group app-search-group" onSubmit={(event) => event.preventDefault()}>
-                        <select className="form-select" value={ordenacao} onChange={(event) => setOrdenacao(event.target.value)} aria-label="Ordenar plantas">
-                            <option value="numero">Núm. planta</option><option value="status">Status</option>
-                        </select>
-                        <input className="form-control" type="search" placeholder="Buscar planta" value={busca} onChange={(event) => setBusca(event.target.value)} />
-                        <button className="btn btn-primary" type="submit"><i className="bi bi-search me-2" aria-hidden="true" />Buscar</button>
-                    </form>
-                </div>
-            </header>
+        <div className="plantas-page app-page">
+            <TituloPagina titulo="Plantas:">
+                <div className='col-md-3'>
+                        <SearchBar
+                            value={busca}
+                            onChange={setBusca}
+                            placeholder="Buscar plantas..."
+                        />
+                    </div>
+            </TituloPagina>
 
             {carregando && <p className="plantas-message">Carregando plantas...</p>}
             {!carregando && erro && <p className="plantas-message error">{erro}</p>}

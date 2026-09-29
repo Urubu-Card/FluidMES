@@ -53,3 +53,11 @@
 .app-loading .spinner span:nth-child(3) {
     animation-delay: 0.3s;
 }
+
+
+/* Wrapper padrão de todas as páginas: garante o título sempre na mesma posição */
+.app-page {
+    width: 100%;
+    padding: 28px 26px;
+    position: relative;
+}

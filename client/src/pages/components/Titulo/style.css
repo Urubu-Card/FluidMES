@@ -1,0 +1,16 @@
+.titulo-pagina-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    margin-bottom: 60px;
+}
+
+.titulo-pagina {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: var(--branco-azulado);
+}

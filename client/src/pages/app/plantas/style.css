@@ -1,23 +1,11 @@
 .plantas-page {
     & {
         min-height: 100%;
-        padding: 28px 20px 110px;
-        color: var(--branco-azulado);
-        position: relative
     }
 
-    .plantas-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 28px
-    }
-
-    .plantas-header h1 {
-        margin: 0;
-        font-size: 34px;
-        font-weight: 400
+    &.app-page {
+        padding-bottom: 110px;
+        color: var(--branco-azulado)
     }
 
     .plantas-toolbar {
@@ -237,7 +225,6 @@
 
     @media(max-width:850px) {
 
-        .plantas-header,
         .plantas-toolbar {
             flex-direction: column
         }

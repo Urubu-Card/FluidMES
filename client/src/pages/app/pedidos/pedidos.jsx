@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import './style.css';
 import BotaoModal from "../../components/ButtonAdd/button";
+import TituloPagina from "../../components/Titulo/titulo";
+import SearchBar from "../../components/SearchBar/searchbar";
 
 
 export default function Pedidos() {
@@ -117,10 +119,7 @@ export default function Pedidos() {
     // ================================
     // ADICIONAR PEDIDO
     // ================================
-    function adicionarPedido() {
-        console.log('Adicionar pedido');
-        // Futuramente: abrir modal
-    }
+
 
     // ================================
     // STATUS
@@ -135,33 +134,19 @@ export default function Pedidos() {
     }
 
     return (
-        <div className='pedidos-page'>
+        <div className='pedidos-page app-page'>
 
             {/* ================= HEADER ================= */}
             <div className='pedidos-header'>
-                <h1>Pedidos:</h1>
-                <div className='col-md-6'>
-                    <form onSubmit={(e) => e.preventDefault()}>
-                        <div className='input-group app-search-group'>
-                            <select className='form-select' defaultValue="">
-                                <option value="">Filtrar por</option>
-                                <option value="feito">Realizado</option>
-                                <option value="fazendo">Em produção</option>
-                                <option value="cancelado">Cancelado</option>
-                            </select>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Buscar Pedido'
-                                value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
-                            />
-                            <button className='btn btn-primary' type='submit'>
-                                <i className='bi bi-search me-2' aria-hidden='true'></i>Buscar
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                <TituloPagina titulo="Pedidos:">
+                    <div className='col-md-3'>
+                        <SearchBar
+                            value={busca}
+                            onChange={setBusca}
+                            placeholder="Buscar pedido..."
+                        />
+                    </div>
+                </TituloPagina>
             </div>
 
             {/* ================= CARDS DE STATUS ================= */}

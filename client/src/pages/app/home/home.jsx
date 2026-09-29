@@ -1,18 +1,18 @@
 import React from 'react';
 import './style.css';
+import TituloPagina from '../../components/Titulo/titulo';
 
 const Home = () => {
     return (
-        <div className='home-page container-xl py-5 text-white'>
+        <div className='home-page app-page text-white'>
 
-            <div className='d-flex justify-content-between align-items-center mb-4'>
-                <h1 className='h3 fw-semibold m-0'>Visão Geral</h1>
+            <TituloPagina titulo="Visão Geral:">
                 <div style={{ width: '180px' }}>
                     <select className='form-select form-select-sm custom-select'>
                         <option>Selecione o período</option>
                     </select>
                 </div>
-            </div>
+            </TituloPagina>
 
             <div className='row g-3 mb-4'>
 

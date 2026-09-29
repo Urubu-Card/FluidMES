@@ -1,23 +1,5 @@
 .pedidos-page {
-    width: 100%;
-    padding: 30px 40px;
-    position: relative;
-
-
     /* ================= HEADER ================= */
-    .pedidos-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .pedidos-header h1 {
-        color: var(--branco-azulado);
-        font-size: 32px;
-        margin: 0;
-    }
-
     .pedidos-header .input-group {
         background-color: var(--branco-azulado);
         height: 50px;
