@@ -2,139 +2,145 @@ import React from 'react';
 import './style.css';
 import TituloPagina from '../../components/Titulo/titulo';
 
+/*----------Dados (troque pelos reais depois)----------*/
+
+const METRICAS = [
+    { id: 1, valor: '53,8%', label: 'OEE Geral', icon: 'bi-graph-up-arrow', variant: 'dark', iconClass: 'icon-glass' },
+    { id: 2, valor: '5.358', label: 'Pedidos Totais', icon: 'bi-star', variant: 'light', iconClass: 'icon-success', trend: { tipo: 'up', valor: '4,2%' } },
+    { id: 3, valor: '367L', label: 'Volume Produzido', icon: 'bi-droplet-half', variant: 'light', iconClass: 'icon-success', trend: { tipo: 'down', valor: '4,2%' } },
+    { id: 4, valor: '45', label: 'Falhas de Conexão com a planta', icon: 'bi-wifi-off', variant: 'light', iconClass: 'icon-primary' },
+];
+
+const SERIE_BARRAS = [
+    { id: 'x', label: 'Item X', value: 50, color: 'var(--chart-red)' },
+    { id: 'y', label: 'Item Y', value: 85, color: 'var(--chart-blue)' },
+    { id: 'z', label: 'Item Z', value: 30, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+
+
+];
+
+/*----------Componentes----------*/
+
+const SelectPeriodo = ({ children, ...props }) => (
+    <div className='select-wrapper'>
+        <select className='form-select form-select-sm custom-select' {...props}>
+            {children}
+        </select>
+    </div>
+);
+
+const MetricCard = ({ valor, label, icon, variant = 'light', iconClass, trend }) => (
+    <div className='col-12 col-md-6 col-lg-3'>
+        <div className={`card metric-card metric-${variant} border-0`}>
+            <div className={`metric-icon rounded-circle ${iconClass}`}>
+                <i className={`bi ${icon}`}></i>
+            </div>
+            <div className='metric-value'>
+                {valor}
+                {trend && (
+                    <span className={`metric-trend trend-${trend.tipo}`}>
+                        <i className={`bi bi-caret-${trend.tipo}-fill`}></i>
+                        <small>{trend.valor}</small>
+                    </span>
+                )}
+            </div>
+            <span className='metric-label'>{label}</span>
+        </div>
+    </div>
+);
+
+/*value: 0–100 sobre o trecho útil do arco (270°)*/
+const GaugeCard = ({ titulo, rodape, value = 59 }) => {
+    const R = 40;
+    const C = 2 * Math.PI * R;          // circunferência ≈ 251.2
+    const trilho = C * 0.75;            // 3/4 do círculo
+    const progresso = trilho * (value / 100);
+
+    return (
+        <div className='col-12 col-md-6'>
+            <div className='card card-gauge-container border-0 rounded-3 p-4 h-100'>
+                <div className='gauge-title'>{titulo}</div>
+
+                <div className='gauge-wrapper'>
+                    <svg className='gauge-svg' viewBox='0 0 100 100'>
+                        <circle cx='50' cy='50' r={R} className='gauge-track'
+                            strokeDasharray={`${trilho} ${C}`} />
+                        <circle cx='50' cy='50' r={R} className='gauge-progress'
+                            strokeDasharray={`${progresso} ${C}`} />
+                    </svg>
+                    <div className='gauge-badge'>
+                        <i className='bi bi-plus'></i>
+                    </div>
+                </div>
+
+                <div className='gauge-footer'>{rodape}</div>
+            </div>
+        </div>
+    );
+};
+
+const BarChartCard = ({ titulo, series }) => {
+    const linhas = [0, 33.3, 66.6, 100];
+
+    return (
+        <div className='col-12 col-md-6'>
+            <div className='card chart-card border-0 rounded-3 p-4 h-100'>
+                <div>
+                    <h5 className='chart-title'>{titulo}</h5>
+                    <div className='chart-legend'>
+                        {series.map(s => (
+                            <div key={s.id} className='legend-item'>
+                                <span className='legend-dot' style={{ backgroundColor: s.color }}></span>
+                                <span>{s.value} {s.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className='chart-container'>
+                    {linhas.map(top => (
+                        <div key={top} className='chart-grid-line' style={{ top: `${top}%` }}></div>
+                    ))}
+                    {series.map(s => (
+                        <div key={s.id} className='bar' style={{ height: `${s.value}%`, backgroundColor: s.color }}></div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/*---------Página-------*/
+
 const Home = () => {
     return (
         <div className='home-page app-page text-white'>
 
-            <TituloPagina titulo="Visão Geral:">
-                <div style={{ width: '180px' }}>
-                    <select className='form-select form-select-sm custom-select'>
-                        <option>Selecione o período</option>
-                    </select>
-                </div>
+            <TituloPagina titulo='Visão Geral:'>
+                <SelectPeriodo>
+                    <option>Selecione o período</option>
+                </SelectPeriodo>
             </TituloPagina>
 
             <div className='row g-3 mb-4'>
-
-                {/* Card 1 (Azul Escuro) */}
-                <div className='col-12 col-md-6 col-lg-3'>
-                    <div className='card card-dark-blue border-0 h-100 rounded-3 p-4 d-flex flex-column align-items-center justify-content-center text-center'>
-                        <div className='rounded-circle d-flex align-items-center justify-content-center mb-2 card-icon-bg'>
-                            <i className='bi bi-graph-up-arrow'></i>
-                        </div>
-                        <small className='text-white-50 text-uppercase tracking-wider fs-7'>Métrica 1</small>
-                    </div>
-                </div>
-
-                {/* Card 2 (Claro) */}
-                <div className='col-12 col-md-6 col-lg-3'>
-                    <div className='card card-light-gray border-0 h-100 rounded-3 p-4 d-flex flex-column align-items-center justify-content-center text-center shadow-sm'>
-                        <div className='rounded-circle d-flex align-items-center justify-content-center mb-2 bg-success text-white' style={{ width: '42px', height: '42px' }}>
-                            <i className='bi bi-star-fill fs-5'></i>
-                        </div>
-                        <small className='text-muted text-uppercase tracking-wider fs-7'>Métrica 2</small>
-                    </div>
-                </div>
-
-                {/* Card 3 (Claro) */}
-                <div className='col-12 col-md-6 col-lg-3'>
-                    <div className='card card-light-gray border-0 h-100 rounded-3 p-4 d-flex flex-column align-items-center justify-content-center text-center shadow-sm'>
-                        <div className='rounded-circle d-flex align-items-center justify-content-center mb-2 bg-success text-white' style={{ width: '42px', height: '42px' }}>
-                            <i className='bi bi-droplet-fill fs-5'></i>
-                        </div>
-
-                        <small className='text-muted text-uppercase tracking-wider fs-7'>Métrica 3</small>
-                    </div>
-                </div>
-
-                {/* Card 4 (Claro) */}
-                <div className='col-12 col-md-6 col-lg-3'>
-                    <div className='card card-light-gray border-0 h-100 rounded-3 p-4 d-flex flex-column align-items-center justify-content-center text-center shadow-sm'>
-                        <div className='rounded-circle d-flex align-items-center justify-content-center mb-2 bg-primary text-white' style={{ width: '42px', height: '42px' }}>
-                            <i className='bi bi-exclamation-triangle-fill fs-5'></i>
-                        </div>
-
-                        <small className='text-muted text-uppercase tracking-wider fs-7'>Métrica 4</small>
-                    </div>
-                </div>
-
+                {METRICAS.map(m => <MetricCard key={m.id} {...m} />)}
             </div>
 
-            {/* Seção de Análise Inferior */}
-            <div className='mb-3'>
-                <div className='d-inline-flex align-items-center text-secondary small cursor-pointer hover-white'>
-                    <span className='me-1'>Análise de </span>
-                    <div style={{ width: '180px' }}>
-                        <select className='form-select form-select-sm custom-select'>
-                            <option>Eficiência</option>
-                        </select>
-                    </div>
-                </div>
+            <div className='analise-de'>
+                <span>Análise de</span>
+                <SelectPeriodo>
+                    <option>Eficiência</option>
+                </SelectPeriodo>
             </div>
 
-            {/* Grid dos Gráficos */}
             <div className='row g-3'>
-
-                {/* Bloco Esquerdo: Gráfico Circular */}
-                <div className='col-12 col-md-6'>
-                    <div className='card card-gauge-container border-0 rounded-3 p-4 h-100 d-flex flex-column justify-content-between align-items-center text-center' style={{ minHeight: '340px' }}>
-                        <div className='w-100 text-start opacity-75 fst-italic small' style={{ color: 'var(--branco-azulado)' }}>
-                            Um aumento em potencial...
-                        </div>
-
-                        {/* SVG do Arco de Progresso */}
-                        <div className='position-relative d-flex align-items-center justify-content-center my-3' style={{ width: '180px', height: '180px' }}>
-                            <svg className='gauge-svg w-100 h-100' viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="40" stroke="#334155" strokeWidth="7" fill="transparent" strokeDasharray="251.2" strokeDashoffset="62.8" strokeLinecap="round" />
-                                <circle cx="50" cy="50" r="40" stroke="#10b981" strokeWidth="7" fill="transparent" strokeDasharray="251.2" strokeDashoffset="140" strokeLinecap="round" />
-                            </svg>
-                            <div className='position-absolute d-flex flex-column align-items-center'>
-                                <div className='bg-success rounded-circle d-flex align-items-center justify-content-center shadow mb-1' style={{ width: '32px', height: '32px' }}>
-                                    <i className='bi bi-plus text-white'></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className='w-100 text-center text-white-50 small'>
-                            Nota informativa de rodapé
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bloco Direito: Gráfico de Barras */}
-                <div className='col-12 col-md-6'>
-                    <div className='card bg-white border-0 text-dark rounded-3 p-4 h-100 d-flex flex-column justify-content-between' style={{ minHeight: '340px' }}>
-                        <div>
-                            <h5 className='fw-bold text-secondary mb-3'>Título do Gráfico</h5>
-                            <div className='d-flex gap-4 small fw-medium text-muted'>
-                                <div className='d-flex align-items-center gap-1'>
-                                    <span className='d-inline-block bg-danger rounded-1' style={{ width: '12px', height: '12px', color: 'var(--azul-ceu)' }}></span>
-                                    <span>Item X</span>
-                                </div>
-                                <div className='d-flex align-items-center gap-1'>
-                                    <span className='d-inline-block bg-primary rounded-1' style={{ width: '12px', height: '12px' }}></span>
-                                    <span>Item Y</span>
-                                </div>
-                                <div className='d-flex align-items-center gap-1'>
-                                    <span className='d-inline-block bg-warning rounded-1' style={{ width: '12px', height: '12px' }}></span>
-                                    <span>Item Z</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Container das Linhas e Barras */}
-                        <div className='chart-container d-flex align-items-end justify-content-around px-2 mt-4'>
-                            <div className='chart-grid-line' style={{ top: '0%' }}></div>
-                            <div className='chart-grid-line' style={{ top: '33.3%' }}></div>
-                            <div className='chart-grid-line' style={{ top: '66.6%' }}></div>
-                            <div className='chart-grid-line' style={{ top: '100%' }}></div>
-
-                            <div className='bar bg-danger' style={{ height: '50%' }}></div>
-                            <div className='bar bg-primary' style={{ height: '85%' }}></div>
-                            <div className='bar bg-warning' style={{ height: '30%' }}></div>
-                        </div>
-                    </div>
-                </div>
+                <GaugeCard
+                    titulo='Um aumento em potencial...'
+                    rodape='Nota informativa de rodapé'
+                    value={59}
+                />
+                <BarChartCard titulo='Grafico de Pedidos' series={SERIE_BARRAS} />
             </div>
         </div>
     );

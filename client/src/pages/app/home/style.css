@@ -1,76 +1,250 @@
 .home-page {
-    & {
-    background-color: #0f172a;
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --border-muted: #334155;
+    --blue-card: #2e4e99;
+    --light-card: #f8fafc;
+    --green: #10b981;
+    --green-icon: #198754;
+    --blue-icon: #3b82f6;
+    --chart-red: #dc3545;
+    --chart-blue: #3b82f6;
+    --chart-yellow: #ffc107;
+
+    background-color: var(--bg-page);
 }
 
-/* Customizações do tema escuro */
-.card-dark-blue {
-    background-color: #2E4E99;
-    color: #ffffff;
+/*---------- Selects---------- */
+.home-page .select-wrapper {
+    width: 180px;
 }
 
-.card-light-gray {
-    background-color: #f8fafc;
-    color: #1e293b;
-}
-
-.card-gauge-container {
-    background-color: rgba(30, 58, 138, 0.2);
-    border: 1px solid rgba(30, 41, 59, 0.5);
-}
-
-.card-icon-bg {
-    width: 42px;
-    height: 42px;
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
-.custom-select {
-    background-color: #1e293b;
+.home-page .custom-select {
+    background-color: var(--bg-surface);
     color: #cbd5e1;
-    border: 1px solid #334155;
+    border: 1px solid var(--border-muted);
 }
 
-.custom-select:focus {
-    background-color: #1e293b;
+.home-page .custom-select:focus {
+    background-color: var(--bg-surface);
     color: #ffffff;
-    border-color: #3b82f6;
+    border-color: var(--blue-icon);
     box-shadow: none;
 }
 
-/* Animações e Gráficos */
-.gauge-svg {
+.home-page .analise-de {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+/*---------- Cards de métric---------- */
+.home-page .metric-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    height: 190px;
+    padding: 0 1rem;
+    border-radius: 4px;
+}
+
+.home-page .metric-dark {
+    background-color: var(--blue-card);
+    color: #ffffff;
+}
+
+.home-page .metric-light {
+    background-color: var(--branco-azulado);
+    color: #1e293b;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+
+.home-page .metric-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    color: var(--branco-azulado);
+    font-size: 1.1rem;
+}
+
+.home-page .icon-glass   { background-color: rgba(255, 255, 255, 0.15); }
+.home-page .icon-success { background-color: var(--azul-ceu-escuro); }
+.home-page .icon-primary { background-color: var(--azul-ceu-escuro); }
+
+.home-page .metric-value {
+    position: relative;
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.home-page .metric-dark .metric-value  { color: var(--branco-azulado); }
+.home-page .metric-light .metric-value { color: var(--azul-ceu-escuro); }
+
+/* Indicador de variação (▲ 4,2%) no canto do número */
+.home-page .metric-trend {
+    position: absolute;
+    top: -8px;
+    right: -26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.55rem;
+    line-height: 1;
+}
+
+.home-page .metric-trend small { font-size: 0.45rem; font-weight: 500; }
+.home-page .trend-up   { color: var(--green); }
+.home-page .trend-down { color: #ef4444; }
+
+.home-page .metric-label {
+    max-width: 150px;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.home-page .metric-dark .metric-label  { color: var(--branco-azulado); }
+.home-page .metric-light .metric-label { color: var(--azul-ceu-escuro); }
+
+/*----------Gauge---------- */
+.home-page .card-gauge-container {
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(30, 58, 138, 0.2);
+    border: 1px solid rgba(30, 41, 59, 0.5) !important;
+}
+
+.home-page .gauge-title {
+    width: 100%;
+    text-align: start;
+    font-size: 0.875rem;
+    font-style: italic;
+    opacity: 0.75;
+    color: var(--branco-azulado, #cbd5e1);
+}
+
+.home-page .gauge-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 180px;
+    margin: 1rem 0;
+}
+
+.home-page .gauge-svg {
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg);
 }
 
-.chart-container {
-    height: 200px;
-    position: relative;
+.home-page .gauge-track,
+.home-page .gauge-progress {
+    fill: transparent;
+    stroke-width: 7;
+    stroke-linecap: round;
 }
 
-.chart-grid-line {
+.home-page .gauge-track    { stroke: var(--border-muted); }
+.home-page .gauge-progress { stroke: var(--green); transition: stroke-dasharray 0.6s ease; }
+
+.home-page .gauge-badge {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--green-icon);
+    color: #ffffff;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+.home-page .gauge-footer {
+    width: 100%;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/*---------- Gráfico de barras---------- */
+.home-page .chart-card {
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--branco-azulado);
+    color: #212529;
+}
+
+.home-page .chart-title {
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: var(--azul-ceu-escuro);
+}
+
+.home-page .chart-legend {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--azul-ceu-escuro);
+}
+
+.home-page .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.home-page .legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.home-page .chart-container {
+    position: relative;
+    height: 200px;
+    margin-top: 1.5rem;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+}
+
+.home-page .chart-grid-line {
     position: absolute;
     left: 0;
     right: 0;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px dotted var(--border-muted);
 }
 
-.bar {
+.home-page .bar {
     width: 32px;
+    z-index: 2;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    z-index: 2;
     transition: height 0.5s ease;
 }
 
-.cursor-pointer {
-    cursor: pointer;
-}
+/*---------- Utilitários---------- */
+.home-page .cursor-pointer { cursor: pointer; }
+.home-page .hover-white:hover { color: #ffffff !important; }
 
-.hover-white:hover {
-    color: #ffffff !important;
-}
-    .sair:hover{
-    background-color: rgba(239, 68, 68,89%) !important;
-    }
-}
+/* OBS: .sair:hover não é da Home. Mova para o CSS da sidebar/layout. */
