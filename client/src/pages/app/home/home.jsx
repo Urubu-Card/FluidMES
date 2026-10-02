@@ -138,7 +138,7 @@ const Home = () => {
                 <GaugeCard
                     titulo='Um aumento em potencial...'
                     rodape='Nota informativa de rodapé'
-                    value={59}
+                    value={10}
                 />
                 <BarChartCard titulo='Grafico de Pedidos' series={SERIE_BARRAS} />
             </div>

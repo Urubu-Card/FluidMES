@@ -4,7 +4,7 @@
     --border-muted: #334155;
     --blue-card: #2e4e99;
     --light-card: #f8fafc;
-    --green: #10b981;
+    --green: #05C585;
     --green-icon: #198754;
     --blue-icon: #3b82f6;
     --chart-red: #dc3545;
@@ -123,8 +123,8 @@
     justify-content: space-between;
     align-items: center;
     text-align: center;
-    background-color: rgba(30, 58, 138, 0.2);
-    border: 1px solid rgba(30, 41, 59, 0.5) !important;
+    background-color:var(--azul-ceu-escuro);
+    border: 1px solid var(--azul-ceu-escuro) !important;
 }
 
 .home-page .gauge-title {
@@ -159,7 +159,7 @@
     stroke-linecap: round;
 }
 
-.home-page .gauge-track    { stroke: var(--border-muted); }
+.home-page .gauge-track    { stroke: #D9D9D9; }
 .home-page .gauge-progress { stroke: var(--green); transition: stroke-dasharray 0.6s ease; }
 
 .home-page .gauge-badge {
