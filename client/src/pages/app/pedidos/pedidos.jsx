@@ -1,186 +1,300 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import api from '../../../services/api'
+import { useEffect, useState } from 'react';
+import api from '../../../services/api';
+import './style.css';
+import BotaoModal from "../../components/ButtonAdd/button";
+import TituloPagina from "../../components/Titulo/titulo";
+import SearchBar from "../../components/SearchBar/searchbar";
 
-function Home() {
-    const [tasks, setTasks] = useState([])
-    const [taskEdit, setTaskEdit] = useState(null)
-    const [titulo, setTitulo] = useState('')
-    const navigate = useNavigate()
 
-    // Recupera o token salvo no localStorage
-    const token = localStorage.getItem('@api:token')
+export default function Pedidos() {
+    const [pedidos, setPedidos] = useState([]);
+    const [busca, setBusca] = useState('');
+    const [carregando, setCarregando] = useState(true);
+    const [erro, setErro] = useState('');
 
-    // GET - Listar as tarefas do usuário logado
-    async function getTasks() {
-        if (!token) {
-            navigate('/auth')
-            return
-        }
+    const [selecionados, setSelecionados] = useState([]);
 
+    // ================================
+    // BUSCAR PEDIDOS DO BACKEND
+    // ================================
+    useEffect(() => {
+        buscarPedidos();
+    }, []);
+
+    async function buscarPedidos() {
         try {
-            const response = await api.get('/api/tasks', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            setTasks(response.data)
+            setCarregando(true);
+            const response = await api.get('/api/pedidos/');
+            setPedidos(response.data);
         } catch (error) {
-            console.error("Erro ao listar tarefas. O token pode ter expirado.", error)
-            if (error.response?.status === 401) {
-                handleLogout()
+            console.error(error);
+            setErro('Erro ao carregar pedidos.');
+        } finally {
+            setCarregando(false);
+        }
+    }
+
+    // ================================
+    // PESQUISA
+    // ================================
+    const pedidosFiltrados = pedidos.filter((pedido) => {
+        const textoBusca = busca.toLowerCase();
+        return (
+            pedido.id?.toString().toLowerCase().includes(textoBusca) ||
+            pedido.receita?.toLowerCase().includes(textoBusca) ||
+            pedido.status?.toLowerCase().includes(textoBusca)
+        );
+    });
+
+    // ================================
+    // TOTAIS
+    // ================================
+    const totalPedidos = pedidos.length;
+    const totalRealizados = pedidos.filter(
+        (p) => p.status?.toLowerCase() === 'feito'
+    ).length;
+    const totalCancelados = pedidos.filter(
+        (p) => p.status?.toLowerCase() === 'cancelado'
+    ).length;
+
+    // ================================
+    // SELECIONAR PEDIDO
+    // ================================
+    function selecionarPedido(id) {
+        setSelecionados((atual) => {
+            if (atual.includes(id)) {
+                return atual.filter((pedidoId) => pedidoId !== id);
             }
+            return [...atual, id];
+        });
+    }
+
+    // ================================
+    // SELECIONAR TODOS
+    // ================================
+    function selecionarTodos() {
+        if (
+            selecionados.length === pedidosFiltrados.length &&
+            pedidosFiltrados.length > 0
+        ) {
+            setSelecionados([]);
+        } else {
+            setSelecionados(pedidosFiltrados.map((pedido) => pedido.id));
         }
     }
 
-    // POST - Adicionar nova tarefa
-    async function createTask(e) {
-        e.preventDefault()
-        if (!titulo.trim()) return
+    // ================================
+    // EDITAR
+    // ================================
+    function editarPedido(pedido) {
+        console.log('Editar:', pedido);
+        // Futuramente: abrir modal de edição
+    }
+
+    // ================================
+    // EXCLUIR
+    // ================================
+    async function excluirPedido(id) {
+        const confirmar = window.confirm(
+            'Deseja realmente excluir este pedido?'
+        );
+        if (!confirmar) return;
 
         try {
-            await api.post('/api/tasks', { titulo, concluida: false }, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            setTitulo('')
-            getTasks()
+            await api.delete(`/api/pedidos/${id}/`);
+
+            setPedidos((atual) =>
+                atual.filter((pedido) => pedido.id !== id)
+            );
+
+            setSelecionados((atual) =>
+                atual.filter((pedidoId) => pedidoId !== id)
+            );
         } catch (error) {
-            console.error("Erro ao criar tarefa.", error)
+            console.error(error);
+            alert('Erro ao excluir pedido.');
         }
     }
 
-    // PATCH - Modificar o conteúdo ou status da tarefa
-    async function updateTask() {
-        if (!taskEdit) return
+    // ================================
+    // ADICIONAR PEDIDO
+    // ================================
 
-        try {
-            await api.patch(`/api/tasks/${taskEdit.id}`, {
-                titulo: taskEdit.titulo,
-                concluida: taskEdit.concluida
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            setTaskEdit(null)
-            getTasks()
-        } catch (error) {
-            console.error("Erro ao atualizar tarefa.", error)
-        }
+
+    // ================================
+    // STATUS
+    // ================================
+    function getStatusClass(status) {
+        const statusLower = status?.toLowerCase();
+        if (statusLower === 'feito') return 'status-feito';
+        if (statusLower === 'cancelado') return 'status-cancelado';
+        if (statusLower === 'fazendo') return 'status-fazendo';
+        if (statusLower === 'na fila') return 'status-nafila';
+        return 'status-offline';
     }
-
-    // DELETE - Apagar tarefa
-    async function deleteTask(id) {
-        const confirmDelete = window.confirm("Deseja mesmo remover esta tarefa?")
-        if (!confirmDelete) return
-
-        try {
-            await api.delete(`/api/tasks/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            getTasks()
-        } catch (error) {
-            console.error("Erro ao deletar tarefa.", error)
-        }
-    }
-
-    // Função para limpar sessão (Logout)
-    function handleLogout() {
-        localStorage.removeItem('@api:token')
-        navigate('/auth')
-    }
-
-    // Disparado ao montar o componente
-    useEffect(() => {
-        getTasks()
-    }, [])
-
-    // Trava scroll da tela quando modal de edição está aberto
-    useEffect(() => {
-        document.body.style.overflow = taskEdit ? "hidden" : "auto"
-        return () => { document.body.style.overflow = "auto" }
-    }, [taskEdit])
 
     return (
-        <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '380px', marginBottom: '10px' }}>
-                <span style={{ color: '#aaa', fontSize: '14px' }}>Sessão Ativa</span>
-                <button onClick={handleLogout} style={{ background: '#ff4a4a', padding: '5px 12px', fontSize: '12px', width: 'auto' }}>Sair</button>
+        <div className='pedidos-page app-page'>
+
+            {/* ================= HEADER ================= */}
+            <div className='pedidos-header'>
+                <TituloPagina titulo="Pedidos:">
+                    <div className='col-md-3'>
+                        <SearchBar
+                            value={busca}
+                            onChange={setBusca}
+                            placeholder="Buscar pedido..."
+                        />
+                    </div>
+                </TituloPagina>
             </div>
 
-            <form onSubmit={createTask}>
-                <h1>Minhas Tarefas</h1>
-                <div className="user-pass">
-                    <input
-                        type="text"
-                        placeholder="Nome da Tarefa..."
-                        required
-                        value={titulo}
-                        onChange={e => setTitulo(e.target.value)}
-                    />
-                    <i className="input-icon bx bx-task"></i>
-                </div>
-                <button type="submit">Adicionar</button>
-            </form>
-
-            {tasks.map(task => (
-                <div key={task.id} className='card'>
+            {/* ================= CARDS DE STATUS ================= */}
+            <div className='status-cards'>
+                <div className='status-card escuro'>
+                    <div className='status-card-icon'>
+                        <i className='bi bi-card-checklist'></i>
+                    </div>
                     <div>
-                        <p>ID: <span>{task.id}</span></p>
-                        <p>Tarefa: <span>{task.titulo}</span></p>
-                        <p>Status: <span style={{ color: task.concluida ? '#4CAF50' : '#FFC107' }}>
-                            {task.concluida ? 'Concluída ✅' : 'Pendente ⏳'}
-                        </span></p>
-                    </div>
-                    <div className='actions'>
-                        <span className='line'></span>
-                        <div className='options'>
-                            <button className='btn-edit' onClick={() => setTaskEdit({ id: task.id, titulo: task.titulo, concluida: task.concluida })}>
-                                <i className='bx bx-pencil'></i>
-                            </button>
-                            <button className='btn-delete' onClick={() => deleteTask(task.id)}>
-                                <i className="bx bx-trash"></i>
-                            </button>
-                        </div>
+                        <h3>Total Pedidos</h3>
+                        <p>{totalPedidos}</p>
                     </div>
                 </div>
-            ))}
+                <div className='status-card claro'>
+                    <div className='status-card-icon'>
+                        <i className='bi bi-check2-circle'></i>
+                    </div>
+                    <div>
+                        <h3>Total Realizados</h3>
+                        <p>{totalRealizados}</p>
+                    </div>
+                </div>
+                <div className='status-card escuro'>
+                    <div className='status-card-icon'>
+                        <i className='bi bi-x-circle'></i>
+                    </div>
+                    <div>
+                        <h3>Total Cancelados</h3>
+                        <p>{totalCancelados}</p>
+                    </div>
+                </div>
+            </div>
 
-            {taskEdit && (
-                <div className="bg-blur">
-                    <div className="box-float">
-                        <div className='header-edit'>
-                            <h2>Editar Tarefa</h2>
-                            <button className='close' onClick={() => setTaskEdit(null)}>
-                                <i className='bx bx-x'></i>
-                            </button>
-                        </div>
-                        <p>ID: <span>{taskEdit.id}</span></p>
+            {/* ================= TABELA ================= */}
+            <div className='pedidos-table'>
+                {/* HEADER */}
+                <div className='table-header'>
+                    <div className='check-column'>
+                        <input
+                            type='checkbox'
+                            checked={
+                                pedidosFiltrados.length > 0 &&
+                                selecionados.length === pedidosFiltrados.length
+                            }
+                            onChange={selecionarTodos}
+                        />
+                    </div>
+                    <div className='ordem-column'>Ordem de ID <i className='bi bi-chevron-down'></i></div>
+                    <div className='receita-column'>Receita</div>
+                    <div className='data-column'>Data <i className='bi bi-chevron-down'></i></div>
+                    <div className='quantidade-column'>Quantidade <i className='bi bi-chevron-down'></i></div>
+                    <div className='status-column'>Status <i className='bi bi-chevron-down'></i></div>
+                    <div className='editar-column'></div>
+                </div>
 
-                        <div className='box-edit'>
-                            <div className="user-edit">
-                                <p>Título: </p>
+                {/* LOADING */}
+                {carregando && (
+                    <div className='table-message'>
+                        Carregando pedidos...
+                    </div>
+                )}
+
+                {/* ERRO */}
+                {erro && (
+                    <div className='table-message error'>
+                        {erro}
+                    </div>
+                )}
+
+                {/* PEDIDOS */}
+                {!carregando &&
+                    pedidosFiltrados.map((pedido) => (
+                        <div className='table-row' key={pedido.id}>
+                            {/* CHECKBOX */}
+                            <div className='check-column'>
                                 <input
-                                    type="text"
-                                    value={taskEdit.titulo}
-                                    onChange={e => setTaskEdit({ ...taskEdit, titulo: e.target.value })}
+                                    type='checkbox'
+                                    checked={selecionados.includes(pedido.id)}
+                                    onChange={() => selecionarPedido(pedido.id)}
                                 />
                             </div>
 
-                            <div className="user-edit" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                <p>Concluída: </p>
-                                <input
-                                    type="checkbox"
-                                    checked={taskEdit.concluida}
-                                    onChange={e => setTaskEdit({ ...taskEdit, concluida: e.target.checked })}
-                                />
+                            {/* ORDEM ID */}
+                            <div className='ordem-column'>
+                                #{pedido.id}
                             </div>
 
-                            <button className='confirm-edit' onClick={updateTask}>
-                                Salvar <i className='bx bxs-save'></i>
-                            </button>
+                            {/* RECEITA */}
+                            <div className='receita-column pedido-receita'>
+                                <div className='pedido-avatar'>
+                                    {pedido.imagem ? (
+                                        <img src={pedido.imagem} alt={pedido.receita} />
+                                    ) : (
+                                        <i className='bi bi-cup-straw'></i>
+                                    )}
+                                </div>
+                                <div className='pedido-receita-info'>
+                                    <strong>{pedido.receita}</strong>
+                                    <p>{pedido.descricao || 'Planta para produção de refrigerante'}</p>
+                                </div>
+                            </div>
+
+                            {/* DATA */}
+                            <div className='data-column'>
+                                {pedido.data}
+                            </div>
+
+                            {/* QUANTIDADE */}
+                            <div className='quantidade-column'>
+                                {pedido.quantidade}
+                            </div>
+
+                            {/* STATUS */}
+                            <div className='status-column'>
+                                <span className={`status ${getStatusClass(pedido.status)}`}>
+                                    {pedido.status}
+                                </span>
+                            </div>
+
+                            {/* AÇÕES */}
+                            <div className='editar-column'>
+                                <button
+                                    className='action-button edit-button'
+                                    onClick={() => editarPedido(pedido)}
+                                >
+                                    <i className='bi bi-pencil-fill'></i>
+                                </button>
+                                <button
+                                    className='action-button delete-button'
+                                    onClick={() => excluirPedido(pedido.id)}
+                                >
+                                    <i className='bi bi-trash-fill'></i>
+                                </button>
+                            </div>
                         </div>
+                    ))
+                }
+
+                {/* VAZIO */}
+                {!carregando && pedidosFiltrados.length === 0 && (
+                    <div className='table-message'>
+                        Nenhum pedido encontrado.
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+
+            {/* ================= BOTÃO ADICIONAR ================= */}
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
         </div>
-    )
+    );
 }
-
-export default Home

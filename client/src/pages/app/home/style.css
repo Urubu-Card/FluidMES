@@ -1,249 +1,250 @@
-/*.container {
-    padding-top: 100px;
+.home-page {
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --border-muted: #334155;
+    --blue-card: #2e4e99;
+    --light-card: #f8fafc;
+    --green: #05C585;
+    --green-icon: #198754;
+    --blue-icon: #3b82f6;
+    --chart-red: #dc3545;
+    --chart-blue: #3b82f6;
+    --chart-yellow: #ffc107;
+
+    background-color: var(--bg-page);
+}
+
+/*---------- Selects---------- */
+.home-page .select-wrapper {
+    width: 180px;
+}
+
+.home-page .custom-select {
+    background-color: var(--bg-surface);
+    color: #cbd5e1;
+    border: 1px solid var(--border-muted);
+}
+
+.home-page .custom-select:focus {
+    background-color: var(--bg-surface);
+    color: #ffffff;
+    border-color: var(--blue-icon);
+    box-shadow: none;
+}
+
+.home-page .analise-de {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+/*---------- Cards de métric---------- */
+.home-page .metric-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-
-    background-image: url('../../public/espaco.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    height: 190px;
+    padding: 0 1rem;
+    border-radius: 4px;
 }
 
-h1 {
-    font-size: 200%;
-    align-items: center;
+.home-page .metric-dark {
+    background-color: var(--blue-card);
+    color: #ffffff;
 }
 
-form {
+.home-page .metric-light {
+    background-color: var(--branco-azulado);
+    color: #1e293b;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+
+.home-page .metric-icon {
+    width: 42px;
+    height: 42px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 30px;
-    width: 420px;
-    max-width: 90%;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 2px solid #ffffff;
-    border-radius: 10px;
-    color: #fff;
-    padding: 1rem 2rem;
-    box-shadow: 0 0 10px #000000;
-    margin-bottom: 10px;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    color: var(--branco-azulado);
+    font-size: 1.1rem;
 }
 
-form button {
-    border-radius: 30px;
-    background-color: #fff;
-    color: #333;
-    border: 2px solid #ffffff;
-    padding: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    height: 40px;
-    width: 100%;
-    font-weight: bold;
-    font-size: 16px;
-}
+.home-page .icon-glass   { background-color: rgba(255, 255, 255, 0.15); }
+.home-page .icon-success { background-color: var(--azul-ceu-escuro); }
+.home-page .icon-primary { background-color: var(--azul-ceu-escuro); }
 
-form button:hover {
-    background-color: transparent;
-    color: #fff;
-    transition: 0.5s;
-}
-
-.user-pass {
+.home-page .metric-value {
     position: relative;
-    width: 100%;
-    height: 2rem;
-    margin: 5px 0;
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
 }
 
-.user-pass input {
-    height: 40px;
-    width: 100%;
-    border: 2px solid #ffffff;
-    border-radius: 40px;
-    background-color: transparent;
-    color: #fff;
-    outline: none;
-    font-size: 1rem;
-    padding: 20px;
-}
+.home-page .metric-dark .metric-value  { color: var(--branco-azulado); }
+.home-page .metric-light .metric-value { color: var(--azul-ceu-escuro); }
 
-.input-icon {
+/* Indicador de variação (▲ 4,2%) no canto do número */
+.home-page .metric-trend {
     position: absolute;
-    right: 20px;
-    font-size: 20px;
-    top: 35%;
-}
-
-/* Ajustes finos nos inputs com pre-estilo do chome */
-
-/* |-> Setas no input number 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* |-> Autocomplete do Chrome 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-    box-shadow: 0 0 0 1000px transparent inset !important;
-    -webkit-text-fill-color: #fff !important;
-    caret-color: #fff;
-    transition: background-color 9999s ease-in-out 0s;
-}
-
-/*--------------------------------------------------
-
-.card {
-    color: #fff;
+    top: -8px;
+    right: -26px;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.55rem;
+    line-height: 1;
+}
+
+.home-page .metric-trend small { font-size: 0.45rem; font-weight: 500; }
+.home-page .trend-up   { color: var(--green); }
+.home-page .trend-down { color: #ef4444; }
+
+.home-page .metric-label {
+    max-width: 150px;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.home-page .metric-dark .metric-label  { color: var(--branco-azulado); }
+.home-page .metric-light .metric-label { color: var(--azul-ceu-escuro); }
+
+/*----------Gauge---------- */
+.home-page .card-gauge-container {
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(51, 51, 51, 0.5);
-    margin: 5px;
-    padding: 10px;
-    width: 350px;
-    max-width: 90%;
-    border: 1px solid #3c3c3c;
-    border-radius: 10px;
+    text-align: center;
+    background-color:var(--azul-ceu-escuro);
+    border: 1px solid var(--azul-ceu-escuro) !important;
 }
 
-.actions {
+.home-page .gauge-title {
+    width: 100%;
+    text-align: start;
+    font-size: 0.875rem;
+    font-style: italic;
+    opacity: 0.75;
+    color: var(--branco-azulado, #cbd5e1);
+}
+
+.home-page .gauge-wrapper {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 12px;
+    width: 180px;
+    height: 180px;
+    margin: 1rem 0;
 }
 
-.line {
-    position: absolute;
-    left: 0;
-    width: 2px;
-    height: 55px;
-    background-color: rgba(204, 204, 204, 0.3);
-    border-radius: 100px;
-}
-
-.options {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.options button {
-    color: #fff;
-    cursor: pointer;
-    background-color: transparent;
-    border-radius: 10px;
-    border: none;
-    height: 25px;
-    width: 25px;
-}
-
-.options button:hover {
-    border: 1px solid #888888;
-    background-color: rgba(51, 51, 51, 0.5);
-    transition: 0.3s;
-}
-
-.bg-blur {
-    position: fixed;
-    top: 0;
-    left: 0;
+.home-page .gauge-svg {
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(3px);
+    transform: rotate(-90deg);
+}
+
+.home-page .gauge-track,
+.home-page .gauge-progress {
+    fill: transparent;
+    stroke-width: 7;
+    stroke-linecap: round;
+}
+
+.home-page .gauge-track    { stroke: #D9D9D9; }
+.home-page .gauge-progress { stroke: var(--green); transition: stroke-dasharray 0.6s ease; }
+
+.home-page .gauge-badge {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    justify-content: center;
+    background-color: var(--green-icon);
+    color: #ffffff;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
-.box-float {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 400px;
-    height: 350px;
-    max-width: 90%;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+.home-page .gauge-footer {
+    width: 100%;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
 }
 
-.header-edit {
-    display: flex;
-    justify-content: space-between;
-}
-
-.close {
-    font-size: 20px;
-    height: 25px;
-    width: 25px;
-    border-radius: 10px;
-    border: 2px solid #696969;
-    background-color: rgba(51, 51, 51, 0.2);
-}
-
-.close i:hover {
-    transform: rotate(360deg);
-    transition: 0.5s ease;
-}
-
-.box-edit {
+/*---------- Gráfico de barras---------- */
+.home-page .chart-card {
+    min-height: 340px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    justify-content: space-between;
+    background-color: var(--branco-azulado);
+    color: #212529;
 }
 
-.user-edit {
-    width: 100%;
-    height: 2rem;
-    margin: 5px 0;
+.home-page .chart-title {
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: var(--azul-ceu-escuro);
 }
 
-.user-edit p {
-    margin-left: 6px;
-    font-size: 16px;
-}
-
-.user-edit input {
-    height: 40px;
-    width: 100%;
-    border: 2px solid #000;
-    border-radius: 12px;
-    background-color: transparent;
-    color: #000;
-    outline: none;
-    font-size: 1rem;
-    padding: 10px;
-}
-
-.confirm-edit {
-    color: #fff;
-    margin-top: 10px;
-    height: 25px;
-    width: 80px;
-    border: 2px solid #000000;
-    border-radius: 5px;
-    background-color: #000;
+.home-page .chart-legend {
     display: flex;
-    gap: 6px;
-    justify-content: center;
-    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--azul-ceu-escuro);
 }
 
-.confirm-edit:hover {
-    background-color: #ffffff;
-    color: #000000;
-    transition: 0.5s;
+.home-page .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
-*/
+
+.home-page .legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.home-page .chart-container {
+    position: relative;
+    height: 200px;
+    margin-top: 1.5rem;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+}
+
+.home-page .chart-grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dotted var(--border-muted);
+}
+
+.home-page .bar {
+    width: 32px;
+    z-index: 2;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    transition: height 0.5s ease;
+}
+
+/*---------- Utilitários---------- */
+.home-page .cursor-pointer { cursor: pointer; }
+.home-page .hover-white:hover { color: #ffffff !important; }
+
+/* OBS: .sair:hover não é da Home. Mova para o CSS da sidebar/layout. */

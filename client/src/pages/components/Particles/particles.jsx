@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import "./particles.css";
+import './style.css';
 
 function Particles({
     quantity = 40,

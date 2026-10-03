@@ -1,0 +1,176 @@
+body:has(#root) {
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+        border: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--azul-ceu-escuro);
+    }
+}
+
+.funcionarios-page {
+    min-height: 100vh;
+
+    /* ================= BUSCA ================= */
+    .filter-button {
+        cursor: pointer;
+        max-width: 124px;
+
+        &,
+        .form-control {
+            background-color: var(--full-white);
+            color: var(--cinza-escuro);
+
+        }
+    }
+
+    .form-control::placeholder {
+        color: #8a94a6;
+    }
+
+
+    /* ================= TABELA ================= */
+    .funcionarios-table {
+        width: 100%;
+    }
+
+    /* HEADER DA TABELA */
+    .table-header,
+    .table-row {
+        display: grid;
+        grid-template-columns:
+            50px 1.4fr 1.1fr 1.4fr 0.9fr 140px;
+        align-items: center;
+    }
+
+    .table-header {
+        min-height: 45px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #31476c;
+        color: #dce3ec;
+        font-size: 14px;
+    }
+
+    /* ================= LINHAS ================= */
+    .table-row {
+        min-height: 53px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.01);
+        font-size: 12px;
+        margin-bottom: 12px;
+        transition: background 0.2s;
+    }
+
+    .table-row:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* ================= CHECKBOX ================= */
+    .check-column input {
+        width: 15px;
+        height: 15px;
+        appearance: none;
+        border: 1px solid var(--azul-ceu);
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .check-column input:checked {
+        background: var(--azul-ceu);
+        border: 2px solid var(--azul-ceu-escuro);
+    }
+
+    /* ================= NOME ================= */
+    .funcionario-nome {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .funcionario-nome>i {
+        font-size: 10px;
+        color: #4777c5;
+    }
+
+    .funcionario-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #273249;
+    }
+
+    .funcionario-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .funcionario-avatar i {
+        font-size: 16px;
+    }
+
+    /* ================= STATUS ================= */
+    .status {
+        width: 80px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+    }
+
+    .status-online {
+        color: #24c76a;
+        background: #104d2b;
+    }
+
+    .status-offline {
+        color: #ff4d4d;
+        background: #632126;
+    }
+
+    .status-ausente {
+        color: #e7bf38;
+        background: #5c4d19;
+    }
+
+    /* ================= AÇÕES ================= */
+    .editar-column {
+        display: flex;
+        gap: 12px;
+    }
+
+    .action-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 7px;
+        cursor: pointer;
+    }
+
+    .edit-button {
+        background: #1c2a43;
+        border: 1px solid #4275c9;
+        color: #c8d7ea;
+    }
+
+    .delete-button {
+        background: #dcecf5;
+        border: none;
+        color: #4e77d0;
+    }
+
+    .action-button:hover {
+        transform: scale(1.05);
+    }
+
+}

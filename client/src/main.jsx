@@ -1,12 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 import './index.css'
 
-import LandingPage from './pages/landing.jsx'
-import Auth from './pages/auth.jsx'
-import ForgotPassword from './pages/forgot.jsx'
+import LandingPage from './pages/landing/landing.jsx'
+import Auth from './pages/auth/auth.jsx'
+import ForgotPassword from './pages/forgot/forgot.jsx'
 import App from './pages/app/app.jsx'
+import Otp from './pages/otp/otp.jsx'
 
 
 // PAGINAS INTERNAS
@@ -30,12 +35,13 @@ createRoot(document.getElementById('root')).render(
         <Route path='/auth' element={<Auth />} />
         {/* ESQUECI MINHA SENHA */}
         <Route path='/auth/forgot-password' element={<ForgotPassword />} />
+        <Route path='/auth/otp' element={<Otp />} />
 
         {/* PAINEL DO SISTEMA (Agrupado sob a rota /app) */}
         <Route path='/app' element={<App />}>
           {/* apenas '/app', direto para a Home */}
           <Route index element={<Navigate to='/app/home' replace />} />
-          
+
           {/* SUB-ROTAS */}
           <Route path='home' element={<Home />} />
           <Route path='profile' element={<Profile />} />

@@ -1,9 +1,13 @@
 import React from 'react';
+import './style.css';
+import TituloPagina from '../../components/Titulo/titulo';
+import BotaoModal from "../../components/ButtonAdd/button";
 
 const MinhaPagina = () => {
     return (
-        <div>
-            {/* O conteúdo da página vai aqui */}
+        <div className='app-page'>
+            <TituloPagina titulo="Receitas:" />
+            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
         </div>
     );
 };

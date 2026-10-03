@@ -1,0 +1,61 @@
+.search-glass {
+    --sg-height: 48px;
+    --sg-pad: 4px;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: min(100%, 380px);
+    height: var(--sg-height);
+    padding: var(--sg-pad) var(--sg-pad) var(--sg-pad) 22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-glass input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--branco-azulado);
+    font-size: 14px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.search-glass input::placeholder {
+    color: rgba(219, 243, 255, 0.5);
+}
+
+.search-glass input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.search-glass button {
+    position: relative;
+    flex-shrink: 0;
+    width: calc(var(--sg-height) - var(--sg-pad) * 2 - 2px);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0);
+    color: var(--azul-ceu);
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.search-glass button:hover {
+    transform: scale(1.06);
+    filter: brightness(1.1);
+}

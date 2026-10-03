@@ -1,13 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
-import Particles from './components/particles/particles.jsx';
-import api from '../services/api.js';
 import axios from 'axios';
+import Particles from '../components/Particles/particles.jsx';
+import api from '../../services/api.js';
+import './style.css';
 
 export default function Auth() {
     const formRef = useRef(null);
-    // true = Tela de Login | false = Tela de Cadastro
     const [isLogin, setIsLogin] = useState(true);
     const [erro, setErro] = useState('');
     const navigate = useNavigate();
@@ -15,21 +15,38 @@ export default function Auth() {
     // Estados dos inputs compartilhados e específicos
     const [cpf, setCpf] = useState('');
     const [password, setPassword] = useState('');
+    const [usuario, setUsuario] = useState('');
 
     // Estados exclusivos do cadastro
+    const [confirmarSenha, setConfirmarSenha] = useState('');
+    const [mostrarSenha, setMostrarSenha] = useState(false);
     const [nomeEmpresa, setNomeEmpresa] = useState('');
     const [cnpj, setCnpj] = useState('');
     const [primeiroNome, setPrimeiroNome] = useState('');
     const [ultimoNome, setUltimoNome] = useState('');
     const [email, setEmail] = useState('');
 
-    // Limpa os estados para esvaziar os inputs controlados da tela
+    useEffect(() => {
+        let ativo = true;
+        axios.get('/api/me/', { withCredentials: true })
+            .then(() => {
+                if (ativo) navigate('/app');
+            })
+            .catch(() => {
+            });
+
+        return () => {
+            ativo = false;
+        };
+    }, [navigate]);
+
     function limparCampos() {
         if (formRef.current) {
             formRef.current.reset();
         }
         setCpf('');
         setPassword('');
+        setConfirmarSenha('');
         setNomeEmpresa('');
         setCnpj('');
         setPrimeiroNome('');
@@ -42,15 +59,20 @@ export default function Auth() {
         e.preventDefault();
         setErro('');
 
+        if (!isLogin && password !== confirmarSenha) {
+            setErro('As senhas não coincidem.');
+            return;
+        }
+
         try {
             if (isLogin) {
-                const response = await api.post('/api/login/', {
-                    usuario: cpf, email,
+                console.log('Login:', { usuario, password });
+                await api.post('/api/login/', {
+                    usuario: usuario,
                     password
                 });
-                localStorage.setItem('@api:token', response.data.acess);
-                localStorage.setItem('@api:refresh', response.data.refresh);
                 navigate('/app');
+
             } else {
                 await api.post('/api/cadastro/', {
                     first_name: primeiroNome,
@@ -59,45 +81,64 @@ export default function Auth() {
                     cpf,
                     password,
                     nomeEmpresa,
-                    cnpj,
+                    cnpj    
                 });
 
                 alert('Cadastro realizado com sucesso! Faça seu login.');
                 setIsLogin(true);
                 limparCampos();
             }
+
         } catch (error) {
-            setErro(error.response?.data?.erro || 'Erro ao processar a requisição.');
+            const data = error.response?.data;
+            let mensagem = 'Erro ao processar a requisição.';
+
+            if (data?.erro) {
+                mensagem = data.erro;
+            } else if (data?.detail) {
+                mensagem = data.detail;
+            } else if (data?.message) {
+                mensagem = data.message;
+            } else if (typeof data === 'string') {
+                mensagem = data;
+            } else if (data && typeof data === 'object') {
+                mensagem = Object.values(data)
+                    .flat()
+                    .join(' - ');
+            }
+
+            setErro(mensagem);
         }
     }
 
     return (
-        <div className='auth-page'>
-            <div className='background-particles'>
-                <Particles
-                    quantity={50}
-                    color="#00adb5"
-                    speed={5}
-                    lineDistance={150}
-                />
-            </div> 
+        <div className='auth-page container-fluid p-0'>
+            <div className={`${isLogin ? 'login-active' : 'login-inactive'}`}>
+                {<Particles
+                    quantity={35}
+                    color="#3E7DFF"
+                    speed={5.5}
+                    lineDistance={200}
+                />}
+            </div>
 
-            <div className='content'>
-                <header>
-                    <NavLink to='/' className='logo'>
-                        FluidMES
+            <div className='content w-100'>
+                <header className='d-flex align-items-center px-3 px-md-4'>
+                    <NavLink to="/">
+                        <i className='bi bi-arrow-left'></i>
                     </NavLink>
                 </header>
-                <form ref={formRef} onSubmit={enviarSubmit}>
-                    <h2>Bem-vindo a FluidMES</h2>
-                    <p>{isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}</p>
+
+                <form ref={formRef} onSubmit={enviarSubmit} className={`w-100 mx-auto ${isLogin ? 'auth-login' : 'auth-register'}`}>
+                    <h2>{isLogin ? 'Entrar' : 'Cadastrar-se'}</h2>
+                    <p className='subtitle'>{isLogin ? 'Faça login para acessar sua conta' : 'Crie sua conta para começar'}</p>
                     {erro && <p className='error-text'>{erro}</p>}
 
                     {/* ─── MODO CADASTRO ─── */}
                     {!isLogin && (
-                        <div className='columns'>
+                        <div className='row g-4'>
                             {/* Coluna Empresarial */}
-                            <div className='column'>
+                            <div className='coline col-12 col-md-6'>
                                 <p className='col-title'>Empresarial :</p>
                                 <div className='user-pass'>
                                     <input
@@ -122,10 +163,8 @@ export default function Auth() {
                                 </div>
                             </div>
 
-                            <div className='divider-v'></div>
-
                             {/* Coluna Pessoal */}
-                            <div className='column'>
+                            <div className='col-12 col-md-6'>
                                 <p className='col-title'>Pessoal :</p>
                                 <div className='user-pass'>
                                     <PatternFormat
@@ -138,25 +177,26 @@ export default function Auth() {
                                     />
                                     <i className='bi bi-person-vcard'></i>
                                 </div>
-                                <div className='user-pass'>
-                                    <input
-                                        type='text'
-                                        placeholder='Primeiro Nome'
-                                        required
-                                        value={primeiroNome}
-                                        onChange={e => setPrimeiroNome(e.target.value)}
-                                    />
-                                    <i className='bi bi-person'></i>
-                                </div>
-                                <div className='user-pass'>
-                                    <input
-                                        type='text'
-                                        placeholder='Último Nome'
-                                        required
-                                        value={ultimoNome}
-                                        onChange={e => setUltimoNome(e.target.value)}
-                                    />
-                                    <i className='bi bi-person'></i>
+                                <div className='name-group'>
+                                    <div className='name-field'>
+                                        <input
+                                            type='text'
+                                            placeholder='Primeiro Nome'
+                                            required
+                                            value={primeiroNome}
+                                            onChange={e => setPrimeiroNome(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className='name-field'>
+                                        <input
+                                            type='text'
+                                            placeholder='Último Nome'
+                                            required
+                                            value={ultimoNome}
+                                            onChange={e => setUltimoNome(e.target.value)}
+                                        />
+                                        <i className='bi bi-person'></i>
+                                    </div>
                                 </div>
                                 <div className='user-pass'>
                                     <input
@@ -170,13 +210,35 @@ export default function Auth() {
                                 </div>
                                 <div className='user-pass'>
                                     <input
-                                        type='password'
+                                        type={mostrarSenha ? 'text' : 'password'}
                                         placeholder='Senha'
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
                                     />
-                                    <i className='bi bi-lock'></i>
+                                    <i
+                                        className={mostrarSenha ? 'bi bi-lock' : 'bi bi-lock-fill'}
+                                        onClick={() => setMostrarSenha(!mostrarSenha)}
+                                        style={{ cursor: 'pointer', padding: '10px', right: '3px' }}
+                                    ></i>
+                                </div>
+                                <div className='user-pass'>
+                                    <input
+                                        type='password'
+                                        placeholder='Confirmar Senha'
+                                        required
+                                        value={confirmarSenha}
+                                        onChange={e => setConfirmarSenha(e.target.value)}
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    />
+                                    <i className='bi bi-lock-fill'></i>
                                 </div>
                             </div>
                         </div>
@@ -184,20 +246,18 @@ export default function Auth() {
 
                     {/* ─── MODO LOGIN ─── */}
                     {isLogin && (
-                        <div className='column'>
-                            <div className='user-pass'>
-                                <PatternFormat
-                                    type='text'
-                                    format='###.###.###-##'
-                                    placeholder='CPF'
-                                    required
-                                    value={cpf}
-                                    onValueChange={(values) => setCpf(values.value)}
-                                />
-                                <i className='bi bi-person-vcard'></i>
-                            </div>
-
+                        <div className='row g-4'>
                             <div>
+                                <div className='user-pass'>
+                                    <input
+                                        type='text'
+                                        placeholder='Email/CPF'
+                                        required
+                                        value={usuario}
+                                        onChange={e => setUsuario(e.target.value)}
+                                    />
+                                    <i className='bi bi-person-vcard'></i>
+                                </div>
                                 <div className='user-pass'>
                                     <input
                                         type='password'
@@ -205,11 +265,18 @@ export default function Auth() {
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onPaste={(e) => e.preventDefault()}
+                                        onContextMenu={(e) => e.preventDefault()}
                                     />
                                     <i className='bi bi-lock'></i>
                                 </div>
                                 <NavLink to='/auth/forgot-password' className='forgot'>
                                     Esqueci a senha
+                                </NavLink>
+                                <NavLink to='/app' className='secret'>
+                                    Entrada Secreta
                                 </NavLink>
                             </div>
                         </div>
