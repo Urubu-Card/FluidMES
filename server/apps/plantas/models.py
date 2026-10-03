@@ -1,10 +1,11 @@
 from django.db import models
 from apps.accounts.models import Empresa
-
+import uuid
 
 class Planta(models.Model):
     idplanta    = models.AutoField(primary_key=True)
     nome        = models.CharField(max_length=45)
+    uuid        = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     localizacao = models.CharField(max_length=45)
     empresa     = models.ForeignKey(
         Empresa,
@@ -17,7 +18,7 @@ class Planta(models.Model):
         db_table = 'planta'
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} de {self.empresa.nome}"
 
 
 class Clp(models.Model):
@@ -47,11 +48,20 @@ class Sensor(models.Model):
         VOLUME      = 'volume',      'Volume'
         TEMPERATURA = 'temperatura', 'Temperatura'
         PRESSAO     = 'pressao',     'Pressão'
+        VAZAO       = 'vazao',       'Vazão'   
 
     class TipoRegistro(models.TextChoices):
         COIL             = 'coil',             'Coil'
         HOLDING_REGISTER = 'holding_register', 'Holding Register'
         INPUT_STATUS     = 'input_status',     'Input Status'
+        
+    class Unidade(models.TextChoices):
+        CELSIUS     = 'celsius',    'Celsius(°C)'
+        FAHRENHEIT  = 'fahrenheit', 'Fahrenheit(°f)'
+        BAR         = 'bar',        'Bar'
+        PASCAL      = 'pascal',     'Pascal (kPa)'
+        LITROS      = 'litros',     'Litros(L)' 
+        
 
     idsensor      = models.AutoField(primary_key=True)
     nome          = models.CharField(max_length=45)

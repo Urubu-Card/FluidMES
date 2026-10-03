@@ -1,5 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+import uuid
+from django.db                          import models
+from django.conf                        import settings
+from django.contrib.auth.models         import AbstractUser, BaseUserManager
+from django.utils                       import timezone
+from datetime                           import timedelta
+
 
 
 class UsuariosManager(BaseUserManager):
@@ -11,9 +16,20 @@ class UsuariosManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE ,related_name='reset_tokens')
+    token = models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+    
+    def is_valid(self):
+        expira_em = self.criado_em +timedelta(hours=1)
+        return not self.used and timezone.now() < expira_em
+    
 
 
 class Empresa(models.Model):

@@ -1,8 +1,15 @@
-from django.urls import path
-from . import views
+from django.urls    import path,include
+from rest_framework.routers import SimpleRouter
+from apps.plantas   import views
+
+router = SimpleRouter()
+router.register(r'plantas' ,    views.PlantasView,  basename='planta')
+router.register(r'clps' ,       views.ClpView,      basename='clp')
+router.register(r'sensores' ,   views.SensoresView, basename='sensor')
 
 urlpatterns = [
-    path('plantas/',   views.plantas,    name='plantas'),
-    path('home/', views.teste_clp,  name='home'),
-    path('status/',    views.status_clp, name='status_coil'),
+    # path('api/plantas/',    views.PlantaListView.as_view()),
+    # path('api/clps/',       views.ClpListView.as_view() ),
+    # path('api/sensores/',   views.SensoresListView.as_view() )
+    path("api/",include(router.urls))
 ]

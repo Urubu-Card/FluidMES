@@ -16,8 +16,10 @@ class Modbus_Control:
         self.cliente = conector
         return self.cliente
 
+
+
     def isConnected(self):
-        ''' Retorna valor bool indicando status da conexão'''
+
         return self.cliente is not None and self.cliente.connected
 
     async def Ler_Coil(self, address: int, count :int = 1):
@@ -87,9 +89,9 @@ if __name__ == "__main__":
     import time
     
     async def main():
-        client = Modbus_Control("127.0.0.1",5020)
+        client = Modbus_Control("192.168.0.2",5020)
         await client.Conectar()
-        print(await client.Escrever_Coil(2,True))
+        print(await client.Write_Register(2,20))
         #valor = int(input("Insira valor:"))
         #while True:
         #    print(await client.Escrever_Coil(0,valor))

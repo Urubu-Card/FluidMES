@@ -4,14 +4,18 @@ from django.db.models import Q
 
 
 class MultiLogin(ModelBackend):
-    #! OBRIGATÓRIO: mantenha o argumento como 'username'
     def authenticate(self, request, username=None, password=None, **kwargs):
-        UserModel = get_user_model()
-        try:
-            user = UserModel.objects.get(Q(cpf=username) | Q(email=username))
-        except UserModel.DoesNotExist:
+        if not username or not password:
             return None
 
-        if user.check_password(password) and self.user_can_authenticate(user):
+        UserModel = get_user_model()
+
+
+        user = UserModel.objects.filter(
+            Q(email__iexact=username) | Q(cpf=username)
+            ).first()
+
+        if user and user.check_password(password) and self.user_can_authenticate(user):
             return user
+
         return None

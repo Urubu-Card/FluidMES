@@ -1,13 +1,14 @@
 from urllib.parse import parse_qs
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import UntypedToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from asgiref.sync import sync_to_async
 
 def busca_usuario(user_id):
+    User = get_user_model()
     try:
-        usuario = User.objects.get(id=user_id)
+        usuario = User.objects.filter(id=user_id)
         return usuario
     
     except User.DoesNotExist:
@@ -22,7 +23,6 @@ class JWTAuthMiddleware:
         query = scope['query_string'].decode('utf-8')
         dict_query = parse_qs(query)
         token = dict_query['token']
-        print(token)
         
         try:
             validated_token = UntypedToken(token)

@@ -10,6 +10,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','django-insecure-kf)h_nohacd_nnh
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'background_task',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,14 +38,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True #Nao utilizar em prod XD
+#CORS_ALLOW_ALL_ORIGINS = True #Nao utilizar em prod XD
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://10.85.198.137:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],   #* Templates na raiz
+        'DIRS': [BASE_DIR / 'pages'],   #* Templates na raiz
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,7 +80,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.accounts.authentication.JWTCookieAuthentication',
     ),
 }
 
@@ -84,17 +91,9 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("127.0.0.1", 6379)],#? Utilização do redis com docker
         },
     },
-}
-
-
-#* Configurações do tempo do token
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-
 }
 
 LANGUAGE_CODE = 'pt-br'
@@ -102,7 +101,26 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
+#* Configurações do tempo do token
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'UPDATE_LAST_LOGIN': True,
+
+}
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'#? O "/1" especifica o namespace
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_TIMEZONE = TIME_ZONE
+
 STATIC_URL = '/static/'
 #STATICFILES_DIRS = [BASE_DIR / 'static']
 
 LOGIN_URL = 'login'
+
+AUTH_COOKIE_ACCESS = 'access_token'
+AUTH_COOKIE_REFRESH = 'refresh_token'
+AUTH_COOKIE_HTTPONLY = True
+AUTH_COOKIE_SAMESITE = 'Lax'
+AUTH_COOKIE_SECURE = False   #! True em PROD
+CSRF_COOKIE_SECURE = False
