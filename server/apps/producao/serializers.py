@@ -12,5 +12,5 @@ class PedidosSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pedido
-        fields= ["*"]
+        fields = '__all__' 
 

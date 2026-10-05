@@ -1,8 +1,10 @@
-from django.urls import path
-from . import views
+from django.urls import path,include
+from apps.producao import views
+from rest_framework.routers import SimpleRouter
 
+router = SimpleRouter()
+router.register(r'pedidos' ,    views.PedidosView,  basename='pedido')
 urlpatterns = [
-    path('pedidos/', views.pedidos, name='pedidos'),
-    path('rendimento/', views.rendimento, name='rendimento'),
-    path('receitas/', views.receitas, name='receitas'),
+    path('api/', include(router.urls)),
+    
 ]
