@@ -4,7 +4,7 @@ from apps.plantas   import views
 
 router = SimpleRouter()
 router.register(r'plantas' ,    views.PlantasView,  basename='planta')
-router.register(r'clps' ,       views.ClpView,      basename='clp')
+router.register(r'clps' ,       views.ClpListView,      basename='clp')
 router.register(r'sensores' ,   views.SensoresView, basename='sensor')
 
 urlpatterns = [
