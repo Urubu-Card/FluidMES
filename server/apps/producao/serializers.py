@@ -5,12 +5,11 @@ class ReceitaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Receita
-        fields= ["*"]
+        fields= '__all__'
 
 
 class PedidosSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pedido
-        fields= ["*"]
-
+        fields = '__all__' 
