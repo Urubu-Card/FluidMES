@@ -65,7 +65,8 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.ERROR(f"Não foi possivel conectar ao servidor: IP{client.conexao.ip} PORT{client.conexao.porta}"))
                         await asyncio.sleep(5)
                 except Exception as e:
-                    self.stdout.write(self.style.NOTICE(e))
+                    self.stdout.write(self.style.NOTICE(f"{e}"))
+                    await asyncio.sleep(5)
     
     
     async def poll_loop(self,id, uuid, ip, port, sensores):
@@ -91,18 +92,18 @@ class Command(BaseCommand):
                 data = {}
                 
                 for sensor in sensores:
-                    tipo = sensor['tipo']
+                    tipo     = sensor['tipo']
                     endereco = sensor['endereco']
                     if tipo == 'coil':
                         resultado = await client.Ler_Coil(endereco, 1)
-                    elif tipo == 'input':
+                    elif tipo == 'input_status':
                         resultado = await client.InputStatus(endereco, 1)
-                    elif tipo == 'holding':
+                    elif tipo == 'holding_register':
                         resultado = await client.HoldingRegister(endereco, 1)
                     else:
-                        self.stdout.write(self.style.WARNING(f"Tipo desconhecido: {tipo}"))#! IMPOSSIVEL DE ACONTECER REMOVER
+                        self.stdout.write(self.style.WARNING(f"Tipo desconhecido: {tipo}"))#? Era impossivel de acontecer XD
                         continue
-                    data[f"{tipo}_{endereco}"] = resultado[0]
+                    data[f"{tipo}_{endereco}"] = resultado[0] if resultado is not None else None
 
                 if data:
                     try:
@@ -123,7 +124,7 @@ class Command(BaseCommand):
             client.conexao.FecharConexao()
 
                 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options): 
         asyncio.run(self.main())
         
         

@@ -18,7 +18,7 @@ class Planta(models.Model):
         db_table = 'planta'
 
     def __str__(self):
-        return f"{self.nome} de {self.empresa.nome}"
+        return f"{self.nome} {self.empresa.nome}"
 
 
 class Clp(models.Model):
@@ -66,7 +66,7 @@ class Sensor(models.Model):
     idsensor      = models.AutoField(primary_key=True)
     nome          = models.CharField(max_length=45)
     tipo          = models.CharField(max_length=20, choices=Tipo.choices)
-    unidade       = models.CharField(max_length=10)
+    unidade       = models.CharField(max_length=20, choices=Unidade.choices)
     minimo        = models.FloatField()
     maximo        = models.FloatField()
     tipo_registro = models.CharField(max_length=20, choices=TipoRegistro.choices)

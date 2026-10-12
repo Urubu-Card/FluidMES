@@ -3,7 +3,7 @@ from apps.plantas.models            import Planta ,Clp , Sensor
 from apps.plantas.serializers       import PlantaSerializer,ClpSerializer,SensorSerializer
 from rest_framework.permissions     import IsAuthenticated
 from rest_framework.exceptions      import NotFound, PermissionDenied
-
+from apps.accounts.permissions      import PodeEscrever
 
 class PlantasView(ModelViewSet):
     queryset = Planta.objects.all()
@@ -14,29 +14,12 @@ class PlantasView(ModelViewSet):
         return Planta.objects.filter(empresa=self.request.user.empresa)
     
     def perform_create(self, serializer):
-        if self.request.user.role == 3:
-            raise PermissionDenied("Funcionarios não podem criar plantas plantas")
-        
         serializer.save(empresa=self.request.user.empresa) 
     
-    def perform_update(self, serializer):
-        if self.request.user.role == 3:
-            raise PermissionDenied("Funcionarios não podem editar plantas")
-        
-        serializer.save()
-    
-    def perform_destroy(self, instance):
-        if self.request.user.role == 3:
-            raise PermissionDenied("Funcionarios não são permitidos deletar plantas")
-        
-        instance.delete()
-        
-    
-class ClpListView(ModelViewSet):
+class ClpView(ModelViewSet):
     queryset = Clp.objects.all()
     serializer_class = ClpSerializer
-    permission_classes = [IsAuthenticated]
-    
+    permission_classes = [IsAuthenticated ,PodeEscrever]
     
     def get_queryset(self):
          user = self.request.user
@@ -44,7 +27,7 @@ class ClpListView(ModelViewSet):
      
 class SensoresView(ModelViewSet):
     serializer_class = SensorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,PodeEscrever]
     
     def get_queryset(self):
         user = self.request.user

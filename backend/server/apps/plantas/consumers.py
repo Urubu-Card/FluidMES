@@ -1,14 +1,13 @@
 import asyncio
 import json
 from   channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import AnonymousUser
 from apps.plantas.models import Planta
 from asgiref.sync import sync_to_async
 
 def busca_Planta(uuid,empresa):
     
     try:
-        planta = Planta.objects.get(uuid=uuid,empresa=empresa)
+        planta = Planta.objects.get(uuid=uuid,empresa_id=empresa)
         return planta
     except Planta.DoesNotExist:
         return None
@@ -16,12 +15,13 @@ def busca_Planta(uuid,empresa):
 
 class PlantMonitorConsumers(AsyncWebsocketConsumer):
     async def connect(self):
+        self.group_name = None
         uuid = self.scope['url_route']['kwargs']['uuid']
-        if isinstance(self.scope["user"]) == AnonymousUser() :
+        if not self.scope["user"].is_authenticated:
             await self.close()
             return
         
-        planta  =await sync_to_async(busca_Planta)(uuid,self.scope['user'].empresa)
+        planta = await sync_to_async(busca_Planta)(uuid,self.scope['user'].empresa_id1)
         if planta is None:
             await self.close()
             return
@@ -31,7 +31,8 @@ class PlantMonitorConsumers(AsyncWebsocketConsumer):
         
         
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name,self.channel_name)
+        if self.group_name:
+            await self.channel_layer.group_discard(self.group_name,self.channel_name)
         
         
         
