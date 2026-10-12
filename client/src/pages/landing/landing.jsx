@@ -1,44 +1,52 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RotatingText from '../components/RotatingText/RotatingText.jsx';
 import FerroFluid from '../components/Ferrofluid/ferrofluid.jsx';
 import CardNav from '../components/NavBar/navbar.jsx';
 import logo from '/logo-01/android-chrome-192x192.png?url';
 import './style.css';
+import './additions.css';
+import useSectionScroll from './hooks/useSectionScroll.js';
+import useElementMotion from './hooks/useElementMotion.js';
+import { SectionNavigation, HeroDetails, Pillars, Architecture, Impact, Academic, FAQFooter } from './LandingAdditions.jsx';
 
 const items = [
     {
-        label: "Sobre",
+        label: "Conheça",
         bgColor: "#3E7DFF",
         textColor: "#fff",
         links: [
-            { label: "Home", ariaLabel: "About Company", href: 'https://www.google.com/' },
-            { label: "Sobre", ariaLabel: "About Company", href: 'https://www.google.com/' },
-            { label: "Funcionalidades", ariaLabel: "About Company", href: 'https://www.google.com/' }
-        ]
+            { label: "Início", ariaLabel: "Ir para o início", href: "#inicio" },
+            { label: "Solução", ariaLabel: "Conhecer a solução", href: "#solucao" },
+            { label: "Funcionalidades", ariaLabel: "Explorar funcionalidades", href: "#tecnologia" },
+        ],
     },
     {
-        label: "O Amanhã",
+        label: "Produção",
         bgColor: "#2E4E99",
         textColor: "#fff",
         links: [
-            { label: "NAUTILUS", ariaLabel: "Featured Projects" },
-        ]
+            { label: "Rastreabilidade", ariaLabel: "Fluxo de produção", href: "#producao" },
+            { label: "Indicadores e OEE", ariaLabel: "Eficiência da linha", href: "#resultados" },
+        ],
     },
     {
-        label: "Contato",
+        label: "Acesso",
         bgColor: "#2E4E99",
         textColor: "#fff",
         links: [
-            { label: "Email", ariaLabel: "Email us" },
-            { label: "GitHub", ariaLabel: "Gitgub" },
-            { label: "LinkedIn", ariaLabel: "LinkedIn" }
-        ]
-    }
+            { label: "Segurança", ariaLabel: "Perfis de acesso", href: "#equipe" },
+            { label: "Dúvidas frequentes", ariaLabel: "Perguntas e respostas", href: "#contato" },
+            { label: "Começar agora", ariaLabel: "Acessar cadastro", href: "/auth?modo=cadastro" },
+        ],
+    },
 ];
 
 function Landing() {
     const navigate = useNavigate();
+    const landingRef = useRef(null);
+    const activeSection = useSectionScroll(landingRef);
+    useElementMotion(landingRef);
 
     useEffect(() => {
         // esconde a Landing Page e joga o usuário para o Login/App
@@ -60,10 +68,11 @@ function Landing() {
     }, [navigate]);
 
     return (
-        <div className="landing-page">
+        <div className="landing-page" ref={landingRef}>
+            <SectionNavigation active={activeSection} />
             <CardNav
                 logo={logo}
-                logoAlt="Company Logo"
+                logoAlt="FluidMES Logo"
                 logoHref="#inicio"
                 items={items}
                 baseColor={"var(--cinza-escuro)"}
@@ -78,7 +87,7 @@ function Landing() {
                 }}
             />
 
-            <section className="landing-hero" id='inicio'>
+            <section className="landing-hero" id='inicio' tabIndex={-1}>
                 <FerroFluid
                     className='background-fluid'
                     colors={["#2E4E99", "#3E7DFF", "#DBF3FF"]}
@@ -115,24 +124,24 @@ function Landing() {
                         </span>
                     </h1>
                 </div>
+                <HeroDetails />
             </section>
 
-            <section className="landing-content">
+            <section className="landing-content" id="solucao" tabIndex={-1}>
                 <div className="container">
-                    <h2>Our Services</h2>
-                    <p>Discover how we can help you achieve your goals.</p>
+                    <Pillars />
                 </div>
             </section>
-            <section className="landing-testimonials">
+            <Architecture />
+            <section className="landing-testimonials" id="resultados" tabIndex={-1}>
                 <div className="container">
-                    <h2>What Our Clients Say</h2>
-                    <p>Don't just take our word for it - hear from our satisfied customers.</p>
+                    <Impact />
                 </div>
             </section>
-            <section className="landing-contact">
+            <Academic />
+            <section className="landing-contact" id="contato" tabIndex={-1}>
                 <div className="container">
-                    <h2>Get In Touch</h2>
-                    <p>Have questions? We'd love to hear from you.</p>
+                    <FAQFooter />
                 </div>
             </section>
         </div>
