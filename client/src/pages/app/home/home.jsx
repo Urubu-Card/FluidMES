@@ -12,9 +12,15 @@ const METRICAS = [
 ];
 
 const SERIE_BARRAS = [
-    { id: 'x', label: 'Item X', value: 50, color: 'var(--chart-red)' },
+    { id: 'x', label: 'Item X', value: 66.6     , color: 'var(--chart-red)' },
     { id: 'y', label: 'Item Y', value: 85, color: 'var(--chart-blue)' },
     { id: 'z', label: 'Item Z', value: 30, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
+    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
     { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
 
 
