@@ -65,7 +65,8 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.ERROR(f"Não foi possivel conectar ao servidor: IP{client.conexao.ip} PORT{client.conexao.porta}"))
                         await asyncio.sleep(5)
                 except Exception as e:
-                    self.stdout.write(self.style.NOTICE(e))
+                    self.stdout.write(self.style.NOTICE(f"{e}"))
+                    await asyncio.sleep(5)
     
     
     async def poll_loop(self,id, uuid, ip, port, sensores):
@@ -102,7 +103,7 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(self.style.WARNING(f"Tipo desconhecido: {tipo}"))#? Era impossivel de acontecer XD
                         continue
-                    data[f"{tipo}_{endereco}"] = resultado[0]
+                    data[f"{tipo}_{endereco}"] = resultado[0] if resultado is not None else None
 
                 if data:
                     try:

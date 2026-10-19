@@ -8,13 +8,13 @@ from asgiref.sync import sync_to_async
 def busca_usuario(user_id):
     User = get_user_model()
     try:
-        usuario = User.objects.filter(id=user_id)
+        usuario = User.objects.get(id=user_id)
         return usuario
     
     except User.DoesNotExist:
         return AnonymousUser()
+
 class JWTAuthMiddleware:
-    
     
     def __init__(self,app):
         self.app = app
@@ -22,7 +22,7 @@ class JWTAuthMiddleware:
     async def __call__(self, scope,receive,send):
         query = scope['query_string'].decode('utf-8')
         dict_query = parse_qs(query)
-        token = dict_query['token']
+        token = dict_query.get('token',[None])[0]
         
         try:
             validated_token = UntypedToken(token)

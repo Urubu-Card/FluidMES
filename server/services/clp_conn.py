@@ -3,7 +3,7 @@ from pymodbus.client import AsyncModbusTcpClient
 from pymodbus.exceptions import ModbusException
 import logging
 import asyncio
-
+logger = logging.getLogger(__name__)
 logging.getLogger('pymodbus').setLevel(logging.CRITICAL)
 
 
@@ -16,7 +16,7 @@ class Conexao:
 
     async def Conectar(self):
         "Faz a conexão com o CLP"
-        
+        self.FecharConexao()
         try:
             self.cliente = AsyncModbusTcpClient(host=self.ip, 
                                                 port=self.porta,
@@ -26,19 +26,21 @@ class Conexao:
             if self.cliente.connected:
                 return self.cliente
 
-        except ModbusException or Exception as e:
-            self.cliente = e
-            return self
+        except (ModbusException,Exception) as e:
+            logger.warning("%s no IP:%s e na PORTA:%s.",e,self.ip,self.porta)
+            self.cliente = None
+            return self.cliente
 
     def FecharConexao(self):
         if self.cliente is not None:
             self.cliente.close()
+            self.cliente = None
 
 
 
 if __name__ =="__main__":
     async def main():
-        conexao_clp = Conexao("127.0.0.1", 5020)
+        conexao_clp = Conexao("999.1.1.1", 5020)
         
         cliente = await conexao_clp.Conectar()
         print(cliente)
