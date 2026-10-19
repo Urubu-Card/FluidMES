@@ -3,6 +3,13 @@ try:
     from .clp_conn  import Conexao 
 except ImportError:
     from clp_conn import Conexao
+import logging
+logger = logging.getLogger(__name__)
+
+
+def Erro(erro,address):
+    logger.warning("Erro: o erro ocorrido foi %s no endereço %s ",erro,address)
+    return None
 
 
 class Modbus_Control:
@@ -30,9 +37,9 @@ class Modbus_Control:
                     return [bool(bits) for bits in leitor.bits]
                 else:
                     return [leitor.bits[0]]
-            return f'Erro ao ler: {leitor}'
+            return None
         except ModbusException as e:
-            return f'Erro: {e}'
+            Erro(e,address)
 
     async def Escrever_Coil(self, address: int, value: bool):
         try:
@@ -41,7 +48,7 @@ class Modbus_Control:
                 return f'Valor {value} registrado na coil {address}'
             return f'Erro ao escrever na coil: {resultado}'
         except ModbusException as e:
-            return f'Erro: {e}'
+            Erro(e,address)
 
     async def InputStatus(self, address: int ,count :int =1):
         try:
@@ -51,9 +58,9 @@ class Modbus_Control:
                     return [bool(bits)for bits in leitor.bits]
                 else:
                     return [bool(leitor.bits[0])]
-            return f'Erro: {leitor}'
+            return None
         except ModbusException as e:
-            return f'Erro: {e}'
+            Erro(e,address)
 
     async def HoldingRegister(self, address: int,count:int =1):
         try:
@@ -63,10 +70,10 @@ class Modbus_Control:
                     return [registros for registros in leitor.registers]
                 else:
                     return [leitor.registers[0]]
-            return f'Erro: {leitor}'
+            return None
             
         except ModbusException as e:
-            return f'Erro: {e}'
+            Erro(e,address)
                    
     async def Write_Register(self,address:int,value):
         
@@ -79,7 +86,7 @@ class Modbus_Control:
             
         
         except ModbusException as e:
-            return f"Ocoreu um erro: {e}"    
+            Erro(e,address)
             
      
         
