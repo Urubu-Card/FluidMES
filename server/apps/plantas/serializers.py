@@ -7,7 +7,7 @@ class PlantaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model  = Planta
-        fields = ['nome','localizacao']
+        fields = ['idclp','nome','localizacao','uuid','idplanta']
 
     
 
@@ -15,12 +15,12 @@ class ClpSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Clp
-        fields = ['nome','ip','porta','ativo']
+        fields = ['nome','ip','porta','ativo','planta']
         
 
 class SensorSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Sensor
-        fields = ['*']
+        fields = '__all__'
     
