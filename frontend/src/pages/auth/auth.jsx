@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import { useNavigate, NavLink, useLocation } from 'react-router-dom';
 import { PatternFormat } from 'react-number-format';
-import axios from 'axios';
+
 import Particles from '../components/Particles/particles.jsx';
 import api from '../../services/api.js';
 import './style.css';
 
 export default function Auth() {
     const formRef = useRef(null);
+    const location = useLocation();
     const [isLogin, setIsLogin] = useState(true);
-    const [erro, setErro] = useState('');
+    const [erro, setErro] = useState(() => location.state?.authError || '');
     const navigate = useNavigate();
 
     // Estados dos inputs compartilhados e específicos
@@ -25,20 +26,6 @@ export default function Auth() {
     const [primeiroNome, setPrimeiroNome] = useState('');
     const [ultimoNome, setUltimoNome] = useState('');
     const [email, setEmail] = useState('');
-
-    useEffect(() => {
-        let ativo = true;
-        axios.get('/api/me/', { withCredentials: true })
-            .then(() => {
-                if (ativo) navigate('/app');
-            })
-            .catch(() => {
-            });
-
-        return () => {
-            ativo = false;
-        };
-    }, [navigate]);
 
     function limparCampos() {
         if (formRef.current) {
@@ -66,7 +53,6 @@ export default function Auth() {
 
         try {
             if (isLogin) {
-                console.log('Login:', { usuario, password });
                 await api.post('/api/login/', {
                     usuario: usuario,
                     password
