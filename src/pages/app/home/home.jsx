@@ -1,155 +1,178 @@
-import React from 'react';
-import './style.css';
-import TituloPagina from '../../components/Titulo/titulo';
-
-/*----------Dados (troque pelos reais depois)----------*/
-
-const METRICAS = [
-    { id: 1, valor: '53,8%', label: 'OEE Geral', icon: 'bi-graph-up-arrow', variant: 'dark', iconClass: 'icon-glass' },
-    { id: 2, valor: '5.358', label: 'Pedidos Totais', icon: 'bi-star', variant: 'light', iconClass: 'icon-success', trend: { tipo: 'up', valor: '4,2%' } },
-    { id: 3, valor: '367L', label: 'Volume Produzido', icon: 'bi-droplet-half', variant: 'light', iconClass: 'icon-success', trend: { tipo: 'down', valor: '4,2%' } },
-    { id: 4, valor: '45', label: 'Falhas de Conexão com a planta', icon: 'bi-wifi-off', variant: 'light', iconClass: 'icon-primary' },
-];
-
-const SERIE_BARRAS = [
-    { id: 'x', label: 'Item X', value: 66.6     , color: 'var(--chart-red)' },
-    { id: 'y', label: 'Item Y', value: 85, color: 'var(--chart-blue)' },
-    { id: 'z', label: 'Item Z', value: 30, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-    { id: 'h', label: 'Item H', value: 67, color: 'var(--chart-yellow)' },
-
-
-];
-
-/*----------Componentes----------*/
-
-const SelectPeriodo = ({ children, ...props }) => (
-    <div className='select-wrapper'>
-        <select className='form-select form-select-sm custom-select' {...props}>
-            {children}
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import useData from "../shared/useData";
+import { useWorkspace } from "../shared/context";
+import { PageHeader, DataState } from "../shared/UI";
+import { number } from "../shared/format";
+import { BarChart, DonutChart } from "../shared/Charts";
+export default function Home() {
+  const { user } = useWorkspace();
+  const { data, error, reload, loading } = useData(
+    ["/api/pedidos/", "/api/solicitacoes/", "/api/plantas/"],
+    2500,
+  );
+  const [period, setPeriod] = useState("todos");
+  const [now] = useState(() => Date.now());
+  const allOrders = data?.[0] || [];
+  const allRequests = data?.[1] || [];
+  const plants = data?.[2] || [];
+  const inPeriod = (item) =>
+    period === "todos" ||
+    new Date(item.criado_em) >= new Date(now - Number(period) * 86400000);
+  const orders = allOrders.filter(inPeriod);
+  const requests = allRequests.filter(inPeriod);
+  const approved =
+    orders.filter((o) => o.aprovacao === "aprovado").length +
+    requests.filter((s) => s.status === "aprovado").length;
+  const refused =
+    orders.filter((o) => o.aprovacao === "reprovado").length +
+    requests.filter((s) => s.status === "reprovado").length;
+  const pending =
+    orders.filter((o) => o.aprovacao === "aguardando").length +
+    requests.filter((s) => s.status === "aguardando").length;
+  const recipes = Object.entries(
+    orders.reduce(
+      (result, item) => ({
+        ...result,
+        [item.receita_nome]: (result[item.receita_nome] || 0) + 1,
+      }),
+      {},
+    ),
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([label, value]) => ({ label, value }));
+  const cards =
+    user.role === 1
+      ? [
+          [
+            "bi-cpu",
+            "Plantas em produção",
+            plants.filter((p) => p.painel?.status === "produzindo").length,
+            "success",
+          ],
+          [
+            "bi-droplet-half",
+            "Quantidade produzida",
+            number(
+              orders
+                .filter((o) => o.status === "concluido")
+                .reduce((sum, o) => sum + o.quantidade, 0),
+            ),
+            "primary",
+          ],
+          ["bi-hourglass-split", "Aguardando decisão", pending, "warning"],
+          [
+            "bi-check2-circle",
+            "Pedidos concluídos",
+            orders.filter((o) => o.status === "concluido").length,
+            "primary",
+          ],
+        ]
+      : [
+          [
+            "bi-file-earmark",
+            "Pedidos realizados",
+            orders.length + requests.length,
+            "primary",
+          ],
+          ["bi-check2-circle", "Aprovados", approved, "success"],
+          ["bi-x-circle", "Recusados", refused, "danger"],
+          ["bi-hourglass-split", "Aguardando aprovação", pending, "warning"],
+        ];
+  return (
+    <section className="mes-page">
+      <PageHeader
+        eyebrow={`BEM-VINDO, ${user.first_name.toUpperCase()}`}
+        title={
+          user.role === 1
+            ? "Visão geral"
+            : user.role === 2
+              ? "Sua operação, no ritmo certo"
+              : "Seu trabalho flui aqui"
+        }
+        description={
+          user.role === 1
+            ? "Indicadores para decidir com clareza."
+            : user.role === 2
+              ? "O que precisa da sua atenção, sem perder o todo."
+              : "Seus pedidos, suas receitas e seu progresso."
+        }
+      >
+        <select
+          aria-label="Período dos indicadores"
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+        >
+          <option value="todos">Todo o período</option>
+          <option value="7">Últimos 7 dias</option>
+          <option value="30">Últimos 30 dias</option>
         </select>
-    </div>
-);
-
-const MetricCard = ({ valor, label, icon, variant = 'light', iconClass, trend }) => (
-    <div className='col-12 col-md-6 col-lg-3'>
-        <div className={`card metric-card metric-${variant} border-0`}>
-            <div className={`metric-icon rounded-circle ${iconClass}`}>
-                <i className={`bi ${icon}`}></i>
-            </div>
-            <div className='metric-value'>
-                {valor}
-                {trend && (
-                    <span className={`metric-trend trend-${trend.tipo}`}>
-                        <i className={`bi bi-caret-${trend.tipo}-fill`}></i>
-                        <small>{trend.valor}</small>
-                    </span>
-                )}
-            </div>
-            <span className='metric-label'>{label}</span>
-        </div>
-    </div>
-);
-
-/*value: 0–100 sobre o trecho útil do arco (270°)*/
-const GaugeCard = ({ titulo, rodape, value = 59 }) => {
-    const R = 40;
-    const C = 2 * Math.PI * R;          // circunferência ≈ 251.2
-    const trilho = C * 0.75;            // 3/4 do círculo
-    const progresso = trilho * (value / 100);
-
-    return (
-        <div className='col-12 col-md-6'>
-            <div className='card card-gauge-container border-0 rounded-3 p-4 h-100'>
-                <div className='gauge-title'>{titulo}</div>
-
-                <div className='gauge-wrapper'>
-                    <svg className='gauge-svg' viewBox='0 0 100 100'>
-                        <circle cx='50' cy='50' r={R} className='gauge-track'
-                            strokeDasharray={`${trilho} ${C}`} />
-                        <circle cx='50' cy='50' r={R} className='gauge-progress'
-                            strokeDasharray={`${progresso} ${C}`} />
-                    </svg>
-                    <div className='gauge-badge'>
-                        <i className='bi bi-plus'></i>
-                    </div>
+      </PageHeader>
+      <DataState loading={loading} error={error} reload={reload} />
+      {data && (
+        <>
+          <div className="metric-grid">
+            {cards.map(([icon, label, value, tone]) => (
+              <article className="metric-card" key={label}>
+                <div className={`metric-symbol tone-${tone}`}>
+                  <i aria-hidden="true" className={`bi ${icon}`} />
                 </div>
-
-                <div className='gauge-footer'>{rodape}</div>
+                <span>{label}</span>
+                <strong>{value}</strong>
+              </article>
+            ))}
+          </div>
+          <div className="dashboard-callout">
+            <div>
+              <span className="eyebrow">PRÓXIMO PASSO</span>
+              <h2>
+                {pending
+                  ? `${pending} ${user.role === 3 ? "solicitações aguardando análise" : "pedidos precisam de uma decisão"}`
+                  : "Tudo organizado para continuar"}
+              </h2>
+              <p>
+                {user.role === 3
+                  ? "Você acompanha o andamento de cada solicitação na tela de pedidos."
+                  : "Organize as aprovações e acompanhe cada planta em tempo real."}
+              </p>
             </div>
-        </div>
-    );
-};
-
-const BarChartCard = ({ titulo, series }) => {
-    const linhas = [0, 33.3, 66.6, 100];
-
-    return (
-        <div className='col-12 col-md-6'>
-            <div className='card chart-card border-0 rounded-3 p-4 h-100'>
-                <div>
-                    <h5 className='chart-title'>{titulo}</h5>
-                    <div className='chart-legend'>
-                        {series.map(s => (
-                            <div key={s.id} className='legend-item'>
-                                <span className='legend-dot' style={{ backgroundColor: s.color }}></span>
-                                <span>{s.value} {s.label}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className='chart-container'>
-                    {linhas.map(top => (
-                        <div key={top} className='chart-grid-line' style={{ top: `${top}%` }}></div>
-                    ))}
-                    {series.map(s => (
-                        <div key={s.id} className='bar' style={{ height: `${s.value}%`, backgroundColor: s.color }}></div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-};
-
-/*---------Página-------*/
-
-const Home = () => {
-    return (
-        <div className='home-page app-page text-white'>
-
-            <TituloPagina titulo='Visão Geral:'>
-                <SelectPeriodo>
-                    <option>Selecione o período</option>
-                </SelectPeriodo>
-            </TituloPagina>
-
-            <div className='row g-3 mb-4'>
-                {METRICAS.map(m => <MetricCard key={m.id} {...m} />)}
-            </div>
-
-            <div className='analise-de'>
-                <span>Análise de</span>
-                <SelectPeriodo>
-                    <option>Eficiência</option>
-                </SelectPeriodo>
-            </div>
-
-            <div className='row g-3'>
-                <GaugeCard
-                    titulo='Um aumento em potencial...'
-                    rodape='Nota informativa de rodapé'
-                    value={10}
-                />
-                <BarChartCard titulo='Grafico de Pedidos' series={SERIE_BARRAS} />
-            </div>
-        </div>
-    );
-};
-
-export default Home;
+            <Link className="mes-button" to="/app/pedidos">
+              {user.role === 3 ? "Ver meus pedidos" : "Acompanhar pedidos"}
+              <i aria-hidden="true" className="bi bi-arrow-right" />
+            </Link>
+          </div>
+          <div className="chart-grid">
+            <DonutChart
+              title={
+                user.role === 3 ? "Minhas solicitações" : "Visão das aprovações"
+              }
+              items={[
+                { label: "Aprovados", value: approved, color: "#198754" },
+                { label: "Aguardando", value: pending, color: "#ffc107" },
+                { label: "Recusados", value: refused, color: "#dc3545" },
+              ]}
+            />
+            <BarChart
+              title={
+                user.role === 3
+                  ? "As receitas que você mais pede"
+                  : "Receitas mais solicitadas"
+              }
+              items={recipes}
+            />
+          </div>
+          {user.role === 1 && (
+            <BarChart
+              title="Produção acumulada por planta"
+              items={plants.map((p) => ({
+                label: p.nome,
+                value: p.painel?.quantidade_produzida || 0,
+              }))}
+            />
+          )}
+        </>
+      )}
+    </section>
+  );
+}
