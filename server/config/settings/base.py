@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 from datetime import timedelta
-
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -84,6 +84,12 @@ REST_FRAMEWORK = {
     ),
 }
 
+CELERY_BEAT_SCHEDULE = {
+    'calcular-oee-diario': {
+        'task': 'apps.producao.tasks.calcular_oee_diario',
+        'schedule': crontab(hour=0, minute=5),
+    },
+}
 
 ASGI_APPLICATION = 'config.asgi.application'
 
