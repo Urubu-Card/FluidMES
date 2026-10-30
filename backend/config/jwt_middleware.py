@@ -1,52 +1,30 @@
-from urllib.parse                           import parse_qs
-from django.contrib.auth                    import get_user_model
-from django.contrib.auth.models             import AnonymousUser
-from rest_framework_simplejwt.tokens        import UntypedToken
-from rest_framework_simplejwt.exceptions    import InvalidToken, TokenError
-from asgiref.sync                           import sync_to_async
-from http.cookies                           import SimpleCookie
+from http.cookies import SimpleCookie, CookieError
+from channels.db import database_sync_to_async
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.exceptions import TokenError
 
-def busca_usuario(user_id):
-    User = get_user_model()
+@database_sync_to_async
+def authenticate(token):
     try:
-        usuario = User.objects.get(id=user_id)
-        return usuario
-    
-    except User.DoesNotExist:
+        auth = JWTAuthentication()
+        return auth.get_user(auth.get_validated_token(token))
+    except (AuthenticationFailed, TokenError):
         return AnonymousUser()
 
-def token_cookie(scope):
-    headers = dict(scope['headers'])
-    cookiesBytes = headers.get(b'cookie')
-    if cookiesBytes is None:
-        return None
-
-    cookies = SimpleCookie(cookiesBytes.decode())
-
-    acessToken = cookies.get('access_token')
-    if acessToken:
-        return acessToken.value
-    else:
-        return None
-
 class JWTAuthMiddleware:
-    
-    def __init__(self,app):
+    def __init__(self, app):
         self.app = app
-        
-    async def __call__(self, scope,receive,send):
-        query = scope['query_string'].decode('utf-8')
-        dict_query = parse_qs(query)
-        token = dict_query.get('token',[None])[0] or token_cookie(scope)
-        scope["user"]= AnonymousUser()
+    async def __call__(self, scope, receive, send):
+        scope = dict(scope)
+        cookies = SimpleCookie()
         try:
-            validated_token = UntypedToken(token)
-            user_Id = validated_token['user_id'] 
-            usuario = await sync_to_async(busca_usuario)(user_Id)
-            scope["user"] = usuario
-            
-        except (InvalidToken,TokenError,KeyError):
-            scope["user"]= AnonymousUser()
-        
+            cookies.load(dict(scope.get('headers', [])).get(b'cookie', b'').decode())
+        except (CookieError, UnicodeError):
+            pass
+        token = cookies.get(settings.AUTH_COOKIE_ACCESS)
+        scope['auth_token'] = token.value if token else None
+        scope['user'] = await authenticate(token.value) if token else AnonymousUser()
         return await self.app(scope, receive, send)
-            

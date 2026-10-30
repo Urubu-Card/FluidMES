@@ -1,42 +1,31 @@
-import os
-from pathlib import Path
+from .base import *
 import environ
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from django.core.exceptions import ImproperlyConfigured
 
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-from .base import *
-
-DEBUG = True
-ALLOWED_HOSTS=['10.85.198.140', 'localhost', '127.0.0.1']
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':     os.environ['DB_NAME'],
-#         'USER':     os.environ['DB_USER'],
-#         'PASSWORD': os.environ['DB_PASSWORD'],
-#         'HOST':     os.environ.get('DB_HOST', 'localhost'),
-#         'PORT':     os.environ.get('DB_PORT', '5432'),
-#     }
-# }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+if len(SECRET_KEY) < 50 or SECRET_KEY.startswith('django-insecure'):
+    raise ImproperlyConfigured('Configure uma chave secreta forte de pelo menos 50 caracteres.')
+DEBUG = False
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+DATABASES = {'default': env.db('DATABASE_URL')}
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+AUTH_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+if env.bool('TRUST_PROXY_SSL_HEADER', default=False):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_ORIGIN')
-EMAIL_HOST_PASSWORD = os.environ.get('GOOGLE_APP_PASSWORD') 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-FRONTEND_URL = 'http://127.0.0.1:8000'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+FRONTEND_URL = env('FRONTEND_URL')
