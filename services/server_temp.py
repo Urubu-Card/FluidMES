@@ -1,126 +1,71 @@
-"""
-Modbus Slave (Server) - pymodbus 3.13.0
-========================================
-Registradores disponíveis (Device ID = 1):
-
-  Coils           (0x)  endereços 1–100  → leitura/escrita (bits)
-  Discrete Inputs (1x)  endereços 1–100  → somente leitura (bits)
-  Input Registers (3x)  endereços 1–100  → somente leitura (16-bit)
-  Holding Regs    (4x)  endereços 1–100  → leitura/escrita (16-bit)
-
-NOTA: Na versão 3.13, endereços começam em 1 (não 0).
-
-Uso:
-  python modbus_slave.py                     # TCP 0.0.0.0:5020 (padrão)
-  python modbus_slave.py --port 502          # porta padrão Modbus (requer root)
-  python modbus_slave.py --host 127.0.0.1    # somente localhost
-  python modbus_slave.py --rtu /dev/ttyUSB0  # modo RTU serial
-"""
+"""Simulador de CLPs Modbus TCP para a bancada do FluidMES."""
 
 import argparse
-import logging
 import asyncio
+from pathlib import Path
+import sys
 
-from pymodbus import ModbusDeviceIdentification
-from pymodbus.datastore import (
-    ModbusSequentialDataBlock,
-    ModbusDeviceContext,
-    ModbusServerContext,
-)
-from pymodbus.server import StartAsyncTcpServer, StartAsyncSerialServer
-from pymodbus.framer import FramerType
+from pymodbus.server import ModbusTcpServer
+from pymodbus.simulator import DataType, SimData, SimDevice
 
-# ---------------------------------------------------------------------------
-# Logging
-# ---------------------------------------------------------------------------
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    level=logging.INFO,
-)
-log = logging.getLogger("modbus_slave")
+if not __package__:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    __package__ = "services"
+
+from .modbus_simulation import build_mapped_context
 
 
-# ---------------------------------------------------------------------------
-# Datastore
-# ---------------------------------------------------------------------------
-def build_context() -> ModbusServerContext:
-    """
-    Cria o contexto de dados com valores iniciais.
-    ATENÇÃO: na pymodbus 3.13 o endereço inicial deve ser >= 1.
-    """
-    coils       = ModbusSequentialDataBlock(1, [False] * 100)
-    discrete    = ModbusSequentialDataBlock(1, [False] * 100)
-    input_regs  = ModbusSequentialDataBlock(1, list(range(100)))
-    holding_reg = ModbusSequentialDataBlock(1, [1000 + i for i in range(100)])
+def build_context():
+    """Mapa genérico legado; endereços de protocolo 0–99, device_id=1."""
+    return SimDevice(id=1, simdata=(
+        [SimData(address=0, values=[False]*100, datatype=DataType.BITS)],
+        [SimData(address=0, values=[False]*100, datatype=DataType.BITS, readonly=True)],
+        [SimData(address=0, values=list(range(1000, 1100)), datatype=DataType.UINT16)],
+        [SimData(address=0, values=list(range(100)), datatype=DataType.UINT16, readonly=True)],
+    ))
 
-    device = ModbusDeviceContext(
-        di=discrete,        # Discrete Inputs   (FC 02)
-        co=coils,           # Coils             (FC 01, 05, 15)
-        hr=holding_reg,     # Holding Registers (FC 03, 06, 16)
-        ir=input_regs,      # Input Registers   (FC 04)
+
+async def servir(host, portas, *, legado, demo, modo=None):
+    servidores = []
+    try:
+        for indice, porta in enumerate(portas):
+            contexto = (
+                build_context() if legado
+                else build_mapped_context(demo=demo, atraso=5 * indice, modo=modo)
+            )
+            servidor = ModbusTcpServer(context=contexto, address=(host, porta))
+            servidores.append(servidor)
+            await servidor.serve_forever(background=True)
+            print(f"CLP simulado {indice + 1}: {host}:{porta} (Unit ID 1)", flush=True)
+        await asyncio.Future()
+    finally:
+        for servidor in reversed(servidores):
+            await servidor.shutdown()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--port", type=int, default=5020)
+    parser.add_argument("--segunda-porta", type=int, help="Porta de um segundo CLP independente.")
+    modos = parser.add_mutually_exclusive_group()
+    modos.add_argument("--demo", action="store_true", help="Executa ciclos locais (modo 0) automaticamente.")
+    modos.add_argument("--legado", action="store_true", help="Usa o mapa genérico anterior.")
+    parser.add_argument(
+        "--modo", type=int, choices=(0, 1, 2),
+        help="MODO inicial dos tanques: 0 local, 1 aparelho, 2 MES (padrão: 2; 0 com --demo).",
     )
-
-    # devices= (não slaves=) na pymodbus 3.13
-    return ModbusServerContext(devices=device, single=True)
-
-
-# ---------------------------------------------------------------------------
-# Device Identification (FC 43 / MEI)
-# ---------------------------------------------------------------------------
-def build_identity() -> ModbusDeviceIdentification:
-    identity = ModbusDeviceIdentification()
-    identity.VendorName         = "Demo Slave"
-    identity.ProductCode        = "MOD-SLAVE-01"
-    identity.ProductName        = "Modbus Slave Python"
-    identity.ModelName          = "PyModbus 3.13"
-    identity.MajorMinorRevision = "3.13.0"
-    return identity
-
-
-# ---------------------------------------------------------------------------
-# Runner
-# ---------------------------------------------------------------------------
-async def run_server(args: argparse.Namespace) -> None:
-    context  = build_context()
-    identity = build_identity()
-
-    if args.rtu:
-        log.info("Iniciando Modbus RTU em %s @ %d baud", args.rtu, args.baudrate)
-        await StartAsyncSerialServer(
-            context=context,
-            identity=identity,
-            port=args.rtu,
-            baudrate=args.baudrate,
-            framer=FramerType.RTU,
-            stopbits=1,
-            bytesize=8,
-            parity="N",
-        )
-    else:
-        log.info("Iniciando Modbus TCP em %s:%d", args.host, args.port)
-        await StartAsyncTcpServer(
-            context=context,
-            identity=identity,
-            address=(args.host, args.port),
-        )
-
-
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Modbus Slave — pymodbus 3.13.0")
-    p.add_argument("--host",     default="0.0.0.0",
-                   help="Endereço de bind TCP (padrão: 0.0.0.0)")
-    p.add_argument("--port",     type=int, default=5020,
-                   help="Porta TCP (padrão: 5020)")
-    p.add_argument("--rtu",      default=None, metavar="SERIAL_PORT",
-                   help="Porta serial RTU, ex: /dev/ttyUSB0 ou COM3")
-    p.add_argument("--baudrate", type=int, default=9600,
-                   help="Baud rate serial (padrão: 9600)")
-    return p.parse_args()
+    args = parser.parse_args()
+    portas = [args.port]
+    if args.segunda_porta is not None:
+        portas.append(args.segunda_porta)
+    if len(set(portas)) != len(portas) or any(not 1 <= porta <= 65535 for porta in portas):
+        parser.error("Use portas distintas entre 1 e 65535.")
+    try:
+        asyncio.run(servir(args.host, portas, legado=args.legado, demo=args.demo, modo=args.modo))
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    try:
-        asyncio.run(run_server(args))
-    except KeyboardInterrupt:
-        log.info("Servidor encerrado pelo usuário.")
+    main()

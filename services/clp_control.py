@@ -1,108 +1,46 @@
-from pymodbus.exceptions import ModbusException
-try:
-    from .clp_conn  import Conexao 
-except ImportError:
-    from clp_conn import Conexao
-import logging
-logger = logging.getLogger(__name__)
+from pymodbus.pdu import ExceptionResponse
+from .clp_conn import Conexao
 
-
-def Erro(erro,address):
-    logger.warning("Erro: o erro ocorrido foi %s no endereço %s ",erro,address)
-    return None
+class EscritaRecusada(IOError):
+    pass
 
 
 class Modbus_Control:
-
-    def __init__(self, ip: str, port: int):
-        self.conexao  = Conexao(ip, port)
-        self.cliente  = None
-
+    """Adapter returning values or exceptions, never error strings as measurements."""
+    def __init__(self, ip: str, port: int, *, retries=1):
+        self.conexao = Conexao(ip, port, retries=retries)
+        self.cliente = None
     async def Conectar(self):
-        conector = await self.conexao.Conectar()
-        self.cliente = conector
+        self.cliente = await self.conexao.Conectar()
         return self.cliente
-
-
-
     def isConnected(self):
-
-        return self.cliente is not None and self.cliente.connected
-
-    async def Ler_Coil(self, address: int, count :int = 1):
-        try:
-            leitor = await self.cliente.read_coils(address=address,count=count)
-            if not leitor.isError():
-                if count>1:
-                    return [bool(bits) for bits in leitor.bits]
-                else:
-                    return [leitor.bits[0]]
-            return None
-        except ModbusException as e:
-            Erro(e,address)
-
-    async def Escrever_Coil(self, address: int, value: bool):
-        try:
-            resultado = await self.cliente.write_coil(address=address, value=value)
-            if not resultado.isError():
-                return f'Valor {value} registrado na coil {address}'
-            return f'Erro ao escrever na coil: {resultado}'
-        except ModbusException as e:
-            Erro(e,address)
-
-    async def InputStatus(self, address: int ,count :int =1):
-        try:
-            leitor =  await self.cliente.read_discrete_inputs(address=address,count=count)
-            if not leitor.isError():
-                if count >1:
-                    return [bool(bits)for bits in leitor.bits]
-                else:
-                    return [bool(leitor.bits[0])]
-            return None
-        except ModbusException as e:
-            Erro(e,address)
-
-    async def HoldingRegister(self, address: int,count:int =1):
-        try:
-            leitor = await self.cliente.read_holding_registers(address,count=count)
-            if not leitor.isError():
-                if count>1:
-                    return [registros for registros in leitor.registers]
-                else:
-                    return [leitor.registers[0]]
-            return None
-            
-        except ModbusException as e:
-            Erro(e,address)
-                   
-    async def Write_Register(self,address:int,value):
-        
-        try:
-            resultado = await self.cliente.write_register(address,value)
-            if not resultado.isError():
-                return f"Valor({value} foi inserido com sucesso no endereço:{address} ) "
-            else:
-                return f"Occoreu um erro :{resultado}"
-            
-        
-        except ModbusException as e:
-            Erro(e,address)
-            
-     
-        
-
-if __name__ == "__main__":
-    import asyncio
-    import time
-    
-    async def main():
-        client = Modbus_Control("192.168.0.2",5020)
-        await client.Conectar()
-        print(await client.Write_Register(2,20))
-        #valor = int(input("Insira valor:"))
-        #while True:
-        #    print(await client.Escrever_Coil(0,valor))
-        #    valor += 1
-        #    time.sleep(1)
-
-    asyncio.run(main())
+        return bool(self.cliente and self.cliente.connected)
+    async def _read(self, method, address, count, field):
+        if not self.isConnected():
+            raise ConnectionError('CLP desconectado.')
+        result = await getattr(self.cliente, method)(address=address, count=count)
+        if result.isError():
+            raise IOError(f'Falha Modbus: {result}')
+        return list(getattr(result, field)[:count])
+    async def Ler_Coil(self, address, count=1):
+        return await self._read('read_coils', address, count, 'bits')
+    async def InputStatus(self, address, count=1):
+        return await self._read('read_discrete_inputs', address, count, 'bits')
+    async def HoldingRegister(self, address, count=1):
+        return await self._read('read_holding_registers', address, count, 'registers')
+    async def _write(self, method, address, value):
+        if not self.isConnected():
+            raise ConnectionError('CLP desconectado.')
+        argumento = 'values' if method == 'write_registers' else 'value'
+        result = await getattr(self.cliente, method)(address=address, **{argumento: value})
+        if isinstance(result, ExceptionResponse):
+            raise EscritaRecusada(f"Código Modbus {result.exception_code}")
+        if result.isError():
+            raise IOError(f'Falha Modbus: {result}')
+        return True
+    async def Escrever_Coil(self, address, value):
+        return await self._write('write_coil', address, value)
+    async def Write_Register(self, address, value):
+        return await self._write('write_register', address, value)
+    async def Write_Registers(self, address, values):
+        return await self._write('write_registers', address, list(values))
