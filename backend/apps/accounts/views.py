@@ -1,261 +1,210 @@
-import os
-from rest_framework                           import status , permissions
-from rest_framework.views                     import APIView
-from rest_framework.viewsets                  import ModelViewSet
-from rest_framework.response                  import Response
-from rest_framework.permissions               import IsAuthenticated
-from rest_framework_simplejwt.tokens          import RefreshToken
-from apps.accounts.models                     import PasswordResetToken
-from apps.accounts.serializers                import CadastroSerializer, LoginSerializer , UsuarioSerializer , PasswordRestRequestSerializer,PasswordRestConfirmSerializer ,FuncionarioSerializer
-from django.contrib.auth.models               import update_last_login
-from django.contrib.auth                      import get_user_model
-from django.core.mail                         import EmailMultiAlternatives
-from rest_framework.exceptions                import NotFound, PermissionDenied
-from django.conf                              import settings
-from django.http                              import Http404
-from django.template.loader                   import render_to_string
-from background_task                          import background
-from email.mime.image                         import MIMEImage
+import logging
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import update_last_login
+from django.core.mail import send_mail
+from django.db import IntegrityError, transaction
+from django.middleware.csrf import get_token
+from rest_framework import permissions, status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from .models import PasswordResetToken
+from .serializers import (CadastroSerializer, LoginSerializer, UsuarioSerializer,
+                          PasswordRestRequestSerializer, PasswordRestConfirmSerializer, FuncionarioSerializer)
+from .permissions import OwnerAccess, EmployeeDirectoryAccess
+from .audit import AuditMixin, record
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
+
+class AuthThrottle(AnonRateThrottle):
+    scope = 'auth'
+
+class PublicView(APIView):
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [AuthThrottle]
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        SessionAuthentication().enforce_csrf(request)
+
+class CsrfView(PublicView):
+    throttle_classes = []
+    def get(self, request):
+        return Response({'csrfToken': get_token(request)})
 
 def set_jwt_cookies(response, access_token, refresh_token):
-    response.set_cookie(
-        key=settings.AUTH_COOKIE_ACCESS,
-        value=str(access_token),
-        max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-        secure=settings.AUTH_COOKIE_SECURE,
-        httponly=settings.AUTH_COOKIE_HTTPONLY,
-        samesite=settings.AUTH_COOKIE_SAMESITE,
-    )
-    response.set_cookie(
-        key=settings.AUTH_COOKIE_REFRESH,
-        value=str(refresh_token),
-        max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-        secure=settings.AUTH_COOKIE_SECURE,
-        httponly=settings.AUTH_COOKIE_HTTPONLY,
-        samesite=settings.AUTH_COOKIE_SAMESITE,
-    )
+    for key, token, lifetime in (
+        (settings.AUTH_COOKIE_ACCESS, access_token, 'ACCESS_TOKEN_LIFETIME'),
+        (settings.AUTH_COOKIE_REFRESH, refresh_token, 'REFRESH_TOKEN_LIFETIME'),
+    ):
+        response.set_cookie(key, str(token), max_age=settings.SIMPLE_JWT[lifetime],
+                            secure=settings.AUTH_COOKIE_SECURE, httponly=True,
+                            samesite=settings.AUTH_COOKIE_SAMESITE)
     return response
 
-class Emails:
-    @background(schedule=1)
-    def welcome(username,empresa,email):
-        contexto = {
-            'username': username,
-            'nome_empresa': empresa,
-            'email_usuario': email,
-            'login_url': f"{settings.FRONTEND_URL}/login",
-        }
-        html_content = render_to_string('registration/welcome.html', contexto)
-        text_content = render_to_string('registration/welcome.html', contexto)
+def clear_cookies(response):
+    for key in (settings.AUTH_COOKIE_ACCESS, settings.AUTH_COOKIE_REFRESH):
+        response.delete_cookie(key, samesite=settings.AUTH_COOKIE_SAMESITE)
+    return response
 
-        email = EmailMultiAlternatives(
-            subject="Bem-vindo à FluidMES!",
-            body=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[email],
-        )
-        email.attach_alternative(html_content, "text/html")
-
-        logo_path = os.path.join(settings.BASE_DIR, 'assets/images/logo.png')
-        with open(logo_path, 'rb') as f:
-            logo = MIMEImage(f.read())
-            logo.add_header('Content-ID', '<logo_fluidmes>')
-            logo.add_header('Content-Disposition', 'inline', filename='logo_fluidmes.png')
-            email.attach(logo)
-
-        email.send()
-
-    @background(schedule=0)
-    def forgotEmail(primeiro_nome,link,user_email):
-
-        context = {
-                        'username':primeiro_nome,
-                        'reset_url':link
-                    }
-        
-        
-        html_content = render_to_string('registration/password_forgot_email.html', context)
-        text_content = render_to_string('registration/password_forgot_email.txt', context)
-        msg = EmailMultiAlternatives(
-            subject="Redefinição de senha - FluidMES",
-            body=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[user_email],
-
-        )
-
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-
-class CadastroView(APIView):
-    
-    def post(self, request ):
-        
+class CadastroView(PublicView):
+    def post(self, request):
         serializer = CadastroSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save(role=1)
-            username = request.data.get("first_name")
-            empresa  = request.data.get("nomeEmpresa")
-            email    = request.data.get("email")
-            Emails.welcome(username,empresa,email)
-            return Response(
-                status= status.HTTP_201_CREATED
-                )
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = serializer.save()
+        except IntegrityError:
+            raise ValidationError('CPF, CNPJ ou e-mail já cadastrado.')
+        return Response(UsuarioSerializer(user).data, status=status.HTTP_201_CREATED)
 
-class PasswordResetRequestView(APIView):
-    permission_classes = [permissions.AllowAny]
-    
+class LoginView(PublicView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        refresh = RefreshToken.for_user(user)
+        update_last_login(None, user)
+        return set_jwt_cookies(Response(UsuarioSerializer(user).data), refresh.access_token, refresh)
+
+class LogoutView(PublicView):
+    def post(self, request):
+        token = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH)
+        if token:
+            try:
+                RefreshToken(token).blacklist()
+            except TokenError:
+                pass
+        return clear_cookies(Response({'detail': 'Logout efetuado.'}))
+
+class TokenRefreshCookieView(PublicView):
+    def post(self, request):
+        try:
+            refresh = RefreshToken(request.COOKIES.get(settings.AUTH_COOKIE_REFRESH, ''))
+            user = User.objects.get(pk=refresh['user_id'], is_active=True)
+        except (TokenError, User.DoesNotExist, KeyError):
+            return clear_cookies(Response({'detail': 'Sessão inválida ou expirada.'}, status=401))
+        # Password changes invalidate existing refresh and access credentials.
+        from rest_framework_simplejwt.utils import get_md5_hash_password
+        if refresh.get('hash_password') != get_md5_hash_password(user.password):
+            return clear_cookies(Response({'detail': 'Sessão inválida.'}, status=401))
+        return set_jwt_cookies(Response({'detail': 'Sessão renovada.'}), refresh.access_token, refresh)
+
+class MeView(APIView):
+    def get(self, request):
+        return Response(UsuarioSerializer(request.user).data)
+
+class PasswordResetRequestView(PublicView):
     def post(self, request):
         serializer = PasswordRestRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        
-        user = User.objects.filter(email__iexact=email).first()
+        user = User.objects.filter(email__iexact=serializer.validated_data['email'], is_active=True).first()
         if user:
-            reset_token =PasswordResetToken.objects.create(user=user)
-            username=user.first_name
-            link = f"{settings.FRONTEND_URL}/api/password-reset/confirm/?token={reset_token.token}"
-            user_email = user.email
+            reset = PasswordResetToken.objects.create(user=user)
+            link = f'{settings.FRONTEND_URL}/auth/reset-password?token={reset.token}'
+            try:
+                send_mail('Redefinição de senha — FluidMES',
+                          f'Use este link em até uma hora: {link}',
+                          settings.DEFAULT_FROM_EMAIL, [user.email])
+            except Exception:
+                reset.delete()
+                logger.exception('Falha no envio de recuperação de senha')
+        return Response({'detail': 'Se o e-mail existir, enviaremos as instruções.'})
 
-            Emails.forgotEmail(username,link,user_email)
-            
-            
-        return Response(
-            {"detail":"Se o email existir,enviamos as instruções para o redefinimento da senha"},
-            status=status.HTTP_200_OK
-        )   
-    
-class PasswordRestConfirmView(APIView):
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request,):
-        serializer = PasswordRestConfirmSerializer(data = request.data)
-        serializer.is_valid(raise_exception=True)
-        token_value = serializer.validated_data['token']
-        nova_senha = serializer.validated_data['nova_senha']
-        
-        reset_token = PasswordResetToken.objects.filter(token=token_value).first()
-        
-        if not reset_token or not reset_token.is_valid():
-            return Response({"detail":"Token espirado ou invalido"},status=status.HTTP_400_BAD_REQUEST)
-        
-        user = reset_token.user
-        user.set_password(nova_senha)
-        user.save()
-        
-        reset_token.used =True
-        reset_token.save()
-        
-        PasswordResetToken.objects.filter(user=user, used=False).exclude(id=reset_token.id).update(used=True)
-        
-        return Response({"detail": "Senha Redefina com sucesso"},status=status.HTTP_200_OK)
-
-class LoginView(APIView):
-    
-    def post(self,request):
-        serializer = LoginSerializer(data=request.data, context={'request': request})
-        
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            refresh = RefreshToken.for_user(user)
-            update_last_login(None,user)
-            response = Response(status=status.HTTP_200_OK)
-            
-    
-            return set_jwt_cookies(response, refresh.access_token, refresh)
-
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
-class LogoutView(APIView):
-    
-    
-    def post(self,request):
-        response = Response({"detail": "Logout efetuado com sucesso!"}, status=status.HTTP_200_OK)
-        
-        try:
-            refresh_token = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH)
-            if refresh_token:
-                token   = RefreshToken(refresh_token)
-                token.blacklist()
-            
-        except Exception:
-            pass
-
-        response.delete_cookie(settings.AUTH_COOKIE_ACCESS, samesite=settings.AUTH_COOKIE_SAMESITE)
-        response.delete_cookie(settings.AUTH_COOKIE_REFRESH, samesite=settings.AUTH_COOKIE_SAMESITE)
-
-        return response
-
-class TokenRefreshCookieView(APIView):
-    authentication_classes = []
-    permission_classes = [permissions.AllowAny]
-
+class PasswordRestConfirmView(PublicView):
+    @transaction.atomic
     def post(self, request):
-        refresh_token = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH)
-        
-        if not refresh_token:
-            return Response({"detail": "Refresh token não encontrado nos cookies."}, status=status.HTTP_401_UNAUTHORIZED)
-            
-        try:
-           
-            refresh = RefreshToken(refresh_token)
-            new_access_token = refresh.access_token
-            
-            response = Response({"detail": "Token atualizado com sucesso!"}, status=status.HTTP_200_OK)
-            
-            response.set_cookie(
-                key=settings.AUTH_COOKIE_ACCESS,
-                value=str(new_access_token),
-                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-                secure=settings.AUTH_COOKIE_SECURE,
-                httponly=settings.AUTH_COOKIE_HTTPONLY,
-                samesite=settings.AUTH_COOKIE_SAMESITE,
-            )
-            return response
-            
-        except Exception as e :
-            response = Response({"detail": "Refresh token inválido ou expirado."+str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-            response.delete_cookie(settings.AUTH_COOKIE_ACCESS)#! Se o cookie estiver expirado ou invalido remover dos cokkies
-            response.delete_cookie(settings.AUTH_COOKIE_REFRESH)
-            return response
+        serializer = PasswordRestConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reset = PasswordResetToken.objects.select_for_update().filter(token=serializer.validated_data['token']).first()
+        if not reset or not reset.is_valid():
+            raise ValidationError('Token expirado ou inválido.')
+        user = User.objects.select_for_update().get(pk=reset.user_id)
+        # Conditional consumption also prevents replay on SQLite.
+        if not PasswordResetToken.objects.filter(pk=reset.pk, used=False).update(used=True):
+            raise ValidationError('Token já utilizado.')
+        user.set_password(serializer.validated_data['nova_senha'])
+        user.save(update_fields=['password'])
+        PasswordResetToken.objects.filter(user=user, used=False).update(used=True)
+        for token in OutstandingToken.objects.filter(user=user):
+            BlacklistedToken.objects.get_or_create(token=token)
+        return clear_cookies(Response({'detail': 'Senha redefinida.'}))
 
-class MeView(APIView):
-    
-    def get(self,request):
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return Response(UsuarioSerializer(request.user).data)
-
-class FuncionariosView(ModelViewSet):
-    queryset = User.objects.all()
+class FuncionariosView(AuditMixin, ModelViewSet):
+    audit_resource = "funcionário"
     serializer_class = FuncionarioSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):     
-        if self.request.user.role == 3:
-            return User.objects.none()
-        
-        return User.objects.filter(empresa=self.request.user.empresa).exclude(id=self.request.user.id)
-
-
+    permission_classes = [EmployeeDirectoryAccess]
+    def get_queryset(self):
+        return User.objects.filter(empresa=self.request.user.empresa).exclude(role=1).select_related('empresa').order_by('id')
     def perform_create(self, serializer):
-        if self.request.user.role == 3:
-            raise PermissionDenied(detail="Apenas cargos expecificos podem adicionar usuarios")
-        
-        funcionario = serializer.save(empresa=self.request.user.empresa)
-        
-        Emails.welcome(funcionario.first_name,funcionario.empresa.nome,funcionario.email)
-
-    def get_object(self):
         try:
-            return super().get_object()
-        except Http404:
-            raise NotFound(detail="Funcionário não encontrado ou você não tem permissão para acessá-lo.")
-    
+            with transaction.atomic():
+                serializer.save(empresa=self.request.user.empresa)
+                record(self.request.user, self.request.user.empresa_id, 'criou', 'funcionário', serializer.instance.get_full_name())
+        except IntegrityError:
+            raise ValidationError('CPF ou e-mail já cadastrado.')
+    def perform_update(self, serializer):
+        try:
+            with transaction.atomic():
+                serializer.save()
+                record(self.request.user, self.request.user.empresa_id, 'editou', 'funcionário', serializer.instance.get_full_name())
+        except IntegrityError:
+            raise ValidationError('CPF ou e-mail já cadastrado.')
 
 
+class PreferenciasView(APIView):
+    def get(self, request):
+        from .models import Preferencias
+        from .serializers import PreferenciasSerializer
+        prefs, _ = Preferencias.objects.get_or_create(usuario=request.user)
+        return Response(PreferenciasSerializer(prefs).data)
+    def patch(self, request):
+        from .models import Preferencias
+        from .serializers import PreferenciasSerializer
+        prefs, _ = Preferencias.objects.get_or_create(usuario=request.user)
+        serializer = PreferenciasSerializer(prefs, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+class AtualizacoesView(APIView):
+    permission_classes = [OwnerAccess]
+    def get(self, request):
+        from .models import Atualizacao
+        from .serializers import AtualizacaoSerializer
+        from rest_framework.pagination import LimitOffsetPagination
+        query = Atualizacao.objects.filter(empresa=request.user.empresa).exclude(autor=request.user)
+        pagination = LimitOffsetPagination()
+        pagination.default_limit = 30
+        pagination.max_limit = 100
+        page = pagination.paginate_queryset(query, request)
+        return pagination.get_paginated_response(AtualizacaoSerializer(page, many=True).data)
+
+
+class ConfigurarEmpresaView(APIView):
+    """Let authenticated orphan accounts create their own company, never join another tenant."""
+    @transaction.atomic
+    def post(self, request):
+        from .models import Empresa
+        from .serializers import ConfigurarEmpresaSerializer
+        user = User.objects.select_for_update().get(pk=request.user.pk)
+        if user.empresa_id:
+            raise ValidationError('Sua conta já está vinculada a uma empresa.')
+        serializer = ConfigurarEmpresaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            with transaction.atomic():
+                company = Empresa.objects.create(**serializer.validated_data)
+        except IntegrityError:
+            raise ValidationError('CNPJ já cadastrado.')
+        user.empresa = company
+        user.role = user.Role.PREPOSTO
+        user.save(update_fields=['empresa','role'])
+        return Response(UsuarioSerializer(user).data, status=201)

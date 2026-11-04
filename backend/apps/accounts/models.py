@@ -9,7 +9,9 @@ from datetime                           import timedelta
 
 class UsuariosManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        email = self.normalize_email(email)
+        if not email:
+            raise ValueError('E-mail obrigatório.')
+        email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -18,6 +20,9 @@ class UsuariosManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', self.model.Role.PREPOSTO)
+        if not extra_fields.get('is_staff') or not extra_fields.get('is_superuser'):
+            raise ValueError('Superusuário exige is_staff e is_superuser.')
         return self.create_user(email, password, **extra_fields)
 
 class PasswordResetToken(models.Model):
@@ -68,6 +73,10 @@ class Usuarios(AbstractUser):
         blank=True,
     )
 
+    @property
+    def is_preposto(self):
+        return self.role == self.Role.PREPOSTO
+
     USERNAME_FIELD  = 'email'
     REQUIRED_FIELDS = ['first_name', 'cpf']#*Adicionar
 
@@ -79,3 +88,22 @@ class Usuarios(AbstractUser):
     def __str__(self):
         return self.first_name
 
+
+
+class Preferencias(models.Model):
+    usuario = models.OneToOneField(Usuarios, on_delete=models.CASCADE, related_name='preferencias')
+    tema = models.CharField(max_length=10, default='sistema', choices=[('sistema','Dispositivo'),('escuro','Escuro'),('claro','Claro')])
+    sidebar_desktop = models.CharField(max_length=10, default='aberta', choices=[('aberta','Aberta'),('icones','Ícones'),('hover','Expandir ao passar o mouse')])
+    sidebar_mobile = models.CharField(max_length=10, default='puxador', choices=[('puxador','Puxador'),('icones','Ícones'),('hamburguer','Menu hambúrguer')])
+
+class Atualizacao(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    autor = models.ForeignKey(Usuarios, null=True, on_delete=models.SET_NULL)
+    autor_nome = models.CharField(max_length=310)
+    autor_cargo = models.CharField(max_length=30)
+    acao = models.CharField(max_length=40)
+    recurso = models.CharField(max_length=60)
+    descricao = models.CharField(max_length=500)
+    criado_em = models.DateTimeField(auto_now_add=True, db_index=True)
+    class Meta:
+        ordering = ['-criado_em', '-pk']
