@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from validate_docbr import CPF
 
 
 class MultiLogin(ModelBackend):
@@ -12,10 +13,14 @@ class MultiLogin(ModelBackend):
 
 
         user = UserModel.objects.filter(
-            Q(email__iexact=username) | Q(cpf=username)
+            Q(email__iexact=username) | Q(cpf=CPF().mask(username) if username.replace('.', '').replace('-', '').isdigit() else username)
             ).first()
 
-        if user and user.check_password(password) and self.user_can_authenticate(user):
+        if user is None:
+            UserModel().set_password(password)
+            return None
+
+        if user.check_password(password) and self.user_can_authenticate(user):
             return user
 
         return None
