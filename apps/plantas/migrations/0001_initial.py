@@ -10,66 +10,119 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Planta',
+            name="Planta",
             fields=[
-                ('idplanta', models.AutoField(primary_key=True, serialize=False)),
-                ('nome', models.CharField(max_length=45)),
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
-                ('localizacao', models.CharField(max_length=45)),
-                ('empresa', models.ForeignKey(db_column='empresa_idempresa', on_delete=django.db.models.deletion.CASCADE, related_name='plantas', to='accounts.empresa')),
+                ("idplanta", models.AutoField(primary_key=True, serialize=False)),
+                ("nome", models.CharField(max_length=45)),
+                (
+                    "uuid",
+                    models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+                ),
+                ("localizacao", models.CharField(max_length=45)),
+                (
+                    "empresa",
+                    models.ForeignKey(
+                        db_column="empresa_idempresa",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="plantas",
+                        to="accounts.empresa",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'planta',
+                "db_table": "planta",
             },
         ),
         migrations.CreateModel(
-            name='Clp',
+            name="Clp",
             fields=[
-                ('idclp', models.AutoField(primary_key=True, serialize=False)),
-                ('nome', models.CharField(max_length=45)),
-                ('ip', models.GenericIPAddressField()),
-                ('porta', models.CharField(max_length=45)),
-                ('status', models.CharField(max_length=45)),
-                ('ativo', models.BooleanField()),
-                ('planta', models.ForeignKey(db_column='planta_idplanta', on_delete=django.db.models.deletion.CASCADE, related_name='clps', to='plantas.planta')),
+                ("idclp", models.AutoField(primary_key=True, serialize=False)),
+                ("nome", models.CharField(max_length=45)),
+                ("ip", models.GenericIPAddressField()),
+                ("porta", models.CharField(max_length=45)),
+                ("status", models.CharField(max_length=45)),
+                ("ativo", models.BooleanField()),
+                (
+                    "planta",
+                    models.ForeignKey(
+                        db_column="planta_idplanta",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="clps",
+                        to="plantas.planta",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'clp',
+                "db_table": "clp",
             },
         ),
         migrations.CreateModel(
-            name='Sensor',
+            name="Sensor",
             fields=[
-                ('idsensor', models.AutoField(primary_key=True, serialize=False)),
-                ('nome', models.CharField(max_length=45)),
-                ('tipo', models.CharField(choices=[('volume', 'Volume'), ('temperatura', 'Temperatura'), ('pressao', 'Pressão')], max_length=20)),
-                ('unidade', models.CharField(max_length=10)),
-                ('minimo', models.FloatField()),
-                ('maximo', models.FloatField()),
-                ('tipo_registro', models.CharField(choices=[('coil', 'Coil'), ('holding_register', 'Holding Register'), ('input_status', 'Input Status')], max_length=20)),
-                ('endereco', models.PositiveIntegerField()),
-                ('clp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sensores', to='plantas.clp')),
+                ("idsensor", models.AutoField(primary_key=True, serialize=False)),
+                ("nome", models.CharField(max_length=45)),
+                (
+                    "tipo",
+                    models.CharField(
+                        choices=[
+                            ("volume", "Volume"),
+                            ("temperatura", "Temperatura"),
+                            ("pressao", "Pressão"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("unidade", models.CharField(max_length=10)),
+                ("minimo", models.FloatField()),
+                ("maximo", models.FloatField()),
+                (
+                    "tipo_registro",
+                    models.CharField(
+                        choices=[
+                            ("coil", "Coil"),
+                            ("holding_register", "Holding Register"),
+                            ("input_status", "Input Status"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("endereco", models.PositiveIntegerField()),
+                (
+                    "clp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sensores",
+                        to="plantas.clp",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'sensor',
+                "db_table": "sensor",
             },
         ),
         migrations.CreateModel(
-            name='Leitura',
+            name="Leitura",
             fields=[
-                ('idleitura', models.AutoField(primary_key=True, serialize=False)),
-                ('valor', models.FloatField()),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('sensor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leituras', to='plantas.sensor')),
+                ("idleitura", models.AutoField(primary_key=True, serialize=False)),
+                ("valor", models.FloatField()),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                (
+                    "sensor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="leituras",
+                        to="plantas.sensor",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'leitura',
-                'ordering': ['-timestamp'],
+                "db_table": "leitura",
+                "ordering": ["-timestamp"],
             },
         ),
     ]
