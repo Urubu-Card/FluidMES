@@ -1,125 +1,262 @@
-import { useEffect, useMemo, useState } from 'react';
-import api from '../../../services/api';
-import './style.css';
-import BotaoModal from "../../components/ButtonAdd/button";
-import TituloPagina from "../../components/Titulo/titulo";
-import SearchBar from "../../components/SearchBar/searchbar";
-
-const STATUS_CONFIG = {
-    produzindo: { label: 'Produzindo', className: 'produzindo' },
-    parada: { label: 'Risco de parada', className: 'parada' },
-    manutencao: { label: 'Manutenção mecânica', className: 'manutencao' },
-    manutencao_mecanica: { label: 'Manutenção mecânica', className: 'manutencao' },
+import Button from "../shared/controls/Button.jsx";
+import { useState } from "react";
+import api from "../../../services/api";
+import useData from "../shared/useData";
+import { useWorkspace } from "../shared/context";
+import { plantFields } from "../shared/resources";
+import {
+  PageHeader,
+  AddButton,
+  DataState,
+  Empty,
+  Details,
+  Confirm,
+} from "../shared/UI";
+import { number, percent } from "../shared/format";
+import { OeeRing } from "../shared/Charts";
+import EntityForm from "../shared/EntityForm";
+import Modal from "../shared/Modal";
+import Telemetry from "./components/Telemetry";
+import TankControl, { ModeBadge } from "./components/TankControl";
+const states = {
+  produzindo: ["Produzindo", "success", "bi-gear-wide-connected"],
+  disponivel: ["Disponível", "primary", "bi-check-circle"],
+  offline: ["Sem comunicação recente", "danger", "bi-wifi-off"],
+  parada: ["Parada", "warning", "bi-pause-circle"],
+  bloqueada: ["MES bloqueado", "secondary", "bi-lock-fill"],
 };
-
-function normalizarStatus(status) {
-    return String(status || 'produzindo').toLowerCase().normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_');
-}
-
-function formatarQuantidade(valor) {
-    const numero = Number(valor);
-    return Number.isFinite(numero)
-        ? `${numero.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} L`
-        : '—';
-}
-
 export default function Plantas() {
-    const [plantas, setPlantas] = useState([]);
-    const [busca, setBusca] = useState('');
-    const [ordenacao, ] = useState('numero');
-    const [carregando, setCarregando] = useState(true);
-    const [erro, setErro] = useState('');
-
-    useEffect(() => {
-        async function buscarPlantas() {
-            try {
-                setCarregando(true);
-                const response = await api.get('/api/plantas/');
-                setPlantas(Array.isArray(response.data) ? response.data : response.data.results || []);
-            } catch (error) {
-                console.error(error);
-                setErro('Erro ao carregar plantas.');
-            } finally {
-                setCarregando(false);
-            }
-        }
-        buscarPlantas();
-    }, []);
-
-    const plantasFiltradas = useMemo(() => {
-        const texto = busca.trim().toLowerCase();
-        return plantas.filter((planta) => {
-            const numero = planta.numero ?? planta.numero_planta ?? planta.id;
-            return !texto || [numero, planta.nome, planta.produto, planta.receita, planta.status]
-                .some((valor) => String(valor || '').toLowerCase().includes(texto));
-        }).sort((a, b) => ordenacao === 'status'
-            ? String(a.status || '').localeCompare(String(b.status || ''))
-            : Number(a.numero ?? a.numero_planta ?? a.id) - Number(b.numero ?? b.numero_planta ?? b.id));
-    }, [busca, ordenacao, plantas]);
-
-    const quantidadePlanejada = plantas.reduce((total, planta) => total + Number(planta.quantidade_planejada ?? planta.quantidadePlanejada ?? 0), 0);
-    const quantidadeProduzida = plantas.reduce((total, planta) => total + Number(planta.quantidade_produzida ?? planta.quantidadeProduzida ?? 0), 0);
-    const percentualGeral = quantidadePlanejada ? Math.min(quantidadeProduzida / quantidadePlanejada * 100, 100) : 0;
-
-    return (
-        <div className="plantas-page app-page">
-            <TituloPagina titulo="Plantas:">
-                <div className='col-md-3'>
-                        <SearchBar
-                            value={busca}
-                            onChange={setBusca}
-                            placeholder="Buscar plantas..."
-                        />
-                    </div>
-            </TituloPagina>
-
-            {carregando && <p className="plantas-message">Carregando plantas...</p>}
-            {!carregando && erro && <p className="plantas-message error">{erro}</p>}
-            {!carregando && !erro && <section className="plantas-grid" aria-label="Lista de plantas">
-                {plantas.length > 2 && <article className="factory-summary">
-                    <h2>Geral da Fábrica</h2><p>Qtd. Produzida / Qtd. Planejada</p><strong>{formatarQuantidade(quantidadeProduzida)} / {formatarQuantidade(quantidadePlanejada)}</strong>
-                    <div className="factory-summary-content"><Progress value={percentualGeral} /><div className="factory-summary-metrics"><span>Disponibilidade</span><div><i style={{ width: `${percentualGeral}%` }} /></div><span>Performance</span><div><i style={{ width: `${percentualGeral}%` }} /></div></div></div>
-                </article>}
-                {plantasFiltradas.map((planta) => <PlantCard key={planta.id ?? planta.numero ?? planta.numero_planta} planta={planta} />)}
-            </section>}
-            {!carregando && !erro && plantasFiltradas.length === 0 && <p className="plantas-message">Nenhuma planta encontrada.</p>}
-            <BotaoModal target="modalAddPlanta" label="Adicionar planta" />
-
-
-            <div class="modal fade" id="modalAddPlanta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Adicionar planta:</h1>
-                            <button type="button" class="btn-close text-light" data-bs-theme="dark" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ...
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary">Criar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  const { user } = useWorkspace();
+  const { data, error, reload, act, loading } = useData(
+    ["/api/plantas/"],
+    2000,
+  );
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [mode, setMode] = useState(null);
+  const plants = data?.[0] || [];
+  const selection = plants.find((item) => item.idplanta === selected);
+  const close = () => {
+    setMode(null);
+    setSelected(null);
+  };
+  const total = plants.reduce(
+    (sum, p) => sum + (p.painel?.quantidade_produzida || 0),
+    0,
+  );
+  async function save(payload) {
+    const response =
+      mode === "edit"
+        ? await api.patch(`/api/plantas/${selected}/`, payload)
+        : await api.post("/api/plantas/", payload);
+    await reload();
+    return response;
+  }
+  return (
+    <section className="mes-page">
+      <PageHeader
+        title="Plantas"
+        description="Um olhar para saber como a operação está fluindo."
+      >
+        <div className="search-input">
+          <i aria-hidden="true" className="bi bi-search" />
+          <input
+            aria-label="Buscar plantas"
+            placeholder="Buscar planta…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
-    );
-}
-
-function Progress({ value }) {
-    return <div className="plant-progress" style={{ '--progress': `${value}%` }}><span>{value.toFixed(1).replace('.', ',')}%</span><small>OEE</small></div>;
-}
-
-function PlantCard({ planta }) {
-    const status = STATUS_CONFIG[normalizarStatus(planta.status)] || STATUS_CONFIG.produzindo;
-    const numero = planta.numero ?? planta.numero_planta ?? planta.id;
-    const planejada = Number(planta.quantidade_planejada ?? planta.quantidadePlanejada ?? 0);
-    const produzida = Number(planta.quantidade_produzida ?? planta.quantidadeProduzida ?? 0);
-    const oee = planejada ? Math.min(produzida / planejada * 100, 100) : Number(planta.oee ?? 0);
-    return <article className="plant-card">
-        <header className={`plant-card-status ${status.className}`}><strong>Planta #{numero}</strong><span>{status.label}</span><span>{planta.tipo ?? planta.categoria ?? 'Refrigerante'}</span></header>
-        <div className="plant-card-body"><p><i className="bi bi-box-seam" /> {planta.produto ?? planta.receita ?? 'Não informado'}</p><p><i className="bi bi-key" /> Código de rastreio: <em>{planta.codigo_rastreio ?? planta.codigoRastreio ?? '—'}</em></p><div className="plant-quantity"><span>{formatarQuantidade(produzida)} / {formatarQuantidade(planejada)}</span><i><b style={{ width: `${oee}%` }} /></i></div><div className="plant-card-footer"><Progress value={oee} /><p><strong>Qtd. Produzida</strong>{formatarQuantidade(produzida)}</p></div></div>
-    </article>;
+      </PageHeader>
+      <div className="plant-summary">
+        <div>
+          <span>Volume produzido</span>
+          <strong>
+            {number(total)} <small>L</small>
+          </strong>
+        </div>
+        <div>
+          <span>Em produção</span>
+          <strong>
+            {plants.filter((p) => p.painel?.status === "produzindo").length}
+            <small> / {plants.length} plantas</small>
+          </strong>
+        </div>
+        <div>
+          <i aria-hidden="true" className="bi bi-arrow-repeat" />
+          <span>Visão atualizada automaticamente</span>
+        </div>
+      </div>
+      <DataState loading={loading} error={error} reload={reload} />
+      <div className="plant-grid">
+        {plants
+          .filter((p) =>
+            `${p.nome} ${p.localizacao}`
+              .toLowerCase()
+              .includes(query.toLowerCase()),
+          )
+          .map((plant) => {
+            const panel = plant.painel || {};
+            const [label, tone, icon] =
+              states[panel.status] || states.disponivel;
+            const progress = panel.quantidade_planejada
+              ? Math.min(
+                  (panel.quantidade_produzida / panel.quantidade_planejada) *
+                    100,
+                  100,
+                )
+              : 0;
+            return (
+              <button
+                className={`plant-card accent-${tone}`}
+                key={plant.idplanta}
+                onClick={() => {
+                  setSelected(plant.idplanta);
+                  setMode("detail");
+                }}
+              >
+                <header className={`card-band bg-${tone}`}>
+                  <span>
+                    <i aria-hidden="true" className={`bi ${icon}`} />
+                    {label}
+                  </span>
+                  <small>#{String(plant.idplanta).padStart(2, "0")}</small>
+                </header>
+                <div className="plant-card-content">
+                  <div className="card-title-row">
+                    <h2>{plant.nome}</h2>
+                    <i aria-hidden="true" className="bi bi-arrow-up-right" />
+                  </div>
+                  <p className="muted">
+                    <i aria-hidden="true" className="bi bi-geo-alt" />{" "}
+                    {plant.localizacao}
+                  </p>
+                  {panel.controle && (
+                    <p className="mode-row">
+                      <ModeBadge control={panel.controle} />
+                    </p>
+                  )}
+                  <div className="current-recipe">
+                    <i aria-hidden="true" className="bi bi-droplet-half" />
+                    <span>
+                      {panel.receita ||
+                        (panel.status === "bloqueada"
+                          ? "Aguardando o modo 2 para o MES produzir"
+                          : "Pronta para o próximo pedido")}
+                    </span>
+                  </div>
+                  <div className="production-volume">
+                    <span>
+                      {number(panel.quantidade_produzida)} /{" "}
+                      {number(panel.quantidade_planejada)}
+                    </span>
+                    <small>produzido / planejado</small>
+                  </div>
+                  <div className="mes-progress">
+                    <span style={{ width: `${progress}%` }} />
+                  </div>
+                  <footer>
+                    <OeeRing value={panel.oee} />
+                    <div>
+                      <span>Ciclos programados</span>
+                      <strong>{panel.fila || 0}</strong>
+                      <small>
+                        {panel.oee_data
+                          ? `OEE de ${panel.oee_data.split("-").reverse().join("/")}`
+                          : "OEE aguardando medição"}
+                      </small>
+                    </div>
+                  </footer>
+                </div>
+              </button>
+            );
+          })}
+      </div>
+      {data && !plants.length && (
+        <Empty
+          title="Sua primeira planta começa aqui"
+          description="Cadastre uma planta para organizar a produção e acompanhar seus indicadores."
+          icon="bi-cpu"
+        />
+      )}
+      <AddButton
+        label={user.role === 3 ? "Solicitar planta" : "Adicionar planta"}
+        onClick={() => setMode("new")}
+      />
+      {(mode === "new" || mode === "edit") && (
+        <EntityForm
+          title={
+            mode === "edit"
+              ? "Editar planta"
+              : user.role === 3
+                ? "Solicitar nova planta"
+                : "Adicionar planta"
+          }
+          fields={plantFields}
+          initial={selection || {}}
+          onSubmit={save}
+          onClose={close}
+          submitLabel={
+            user.role === 3 ? "Enviar para aprovação" : "Salvar planta"
+          }
+        />
+      )}
+      {mode === "detail" && selection && (
+        <Modal
+          title={selection.nome}
+          onClose={close}
+          footer={
+            user.role !== 3 && (
+              <>
+                <Button className="secondary" onClick={() => setMode("edit")}>
+                  <i aria-hidden="true" className="bi bi-pencil" />
+                  Editar
+                </Button>
+                <Button
+                  className="ghost danger-text"
+                  onClick={() => setMode("delete")}
+                >
+                  <i aria-hidden="true" className="bi bi-trash" />
+                  Excluir
+                </Button>
+              </>
+            )
+          }
+        >
+          <Details
+            items={[
+              ["Localização", selection.localizacao],
+              ["Capacidade útil", `${number(selection.capacidade_l)} L`],
+              [
+                "Reset entre receitas",
+                `${number(selection.tempo_reset_seg)} s`,
+              ],
+              ["Status", states[selection.painel?.status]?.[0] || "Disponível"],
+              ["Produzido", number(selection.painel?.quantidade_produzida)],
+              ["OEE", percent(selection.painel?.oee)],
+              ["Receita em produção", selection.painel?.receita],
+              ["Ciclos programados", selection.painel?.fila || 0],
+            ]}
+          />
+          <TankControl control={selection.painel?.controle} />
+          <Telemetry plant={selection} />
+        </Modal>
+      )}
+      {mode === "delete" && selection && (
+        <Confirm
+          description={`Excluir a planta ${selection.nome}? Plantas com pedidos não podem ser excluídas.`}
+          onClose={close}
+          onConfirm={async () => {
+            if (
+              await act(
+                () => api.delete(`/api/plantas/${selected}/`),
+                "Planta excluída.",
+              )
+            )
+              close();
+          }}
+        />
+      )}
+    </section>
+  );
 }
