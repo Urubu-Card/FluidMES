@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plantas', '0001_initial'),
+        ("plantas", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sensor',
-            name='tipo',
-            field=models.CharField(choices=[('volume', 'Volume'), ('temperatura', 'Temperatura'), ('pressao', 'Pressão'), ('vazao', 'Vazão')], max_length=20),
+            model_name="sensor",
+            name="tipo",
+            field=models.CharField(
+                choices=[
+                    ("volume", "Volume"),
+                    ("temperatura", "Temperatura"),
+                    ("pressao", "Pressão"),
+                    ("vazao", "Vazão"),
+                ],
+                max_length=20,
+            ),
         ),
     ]
