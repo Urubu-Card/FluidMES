@@ -1,6 +1,4 @@
-from django.urls import re_path
-from  apps.plantas import consumers
+from django.urls import path
+from .consumers import PlantMonitorConsumers
 
-websocket_urlpatterns = [
-    re_path(r"ws/plant/(?P<uuid>[\w-]+)/$",consumers.PlantMonitorConsumers.as_asgi()),
-]
+websocket_urlpatterns = [path("ws/plant/<uuid:uuid>/", PlantMonitorConsumers.as_asgi())]

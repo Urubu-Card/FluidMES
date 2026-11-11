@@ -1,140 +1,136 @@
 import asyncio
-from django.core.management.base import BaseCommand
+import logging
+from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
+from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
+from django.utils import timezone
 from services.clp_control import Modbus_Control
-from apps.plantas.models import Clp, Sensor
-from asgiref.sync import sync_to_async
-from redis.exceptions import ConnectionError
-import re
-import time
+from apps.plantas.models import Clp, Leitura
+
+logger = logging.getLogger(__name__)
 
 
-def busca_clps():
-    dados = []
-    resultado =  Clp.objects.filter(ativo=True)
-    for clp in resultado:
-        dados.append ( {
-            "id": clp.idclp,
-            "nome":clp.nome,
-            "ip":clp.ip,
-            "porta":clp.porta,
-            "uuid":clp.planta.uuid
-        })
-    return dados
-        
-def busca_sensores_um_clp(clpID):
-    dados= {}
-    sensores = Sensor.objects.filter(clp=clpID)
-    sensores_do_clp = []
-    for sensor in sensores:
-            sensores_do_clp.append({
-                "tipo": sensor.tipo_registro,
-                "endereco": sensor.endereco,
-            })
-    return sensores_do_clp
-        
-        
-def busca_sensores(clps):
-    dados = {}
-    for clp in clps:
-        resultado = Sensor.objects.filter(clp=clp['id'])
-        sensores_do_clp = []
-        for sensor in resultado:
-            sensores_do_clp.append({
-                "tipo": sensor.tipo_registro,
-                "endereco": sensor.endereco,
-            })
-        dados[clp['id']] = sensores_do_clp
-    return dados
+@database_sync_to_async
+def load_config():
+    return [
+        dict(
+            id=c.pk,
+            ip=c.ip,
+            port=c.porta,
+            uuid=str(c.planta.uuid),
+            nome=c.nome,
+            sensors=[
+                {
+                    "idsensor": s.pk,
+                    "tipo_registro": s.tipo_registro,
+                    "endereco": s.endereco,
+                    "nome": s.nome,
+                    "unidade": s.unidade_exibicao,
+                }
+                for s in c.sensores.all()
+            ],
+        )
+        for c in Clp.objects.filter(ativo=True)
+        .select_related("planta")
+        .prefetch_related("sensores")
+    ]
 
+
+@database_sync_to_async
+def save_readings(clp_id, readings, status):
+    changes = {"status": status}
+    if status == "online":
+        changes["ultima_comunicacao"] = timezone.now()
+    Clp.objects.filter(pk=clp_id).update(**changes)
+    Leitura.objects.bulk_create(
+        [Leitura(sensor_id=sensor_id, valor=value) for sensor_id, value in readings]
+    )
 
 
 class Command(BaseCommand):
-    
-    help = "Comando Modbus para distrubuição dos WebSockets"
-    
-    INTERVALO = 30 #*30 segundos de intervalo para a busca no banco
-    
-    async def verificar_conexao(self,client):
-        while True:
-                try:
-                    await client.Conectar()
-                    if client.isConnected():
-                        break
-                    else:
-                        self.stdout.write(self.style.ERROR(f"Não foi possivel conectar ao servidor: IP{client.conexao.ip} PORT{client.conexao.porta}"))
-                        await asyncio.sleep(5)
-                except Exception as e:
-                    self.stdout.write(self.style.NOTICE(f"{e}"))
-                    await asyncio.sleep(5)
-    
-    
-    async def poll_loop(self,id, uuid, ip, port, sensores):
-        channel_layer = get_channel_layer()
-        client = Modbus_Control(ip,port)
-        await client.Conectar()
+    help = "Coleta Modbus somente leitura; recarrega configuração a cada ciclo."
 
-        if not client.isConnected():
-            await self.verificar_conexao(client)
+    def add_arguments(self, parser):
+        parser.add_argument("--interval", type=float, default=5)
 
-        if bool(sensores) is False:
-            self.stdout.write(self.style.ERROR("Nenhum sensor registrado ao clp"))
-            return
-            
+    def handle(self, *args, **options):
+        if settings.CHANNEL_LAYERS["default"]["BACKEND"].endswith(
+            "InMemoryChannelLayer"
+        ):
+            raise CommandError(
+                "Configure REDIS_URL no coletor e no servidor para telemetria entre processos."
+            )
+        if options["interval"] < 1:
+            raise ValueError("Intervalo mínimo: 1 segundo.")
         try:
-            counter = 0
-            while True:
-                if not client.isConnected():
-                    await self.verificar_conexao(client)
-                if counter % self.INTERVALO ==0:
-                    sensores = await sync_to_async(busca_sensores_um_clp)(id)
-                
-                data = {}
-                
-                for sensor in sensores:
-                    tipo     = sensor['tipo']
-                    endereco = sensor['endereco']
-                    if tipo == 'coil':
-                        resultado = await client.Ler_Coil(endereco, 1)
-                    elif tipo == 'input_status':
-                        resultado = await client.InputStatus(endereco, 1)
-                    elif tipo == 'holding_register':
-                        resultado = await client.HoldingRegister(endereco, 1)
-                    else:
-                        self.stdout.write(self.style.WARNING(f"Tipo desconhecido: {tipo}"))#? Era impossivel de acontecer XD
-                        continue
-                    data[f"{tipo}_{endereco}"] = resultado[0] if resultado is not None else None
+            asyncio.run(self.run(options["interval"]))
+        except KeyboardInterrupt:
+            pass
 
-                if data:
-                    try:
-                        await channel_layer.group_send(
-                            f'plant_{uuid}',
-                            {'type': "plant.update", 'data': data}
+    async def poll(self, config, semaphore):
+        async with semaphore:
+            client = Modbus_Control(config["ip"], config["port"])
+            readings = []
+            error = None
+            try:
+                await client.Conectar()
+                methods = {
+                    "coil": client.Ler_Coil,
+                    "input_status": client.InputStatus,
+                    "holding_register": client.HoldingRegister,
+                }
+                for sensor in config["sensors"]:
+                    values = await methods[sensor["tipo_registro"]](sensor["endereco"])
+                    readings.append((sensor["idsensor"], float(values[0])))
+            except Exception:
+                error = "Falha de comunicação com CLP"
+                logger.exception("Falha na coleta do CLP %s", config["id"])
+            finally:
+                client.conexao.FecharConexao()
+            await save_readings(
+                config["id"], readings, "offline" if error else "online"
+            )
+            try:
+                await get_channel_layer().group_send(
+                    f"plant_{config['uuid']}",
+                    {
+                        "type": "plant.update",
+                        "data": {
+                            "clp": config["id"],
+                            "nome_clp": config.get("nome"),
+                            "leituras": {
+                                str(sensor_id): value for sensor_id, value in readings
+                            },
+                            "sensores": {
+                                str(sensor["idsensor"]): {
+                                    "nome": sensor.get("nome"),
+                                    "unidade": sensor.get("unidade"),
+                                }
+                                for sensor in config["sensors"]
+                            },
+                            "erro": error,
+                            "timestamp": timezone.now().isoformat(),
+                        },
+                    },
+                )
+            except Exception:
+                logger.exception("Falha de publicação; leituras preservadas no banco")
+
+    async def run(self, interval):
+        semaphore = asyncio.Semaphore(8)
+        while True:
+            try:
+                configs = await load_config()
+                results = await asyncio.gather(
+                    *(self.poll(config, semaphore) for config in configs),
+                    return_exceptions=True,
+                )
+                for result in results:
+                    if isinstance(result, Exception):
+                        logger.error(
+                            "Falha de persistência/coleta: %s", type(result).__name__
                         )
-                        self.stdout.write(f"Enviando para {uuid} data:{data}")
-                    except ConnectionError as e:
-                        self.stdout.write(self.style.WARNING(f"Redis não conectado : {e}"))
-                else:
-                    self.stdout.write(self.style.WARNING("Data não foi realizada"))
-
-                counter += 1
-                await asyncio.sleep(1)
-
-        finally:
-            client.conexao.FecharConexao()
-
-                
-    def handle(self, *args, **options): 
-        asyncio.run(self.main())
-        
-        
-    async def main(self,):
-
-        clps = await sync_to_async(busca_clps)()#? Genial isso ele primeiro transforma e depois chama
-        sensores = await sync_to_async(busca_sensores)(clps)
-        lista_de_clps =[]
-        for clp in clps:
-            sensores_do_clp =sensores[clp['id']]
-            lista_de_clps.append(self.poll_loop(clp['id'],clp['uuid'],clp['ip'],clp['porta'],sensores_do_clp))
-            
-        await asyncio.gather(*lista_de_clps)
+            except Exception:
+                logger.exception("Não foi possível carregar a configuração dos CLPs")
+            await asyncio.sleep(interval)
