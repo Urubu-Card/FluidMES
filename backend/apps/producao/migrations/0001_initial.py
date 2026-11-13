@@ -10,45 +10,93 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Receita',
+            name="Receita",
             fields=[
-                ('idreceita', models.AutoField(primary_key=True, serialize=False)),
-                ('nome', models.CharField(max_length=45)),
-                ('ingrediente1', models.FloatField()),
-                ('ingrediente2', models.FloatField()),
-                ('ingrediente3', models.FloatField()),
-                ('tempo1', models.FloatField()),
-                ('tempo2', models.FloatField()),
+                ("idreceita", models.AutoField(primary_key=True, serialize=False)),
+                ("nome", models.CharField(max_length=45)),
+                ("ingrediente1", models.FloatField()),
+                ("ingrediente2", models.FloatField()),
+                ("ingrediente3", models.FloatField()),
+                ("tempo1", models.FloatField()),
+                ("tempo2", models.FloatField()),
             ],
             options={
-                'verbose_name': 'Receita',
-                'verbose_name_plural': 'Receitas',
-                'db_table': 'receita',
+                "verbose_name": "Receita",
+                "verbose_name_plural": "Receitas",
+                "db_table": "receita",
             },
         ),
         migrations.CreateModel(
-            name='Pedido',
+            name="Pedido",
             fields=[
-                ('idpedido', models.AutoField(primary_key=True, serialize=False)),
-                ('prazo', models.DateField()),
-                ('quantidade', models.FloatField()),
-                ('pedidocol', models.CharField(blank=True, max_length=45, null=True)),
-                ('status', models.CharField(choices=[('pendente', 'Pendente'), ('em_andamento', 'Em Andamento'), ('concluido', 'Concluído'), ('cancelado', 'Cancelado')], default='pendente', max_length=20)),
-                ('aprovacao', models.CharField(choices=[('aguardando', 'Aguardando'), ('aprovado', 'Aprovado'), ('reprovado', 'Reprovado')], default='aguardando', max_length=20)),
-                ('empresa', models.ForeignKey(db_column='empresa_idempresa', on_delete=django.db.models.deletion.CASCADE, related_name='pedidos', to='accounts.empresa')),
-                ('usuario', models.ForeignKey(db_column='usuarios_idusuario', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='pedidos', to=settings.AUTH_USER_MODEL)),
-                ('receita', models.ForeignKey(db_column='receita_idreceita', on_delete=django.db.models.deletion.PROTECT, related_name='pedidos', to='producao.receita')),
+                ("idpedido", models.AutoField(primary_key=True, serialize=False)),
+                ("prazo", models.DateField()),
+                ("quantidade", models.FloatField()),
+                ("pedidocol", models.CharField(blank=True, max_length=45, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pendente", "Pendente"),
+                            ("em_andamento", "Em Andamento"),
+                            ("concluido", "Concluído"),
+                            ("cancelado", "Cancelado"),
+                        ],
+                        default="pendente",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "aprovacao",
+                    models.CharField(
+                        choices=[
+                            ("aguardando", "Aguardando"),
+                            ("aprovado", "Aprovado"),
+                            ("reprovado", "Reprovado"),
+                        ],
+                        default="aguardando",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "empresa",
+                    models.ForeignKey(
+                        db_column="empresa_idempresa",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="pedidos",
+                        to="accounts.empresa",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        db_column="usuarios_idusuario",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="pedidos",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "receita",
+                    models.ForeignKey(
+                        db_column="receita_idreceita",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="pedidos",
+                        to="producao.receita",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Pedido',
-                'verbose_name_plural': 'Pedidos',
-                'db_table': 'pedido',
+                "verbose_name": "Pedido",
+                "verbose_name_plural": "Pedidos",
+                "db_table": "pedido",
             },
         ),
     ]

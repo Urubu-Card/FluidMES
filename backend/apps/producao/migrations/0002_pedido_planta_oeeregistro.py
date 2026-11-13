@@ -7,35 +7,49 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plantas', '0002_alter_sensor_tipo'),
-        ('producao', '0001_initial'),
+        ("plantas", "0002_alter_sensor_tipo"),
+        ("producao", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='pedido',
-            name='planta',
-            field=models.ForeignKey(db_column='planta_idplanta', default=1, on_delete=django.db.models.deletion.CASCADE, related_name='pedidos', to='plantas.planta'),
+            model_name="pedido",
+            name="planta",
+            field=models.ForeignKey(
+                db_column="planta_idplanta",
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="pedidos",
+                to="plantas.planta",
+            ),
             preserve_default=False,
         ),
         migrations.CreateModel(
-            name='OEERegistro',
+            name="OEERegistro",
             fields=[
-                ('idoeeregistro', models.AutoField(primary_key=True, serialize=False)),
-                ('data', models.DateField()),
-                ('tempo_planejado_min', models.IntegerField()),
-                ('tempo_parado_min', models.IntegerField(default=0)),
-                ('quantidade_produzida', models.FloatField(default=0)),
-                ('tempo_ciclo_ideal_seg', models.FloatField()),
-                ('quantidade_boa', models.FloatField(default=0)),
-                ('planta', models.ForeignKey(db_column='planta_idplanta', on_delete=django.db.models.deletion.CASCADE, related_name='oee_registros', to='plantas.planta')),
+                ("idoeeregistro", models.AutoField(primary_key=True, serialize=False)),
+                ("data", models.DateField()),
+                ("tempo_planejado_min", models.IntegerField()),
+                ("tempo_parado_min", models.IntegerField(default=0)),
+                ("quantidade_produzida", models.FloatField(default=0)),
+                ("tempo_ciclo_ideal_seg", models.FloatField()),
+                ("quantidade_boa", models.FloatField(default=0)),
+                (
+                    "planta",
+                    models.ForeignKey(
+                        db_column="planta_idplanta",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="oee_registros",
+                        to="plantas.planta",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Registro de OEE',
-                'verbose_name_plural': 'Registros de OEE',
-                'db_table': 'oee_registro',
-                'ordering': ['-data'],
-                'unique_together': {('planta', 'data')},
+                "verbose_name": "Registro de OEE",
+                "verbose_name_plural": "Registros de OEE",
+                "db_table": "oee_registro",
+                "ordering": ["-data"],
+                "unique_together": {("planta", "data")},
             },
         ),
     ]

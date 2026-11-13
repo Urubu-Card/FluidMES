@@ -7,23 +7,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plantas', '0002_alter_sensor_tipo'),
-        ('producao', '0002_pedido_planta_oeeregistro'),
+        ("plantas", "0002_alter_sensor_tipo"),
+        ("producao", "0002_pedido_planta_oeeregistro"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Parada',
+            name="Parada",
             fields=[
-                ('idparada', models.AutoField(primary_key=True, serialize=False)),
-                ('inicio', models.DateTimeField()),
-                ('fim', models.DateTimeField(null=True)),
-                ('planta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='plantas.planta')),
+                ("idparada", models.AutoField(primary_key=True, serialize=False)),
+                ("inicio", models.DateTimeField()),
+                ("fim", models.DateTimeField(null=True)),
+                (
+                    "planta",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="plantas.planta"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Parada da Planta',
-                'verbose_name_plural': 'Paradas das Plantas',
-                'db_table': 'parada_planta',
+                "verbose_name": "Parada da Planta",
+                "verbose_name_plural": "Paradas das Plantas",
+                "db_table": "parada_planta",
             },
         ),
     ]
