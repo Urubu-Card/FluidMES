@@ -1,459 +1,374 @@
-import { useEffect, useMemo, useState } from 'react';
-import api from '../../../services/api';
-import './style.css';
-import BotaoModal from "../../components/ButtonAdd/button";
-import TituloPagina from "../../components/Titulo/titulo";
-import SearchBar from "../../components/SearchBar/searchbar";
-
-// ================================
-// CONSTANTES (espelham o model Pedido)
-// ================================
-const STATUS = {
-    pendente:     { label: 'Pendente',     classe: 'status-pendente' },
-    em_andamento: { label: 'Em Andamento', classe: 'status-andamento' },
-    concluido:    { label: 'Concluído',    classe: 'status-concluido' },
-    cancelado:    { label: 'Cancelado',    classe: 'status-cancelado' },
-};
-
-const APROVACAO = {
-    aguardando: { label: 'Aguardando', classe: 'aprov-aguardando' },
-    aprovado:   { label: 'Aprovado',   classe: 'aprov-aprovado' },
-    reprovado:  { label: 'Reprovado',  classe: 'aprov-reprovado' },
-};
-
-// ================================
-// HELPERS
-// ================================
-
-// A FK pode vir como objeto, como id ou em um campo "<fk>_nome".
-// Ajuste aqui conforme o seu serializer.
-function nomeRelacao(pedido, campo) {
-    const valor = pedido[campo];
-    if (valor && typeof valor === 'object') {
-        return valor.nome ?? valor.nome_fantasia ?? valor.descricao ?? `#${valor.id ?? ''}`;
-    }
-    return pedido[`${campo}_nome`] ?? (valor != null ? `#${valor}` : '—');
-}
-
-// "2026-10-05" -> "05/10/2026" (sem passar por Date, evita bug de fuso)
-function formatarData(data) {
-    if (!data) return '—';
-    const [ano, mes, dia] = data.split('T')[0].split('-');
-    return `${dia}/${mes}/${ano}`;
-}
-
-function formatarQuantidade(qtd) {
-    if (qtd == null) return '—';
-    return Number(qtd).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
-}
-
-function estaAtrasado(pedido) {
-    if (!pedido.prazo) return false;
-    if (!['pendente', 'em_andamento'].includes(pedido.status)) return false;
-    const hoje = new Date().toISOString().split('T')[0];
-    return pedido.prazo.split('T')[0] < hoje;
-}
-
+import { types, normalized, status } from "./orderModel";
+import OrderProgress from "./components/OrderProgress";
+import { requestDetails } from "./requestDetails";
+import Button from "../shared/controls/Button.jsx";
+import { useState } from "react";
+import api from "../../../services/api";
+import useData from "../shared/useData";
+import { useWorkspace } from "../shared/context";
+import {
+  AddButton,
+  DataState,
+  Details,
+  Empty,
+  PageHeader,
+  StatusBadge,
+  Confirm,
+} from "../shared/UI";
+import { dateTime, number } from "../shared/format";
+import Modal from "../shared/Modal";
+import ProductionOrderForm from "./components/ProductionOrderForm";
+import OrderExecution from "./components/OrderExecution";
 export default function Pedidos() {
-    const [pedidos, setPedidos] = useState([]);
-    const [busca, setBusca] = useState('');
-    const [filtroStatus, setFiltroStatus] = useState('todos');
-    const [carregando, setCarregando] = useState(true);
-    const [erro, setErro] = useState('');
-
-    const [selecionados, setSelecionados] = useState([]);
-    const [ordem, setOrdem] = useState({ campo: 'idpedido', direcao: 'desc' });
-
-    // ================================
-    // BUSCAR PEDIDOS DO BACKEND
-    // ================================
-    useEffect(() => {
-        buscarPedidos();
-    }, []);
-
-    async function buscarPedidos() {
-        try {
-            setCarregando(true);
-            setErro('');
-            const response = await api.get('/api/pedidos/');
-            setPedidos(response.data);
-        } catch (error) {
-            console.error(error);
-            setErro('Erro ao carregar pedidos.');
-        } finally {
-            setCarregando(false);
+  const { user } = useWorkspace();
+  const { data, error, reload, loading, act } = useData(
+    ["/api/pedidos/", "/api/solicitacoes/"],
+    1500,
+  );
+  const [tab, setTab] = useState("ativos");
+  const [kind, setKind] = useState("todos");
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [create, setCreate] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [busy, setBusy] = useState(null);
+  const all = normalized(data?.[0] || [], data?.[1] || []);
+  const current = all.find((item) => item.key === selected);
+  const active = (item) =>
+    ["aguardando", "fila", "producao"].includes(item.estado);
+  const filtered = all.filter(
+    (item) =>
+      (tab === "ativos" ? active(item) : !active(item)) &&
+      (kind === "todos" || item.tipo === kind) &&
+      `${item.nome} ${item.autor_nome} ${item.id}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+  );
+  async function decide(item, approved) {
+    setBusy(item.key);
+    try {
+      await act(
+        () =>
+          api.post(
+            `/api/${item.endpoint}/${item.id}/${approved ? "aprovar" : "recusar"}/`,
+          ),
+        approved ? "Pedido aprovado." : "Pedido recusado.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+  function actions(item) {
+    return user.role !== 3 && item.estado === "aguardando" ? (
+      <div className="order-actions">
+        <Button
+          className="secondary"
+          disabled={busy === item.key}
+          onClick={(e) => {
+            e.stopPropagation();
+            decide(item, false);
+          }}
+        >
+          <i aria-hidden="true" className="bi bi-x-lg" />
+          Recusar
+        </Button>
+        <Button
+          disabled={busy === item.key}
+          onClick={(e) => {
+            e.stopPropagation();
+            decide(item, true);
+          }}
+        >
+          <i aria-hidden="true" className="bi bi-check-lg" />
+          Aprovar
+        </Button>
+      </div>
+    ) : null;
+  }
+  return (
+    <section className="mes-page">
+      <PageHeader
+        title={user.role === 3 ? "Meus pedidos" : "Pedidos"}
+        description={
+          user.role === 3
+            ? "Acompanhe suas solicitações, da ideia à conclusão."
+            : "Aprovações claras. Produção em movimento."
         }
-    }
-
-    // ================================
-    // PESQUISA + FILTRO + ORDENAÇÃO
-    // ================================
-    const pedidosFiltrados = useMemo(() => {
-        const textoBusca = busca.toLowerCase();
-
-        const filtrados = pedidos.filter((pedido) => {
-            if (filtroStatus !== 'todos' && pedido.status !== filtroStatus) return false;
-
-            return (
-                pedido.idpedido?.toString().includes(textoBusca) ||
-                nomeRelacao(pedido, 'receita').toLowerCase().includes(textoBusca) ||
-                nomeRelacao(pedido, 'planta').toLowerCase().includes(textoBusca) ||
-                nomeRelacao(pedido, 'usuario').toLowerCase().includes(textoBusca) ||
-                pedido.pedidocol?.toLowerCase().includes(textoBusca) ||
-                STATUS[pedido.status]?.label.toLowerCase().includes(textoBusca) ||
-                APROVACAO[pedido.aprovacao]?.label.toLowerCase().includes(textoBusca)
-            );
-        });
-
-        const { campo, direcao } = ordem;
-        const fator = direcao === 'asc' ? 1 : -1;
-
-        return [...filtrados].sort((a, b) => {
-            const va = a[campo];
-            const vb = b[campo];
-            if (va == null) return 1;
-            if (vb == null) return -1;
-            if (typeof va === 'number') return (va - vb) * fator;
-            return String(va).localeCompare(String(vb)) * fator;
-        });
-    }, [pedidos, busca, filtroStatus, ordem]);
-
-    // ================================
-    // TOTAIS
-    // ================================
-    const total = (status) => pedidos.filter((p) => p.status === status).length;
-    const totalPedidos = pedidos.length;
-    const totalPendentes = total('pendente');
-    const totalEmAndamento = total('em_andamento');
-    const totalConcluidos = total('concluido');
-    const totalCancelados = total('cancelado');
-
-    // ================================
-    // ORDENAR
-    // ================================
-    function ordenarPor(campo) {
-        setOrdem((atual) => ({
-            campo,
-            direcao: atual.campo === campo && atual.direcao === 'asc' ? 'desc' : 'asc',
-        }));
-    }
-
-    function iconeOrdem(campo) {
-        if (ordem.campo !== campo) return 'bi-chevron-expand';
-        return ordem.direcao === 'asc' ? 'bi-chevron-up' : 'bi-chevron-down';
-    }
-
-    // ================================
-    // SELECIONAR PEDIDO
-    // ================================
-    function selecionarPedido(id) {
-        setSelecionados((atual) =>
-            atual.includes(id) ? atual.filter((pedidoId) => pedidoId !== id) : [...atual, id]
-        );
-    }
-
-    function selecionarTodos() {
-        if (
-            selecionados.length === pedidosFiltrados.length &&
-            pedidosFiltrados.length > 0
-        ) {
-            setSelecionados([]);
-        } else {
-            setSelecionados(pedidosFiltrados.map((pedido) => pedido.idpedido));
-        }
-    }
-
-    // ================================
-    // APROVAÇÃO (aprovar / reprovar)
-    // ================================
-    async function atualizarAprovacao(id, aprovacao) {
-        try {
-            const response = await api.patch(`/api/pedidos/${id}/`, { aprovacao });
-            setPedidos((atual) =>
-                atual.map((p) =>
-                    p.idpedido === id ? { ...p, ...response.data } : p
-                )
-            );
-        } catch (error) {
-            console.error(error);
-            alert('Erro ao atualizar aprovação do pedido.');
-        }
-    }
-
-    // ================================
-    // EDITAR
-    // ================================
-    function editarPedido(pedido) {
-        console.log('Editar:', pedido);
-        // Futuramente: abrir modal de edição
-    }
-
-    // ================================
-    // EXCLUIR
-    // ================================
-    async function excluirPedido(id) {
-        const confirmar = window.confirm('Deseja realmente excluir este pedido?');
-        if (!confirmar) return;
-
-        try {
-            await api.delete(`/api/pedidos/${id}/`);
-
-            setPedidos((atual) => atual.filter((pedido) => pedido.idpedido !== id));
-            setSelecionados((atual) => atual.filter((pedidoId) => pedidoId !== id));
-        } catch (error) {
-            console.error(error);
-            alert('Erro ao excluir pedido.');
-        }
-    }
-
-    return (
-        <div className='pedidos-page app-page'>
-
-            {/* ================= HEADER ================= */}
-            <div className='pedidos-header'>
-                <TituloPagina titulo="Pedidos:">
-                    <div className='col-md-3'>
-                        <SearchBar
-                            value={busca}
-                            onChange={setBusca}
-                            placeholder="Buscar por ID, receita, planta..."
-                        />
-                    </div>
-                </TituloPagina>
-            </div>
-
-            {/* ================= CARDS DE STATUS ================= */}
-            <div className='status-cards'>
-                <div className='status-card escuro'>
-                    <div className='status-card-icon'>
-                        <i className='bi bi-card-checklist'></i>
-                    </div>
-                    <div>
-                        <h3>Total de pedidos</h3>
-                        <p>{totalPedidos}</p>
-                    </div>
-                </div>
-                <div className='status-card claro'>
-                    <div className='status-card-icon'>
-                        <i className='bi bi-hourglass-split'></i>
-                    </div>
-                    <div>
-                        <h3>Pendentes</h3>
-                        <p>{totalPendentes}</p>
-                    </div>
-                </div>
-                <div className='status-card escuro'>
-                    <div className='status-card-icon'>
-                        <i className='bi bi-gear-wide-connected'></i>
-                    </div>
-                    <div>
-                        <h3>Em andamento</h3>
-                        <p>{totalEmAndamento}</p>
-                    </div>
-                </div>
-                <div className='status-card claro'>
-                    <div className='status-card-icon'>
-                        <i className='bi bi-check2-circle'></i>
-                    </div>
-                    <div>
-                        <h3>Concluídos</h3>
-                        <p>{totalConcluidos}</p>
-                    </div>
-                </div>
-                <div className='status-card escuro'>
-                    <div className='status-card-icon'>
-                        <i className='bi bi-x-circle'></i>
-                    </div>
-                    <div>
-                        <h3>Cancelados</h3>
-                        <p>{totalCancelados}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* ================= FILTRO DE STATUS ================= */}
-            <div className='status-filtros'>
-                <button
-                    className={`filtro-chip ${filtroStatus === 'todos' ? 'ativo' : ''}`}
-                    onClick={() => setFiltroStatus('todos')}
-                >
-                    Todos
-                </button>
-                {Object.entries(STATUS).map(([chave, { label }]) => (
-                    <button
-                        key={chave}
-                        className={`filtro-chip ${filtroStatus === chave ? 'ativo' : ''}`}
-                        onClick={() => setFiltroStatus(chave)}
-                    >
-                        {label}
-                    </button>
-                ))}
-            </div>
-
-            {/* ================= TABELA ================= */}
-            <div className='pedidos-table'>
-                {/* HEADER */}
-                <div className='table-header'>
-                    <div className='check-column'>
-                        <input
-                            type='checkbox'
-                            checked={
-                                pedidosFiltrados.length > 0 &&
-                                selecionados.length === pedidosFiltrados.length
-                            }
-                            onChange={selecionarTodos}
-                        />
-                    </div>
-                    <div className='ordem-column sortable' onClick={() => ordenarPor('idpedido')}>
-                        Pedido <i className={`bi ${iconeOrdem('idpedido')}`}></i>
-                    </div>
-                    <div className='receita-column'>Receita</div>
-                    <div className='planta-column'>Planta</div>
-                    <div className='data-column sortable' onClick={() => ordenarPor('prazo')}>
-                        Prazo <i className={`bi ${iconeOrdem('prazo')}`}></i>
-                    </div>
-                    <div className='quantidade-column sortable' onClick={() => ordenarPor('quantidade')}>
-                        Quantidade <i className={`bi ${iconeOrdem('quantidade')}`}></i>
-                    </div>
-                    <div className='status-column sortable' onClick={() => ordenarPor('status')}>
-                        Status <i className={`bi ${iconeOrdem('status')}`}></i>
-                    </div>
-                    <div className='aprovacao-column sortable' onClick={() => ordenarPor('aprovacao')}>
-                        Aprovação <i className={`bi ${iconeOrdem('aprovacao')}`}></i>
-                    </div>
-                    <div className='editar-column'></div>
-                </div>
-
-                {/* LOADING */}
-                {carregando && (
-                    <div className='table-message'>
-                        Carregando pedidos...
-                    </div>
-                )}
-
-                {/* ERRO */}
-                {erro && (
-                    <div className='table-message error'>
-                        {erro}
-                    </div>
-                )}
-
-                {/* PEDIDOS */}
-                {!carregando &&
-                    pedidosFiltrados.map((pedido) => {
-                        const status = STATUS[pedido.status];
-                        const aprovacao = APROVACAO[pedido.aprovacao];
-                        const atrasado = estaAtrasado(pedido);
-
-                        return (
-                            <div className='table-row' key={pedido.idpedido}>
-                                {/* CHECKBOX */}
-                                <div className='check-column'>
-                                    <input
-                                        type='checkbox'
-                                        checked={selecionados.includes(pedido.idpedido)}
-                                        onChange={() => selecionarPedido(pedido.idpedido)}
-                                    />
-                                </div>
-
-                                {/* ID */}
-                                <div className='ordem-column'>
-                                    #{pedido.idpedido}
-                                </div>
-
-                                {/* RECEITA */}
-                                <div className='receita-column pedido-receita'>
-                                    <div className='pedido-avatar'>
-                                        <i className='bi bi-droplet-half'></i>
-                                    </div>
-                                    <div className='pedido-receita-info'>
-                                        <strong>{nomeRelacao(pedido, 'receita')}</strong>
-                                        <p>
-                                            {pedido.pedidocol || `Solicitante: ${nomeRelacao(pedido, 'usuario')}`}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* PLANTA */}
-                                <div className='planta-column'>
-                                    {nomeRelacao(pedido, 'planta')}
-                                </div>
-
-                                {/* PRAZO */}
-                                <div className={`data-column ${atrasado ? 'prazo-atrasado' : ''}`}>
-                                    {formatarData(pedido.prazo)}
-                                    {atrasado && <small>Atrasado</small>}
-                                </div>
-
-                                {/* QUANTIDADE */}
-                                <div className='quantidade-column'>
-                                    {formatarQuantidade(pedido.quantidade)}
-                                </div>
-
-                                {/* STATUS */}
-                                <div className='status-column'>
-                                    <span className={`status ${status?.classe ?? 'status-offline'}`}>
-                                        {status?.label ?? pedido.status}
-                                    </span>
-                                </div>
-
-                                {/* APROVAÇÃO */}
-                                <div className='aprovacao-column'>
-                                    <span className={`status ${aprovacao?.classe ?? 'status-offline'}`}>
-                                        {aprovacao?.label ?? pedido.aprovacao}
-                                    </span>
-                                </div>
-
-                                {/* AÇÕES */}
-                                <div className='editar-column'>
-                                    {pedido.aprovacao === 'aguardando' && (
-                                        <>
-                                            <button
-                                                className='action-button approve-button'
-                                                title='Aprovar'
-                                                onClick={() => atualizarAprovacao(pedido.idpedido, 'aprovado')}
-                                            >
-                                                <i className='bi bi-check-lg'></i>
-                                            </button>
-                                            <button
-                                                className='action-button reject-button'
-                                                title='Reprovar'
-                                                onClick={() => atualizarAprovacao(pedido.idpedido, 'reprovado')}
-                                            >
-                                                <i className='bi bi-x-lg'></i>
-                                            </button>
-                                        </>
-                                    )}
-                                    <button
-                                        className='action-button edit-button'
-                                        title='Editar'
-                                        onClick={() => editarPedido(pedido)}
-                                    >
-                                        <i className='bi bi-pencil-fill'></i>
-                                    </button>
-                                    <button
-                                        className='action-button delete-button'
-                                        title='Excluir'
-                                        onClick={() => excluirPedido(pedido.idpedido)}
-                                    >
-                                        <i className='bi bi-trash-fill'></i>
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    })
-                }
-
-                {/* VAZIO */}
-                {!carregando && !erro && pedidosFiltrados.length === 0 && (
-                    <div className='table-message'>
-                        Nenhum pedido encontrado.
-                    </div>
-                )}
-            </div>
-
-            {/* ================= BOTÃO ADICIONAR ================= */}
-            <BotaoModal target="modalAddPedido" label="Adicionar pedido" />
+      >
+        <div className="search-input">
+          <i aria-hidden="true" className="bi bi-search" />
+          <input
+            aria-label="Buscar pedidos"
+            placeholder="Buscar pedido…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
-    );
+      </PageHeader>
+      <div className="overview-strip">
+        <div>
+          <strong>{all.filter((i) => i.estado === "aguardando").length}</strong>
+          <span>Aguardando aprovação</span>
+        </div>
+        <div>
+          <strong>{all.filter((i) => i.estado === "producao").length}</strong>
+          <span>Em produção</span>
+        </div>
+        <div>
+          <strong>
+            {
+              all.filter((i) => ["concluido", "aprovado"].includes(i.estado))
+                .length
+            }
+          </strong>
+          <span>Concluídos / aprovados</span>
+        </div>
+      </div>
+      <div className="filter-toolbar">
+        <div className="segmented">
+          <button
+            className={tab === "ativos" ? "active" : ""}
+            onClick={() => setTab("ativos")}
+          >
+            Ativos <small>{all.filter(active).length}</small>
+          </button>
+          <button
+            className={tab === "historico" ? "active" : ""}
+            onClick={() => setTab("historico")}
+          >
+            Histórico
+          </button>
+        </div>
+        <select
+          aria-label="Filtrar tipo de pedido"
+          value={kind}
+          onChange={(e) => setKind(e.target.value)}
+        >
+          <option value="todos">Todos os tipos</option>
+          {Object.entries(types).map(([key, [label]]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <DataState loading={loading} error={error} reload={reload} />
+      <div className="order-grid">
+        {filtered.map((item) => {
+          const [typeLabel, typeTone, icon] = types[item.tipo];
+          const [label, tone] = status[item.estado] || status.cancelado;
+          return (
+            <article key={item.key} className="order-card">
+              <button
+                className="order-card-open"
+                onClick={() => setSelected(item.key)}
+                aria-label={`Ver pedido ${item.id}: ${item.nome}`}
+              >
+                <header
+                  className={`card-band bg-${user.role === 3 ? tone : typeTone}`}
+                >
+                  <span>
+                    <i aria-hidden="true" className={`bi ${icon}`} />
+                    {user.role === 3 ? label : typeLabel}
+                  </span>
+                  <small>#{item.id}</small>
+                </header>
+                <div className="order-card-content">
+                  <div className="card-title-row">
+                    <h2>{item.nome}</h2>
+                    <i aria-hidden="true" className="bi bi-arrow-up-right" />
+                  </div>
+                  <StatusBadge label={label} tone={tone} />
+                  <p className="muted order-author">
+                    <i aria-hidden="true" className="bi bi-person" />{" "}
+                    {item.autor_nome} · {item.autor_cargo}
+                  </p>
+                  {item.tipo === "producao" ? (
+                    <div className="order-meta">
+                      <div>
+                        <small>Quantidade (L)</small>
+                        <strong>{number(item.quantidade)}</strong>
+                      </div>
+                      <div>
+                        <small>Tanques</small>
+                        <strong>
+                          {item.plano?.plantas?.join(", ") || item.planta_nome}
+                        </strong>
+                      </div>
+                      <div>
+                        <small>Prazo</small>
+                        <strong>
+                          {item.prazo?.split("-").reverse().join("/")}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="muted">
+                      {item.tipo === "planta"
+                        ? item.dados.localizacao
+                        : "Nova composição para a operação."}
+                    </p>
+                  )}
+                  {item.plano?.previsao_conclusao && (
+                    <p className="order-estimate">
+                      <small>
+                        {item.em_pausa
+                          ? "Previsão pausada"
+                          : "Conclusão estimada"}
+                      </small>
+                      <strong>
+                        {item.em_pausa
+                          ? "Aguardando liberação"
+                          : dateTime(item.plano.previsao_conclusao)}
+                      </strong>
+                      <span>
+                        {item.plano.lotes_qtd} ciclos · {item.plano.plantas_qtd}{" "}
+                        tanques
+                      </span>
+                    </p>
+                  )}
+                  {!item.plano?.previsao_conclusao && (
+                    <OrderProgress order={item} />
+                  )}
+                  <p className="order-date">{dateTime(item.criado_em)}</p>
+                </div>
+              </button>
+              {actions(item)}
+            </article>
+          );
+        })}
+      </div>
+      {data && !filtered.length && (
+        <Empty
+          title={
+            tab === "ativos"
+              ? "Tudo em dia por aqui"
+              : "Seu histórico começa aqui"
+          }
+          description={
+            tab === "ativos"
+              ? "Novos pedidos aparecerão neste espaço."
+              : "Pedidos concluídos e solicitações analisadas ficam disponíveis neste filtro."
+          }
+        />
+      )}
+      <AddButton
+        label="Novo pedido de produção"
+        onClick={() => setCreate(true)}
+      />
+      {create && (
+        <ProductionOrderForm
+          title="Novo pedido de produção"
+          submitLabel={
+            user.role === 3 ? "Enviar para aprovação" : "Confirmar programação"
+          }
+          onClose={() => setCreate(false)}
+          onSubmit={async (payload) => {
+            const response = await api.post("/api/pedidos/", payload);
+            await reload();
+            return response;
+          }}
+        />
+      )}
+      {current && (
+        <Modal
+          title={`Pedido #${current.id} · ${current.nome}`}
+          onClose={() => setSelected(null)}
+          footer={
+            <>
+              {actions(current)}
+              {user.role === 1 &&
+                current.tipo === "producao" &&
+                current.estado === "aguardando" && (
+                  <>
+                    <Button
+                      className="secondary"
+                      onClick={() => {
+                        setEditing(current);
+                        setSelected(null);
+                      }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      className="ghost danger-text"
+                      onClick={() => {
+                        setDeleting(current);
+                        setSelected(null);
+                      }}
+                    >
+                      Excluir
+                    </Button>
+                  </>
+                )}
+            </>
+          }
+        >
+          <StatusBadge
+            label={status[current.estado]?.[0] || current.estado}
+            tone={status[current.estado]?.[1]}
+          />
+          <Details
+            items={[
+              ["Tipo", types[current.tipo][0]],
+              ["Solicitante", current.autor_nome],
+              ["Cargo", current.autor_cargo],
+              ["Criado em", dateTime(current.criado_em)],
+              ...(current.tipo === "producao"
+                ? [
+                    [
+                      "Planta de preferência",
+                      current.planta_preferida_nome || "Seleção automática",
+                    ],
+                    [
+                      "Tanques programados",
+                      current.plano?.plantas?.join(", ") || current.planta_nome,
+                    ],
+                    ["Quantidade", `${number(current.quantidade)} L`],
+                    ["Observação", current.pedidocol],
+                    ["Início", dateTime(current.iniciado_em)],
+                    ["Conclusão", dateTime(current.concluido_em)],
+                  ]
+                : requestDetails(current.dados)),
+            ]}
+          />
+          {current.tipo === "producao" && <OrderExecution id={current.id} />}
+          {!current.plano?.previsao_conclusao && (
+            <OrderProgress order={current} />
+          )}
+        </Modal>
+      )}
+      {editing && (
+        <ProductionOrderForm
+          title={`Editar pedido #${editing.id}`}
+          initial={editing}
+          onClose={() => setEditing(null)}
+          onSubmit={async (payload) => {
+            const response = await api.patch(
+              `/api/pedidos/${editing.id}/`,
+              payload,
+            );
+            await reload();
+            return response;
+          }}
+        />
+      )}
+      {deleting && (
+        <Confirm
+          description={`Excluir o pedido #${deleting.id}?`}
+          onClose={() => setDeleting(null)}
+          onConfirm={async () => {
+            if (
+              await act(
+                () => api.delete(`/api/pedidos/${deleting.id}/`),
+                "Pedido excluído.",
+              )
+            )
+              setDeleting(null);
+          }}
+        />
+      )}
+    </section>
+  );
 }
