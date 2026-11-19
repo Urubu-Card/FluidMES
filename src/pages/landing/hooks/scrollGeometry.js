@@ -1,17 +1,20 @@
-// Pure geometry: long sections retain natural scrolling until their boundary.
-export function sectionTarget(sections, scrollY, viewport, direction, maxScroll) {
-    if (!sections.length) return null;
-    const probe = scrollY + Math.min(120, viewport / 4);
-    let index = 0;
-    sections.forEach((section, i) => { if (section.top <= probe) index = i; });
-    const current = sections[index];
-    if (direction > 0) {
-        if (current.bottom > scrollY + viewport + 3) return null;
-        if (index === sections.length - 1) return null;
-        return Math.min(sections[index + 1].top, maxScroll);
+// Align to the closest section, regardless of the last gesture's direction.
+export function nearestSectionTarget(sections, scrollY, viewport, maxScroll) {
+    if (!sections.length || viewport <= 0) return null;
+    const max = Math.max(0, maxScroll);
+    const edgeZone = Math.min(140, viewport * .2);
+    const candidates = [];
+    for (const { top, bottom } of sections) {
+        const lastViewport = bottom - viewport;
+        if (bottom - top > viewport + 3) {
+            // Keep the middle of long sections readable, especially on phones.
+            if (scrollY > top + edgeZone && scrollY < lastViewport - edgeZone) return null;
+            candidates.push(lastViewport);
+        }
+        candidates.push(top);
     }
-    if (scrollY > current.top + 3) return null;
-    if (!index) return null;
-    const previous = sections[index - 1];
-    return Math.max(previous.top, previous.bottom - viewport, 0);
+    return candidates.reduce((nearest, edge) => {
+        const target = Math.max(0, Math.min(edge, max));
+        return nearest === null || Math.abs(target - scrollY) < Math.abs(nearest - scrollY) ? target : nearest;
+    }, null);
 }
