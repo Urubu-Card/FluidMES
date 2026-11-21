@@ -1,0 +1,8 @@
+# Frontend FluidMES em nginx. Aponte API_UPSTREAM para o backend (projeto fluidmes-backend).
+services:
+  web:
+    build: .
+    environment:
+      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:8000}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    ports: ["127.0.0.1:8080:80"]
