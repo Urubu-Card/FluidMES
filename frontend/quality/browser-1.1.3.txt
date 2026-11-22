@@ -1,0 +1,12 @@
+FluidMES 1.1.3 — Chromium — 20/10/2026
+PASS Acessar sem sessão abre o auth original.
+PASS cadastro original cria empresa e Preposto; login mantém acesso a todas as áreas.
+PASS sessão válida salva não pula o login ao clicar Acessar ou recarregar /auth.
+PASS Preposto cria planta e visualiza o card após login.
+PASS sessão antiga sem empresa também abre o auth, sem tela extra.
+PASS acesso direto ao painel com conta sem vínculo volta ao auth com mensagem, sem ciclo.
+PASS login de conta sem vínculo permanece no formulário original.
+PASS zero erros JavaScript. Banco de teste isolado; nenhum banco existente alterado.
+
+Comparação com ZIP inicial: JSX de apresentação e CSS do auth idênticos.
+Comparação com 1.1.2: landing e scroll sem alteração.

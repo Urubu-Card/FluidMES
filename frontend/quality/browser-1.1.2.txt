@@ -1,0 +1,16 @@
+FluidMES 1.1.2 — Chromium headless — 20/10/2026
+LAYOUT {"sections":[{"id":"inicio","top":0,"bottom":1000},{"id":"solucao","top":1000,"bottom":2000},{"id":"tecnologia","top":2000,"bottom":3000},{"id":"producao","top":3000,"bottom":4000},{"id":"resultados","top":4000,"bottom":5000},{"id":"equipe","top":5000,"bottom":6000},{"id":"contato","top":6000,"bottom":7283.125}],"viewport":1000,"max":6283}
+PASS idle alignment to closest section behind
+PASS idle alignment to closest section ahead
+PASS alignment waits for continuous scrolling to end
+PASS alignment can be interrupted and resumed
+PASS keyboard scroll aligns after release
+PASS nested scroll
+PASS anchor navigation
+PASS reduced motion
+PASS original auth login and registration
+PASS native touch gesture, no alignment before release
+PASS zero JavaScript errors
+
+Auth JSX idêntico à versão 1.1; CSS idêntico ao original.
+Backend sem alterações em relação à versão 1.1.1.
