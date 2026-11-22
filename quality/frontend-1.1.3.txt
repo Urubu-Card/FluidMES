@@ -1,0 +1,56 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.1.3 lint
+> eslint .
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.1.3 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 621 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/site-QrULA5-9.webmanifest              0.28 kB
+dist/assets/favicon-16x16-Bn9U5Td6.png             0.65 kB
+dist/index.html                                    1.03 kB │ gzip:   0.49 kB
+dist/assets/favicon-32x32-zayh_efj.png             1.73 kB
+dist/assets/apple-touch-icon-CMT2LCzc.png         23.37 kB
+dist/assets/android-chrome-192x192-Dp5neZfy.png   26.21 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2       134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff        180.29 kB
+dist/assets/particles-Db1wLs5d.css                 0.14 kB │ gzip:   0.13 kB
+dist/assets/forgot-Bp0dIHnE.css                    2.35 kB │ gzip:   0.81 kB
+dist/assets/auth-DG2gZBW6.css                      4.50 kB │ gzip:   1.30 kB
+dist/assets/landing-D505HWR0.css                  21.69 kB │ gzip:   5.09 kB
+dist/assets/app-B6uEwODW.css                      25.95 kB │ gzip:   5.75 kB
+dist/assets/index-BX2ZSblL.css                   313.62 kB │ gzip:  45.39 kB
+dist/assets/format-Chh0ON79.js                     0.22 kB │ gzip:   0.20 kB
+dist/assets/errors-D0CpkBp5.js                     0.23 kB │ gzip:   0.20 kB
+dist/assets/profile-BcZAqo0h.js                    0.50 kB │ gzip:   0.33 kB
+dist/assets/useData-Dhps2hCO.js                    0.87 kB │ gzip:   0.54 kB
+dist/assets/reset-Dm0R9KHV.js                      1.12 kB │ gzip:   0.62 kB
+dist/assets/funcionarios-BayakAEw.js               1.23 kB │ gzip:   0.67 kB
+dist/assets/particles-C69Sx9DV.js                  1.28 kB │ gzip:   0.72 kB
+dist/assets/receitas-D-1fZkJ2.js                   1.34 kB │ gzip:   0.68 kB
+dist/assets/administracao-GLkOQCXA.js              1.47 kB │ gzip:   0.86 kB
+dist/assets/rendimentos-CrQMjyUy.js                1.57 kB │ gzip:   0.85 kB
+dist/assets/forgot-CU7k5GwZ.js                     1.74 kB │ gzip:   0.89 kB
+dist/assets/atualizacoes-DjO5XQJ7.js               1.85 kB │ gzip:   0.92 kB
+dist/assets/Modal-Ds6U_mq6.js                      2.07 kB │ gzip:   0.96 kB
+dist/assets/UI-CEeUW8o8.js                         2.24 kB │ gzip:   0.95 kB
+dist/assets/config-CC-Tgkof.js                     2.45 kB │ gzip:   1.16 kB
+dist/assets/EntityList-Bv_pu360.js                 2.63 kB │ gzip:   1.30 kB
+dist/assets/Charts-DlPE18RF.js                     3.00 kB │ gzip:   1.24 kB
+dist/assets/home-oyWIXtvJ.js                       4.02 kB │ gzip:   1.77 kB
+dist/assets/EntityForm-ayn_pOWU.js                 4.93 kB │ gzip:   2.06 kB
+dist/assets/plantas-BHu2ZO0l.js                    6.32 kB │ gzip:   2.56 kB
+dist/assets/app-C21kUHm6.js                        6.48 kB │ gzip:   2.72 kB
+dist/assets/pedidos-DasoruqY.js                    8.46 kB │ gzip:   3.15 kB
+dist/assets/auth-N1DBTGYP.js                      16.52 kB │ gzip:   5.96 kB
+dist/assets/api-DoKBSwYY.js                       52.28 kB │ gzip:  19.84 kB
+dist/assets/landing-DvLvd4Te.js                  284.54 kB │ gzip:  96.79 kB
+dist/assets/index-BjSE6CGW.js                    320.95 kB │ gzip: 101.44 kB
+✓ built in 3.40s

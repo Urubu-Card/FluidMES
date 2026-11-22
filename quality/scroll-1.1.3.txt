@@ -1,0 +1,17 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.1.3 test:scroll
+> node --test tests/scrollGeometry.test.js
+
+✔ chooses the nearest section on either side without direction bias (0.970766ms)
+✔ clamps the final section to the document scroll range (0.147061ms)
+✔ long sections keep their middle readable and align near either edge (0.149434ms)
+✔ handles an empty page and an unavailable viewport (0.117997ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 81.820272

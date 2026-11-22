@@ -1,0 +1,2 @@
+
+154 static files copied to '/workspace/scratch/0cd6ae7203c2/deploy/FluidMES/server/staticfiles', 444 post-processed.

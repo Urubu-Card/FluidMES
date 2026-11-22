@@ -1,0 +1,13 @@
+FluidMES 1.2 — Chromium headless — 24/10/2026
+PASS plant modal capacity/reset, four cards, plus-only create button, version absent.
+PASS two ingredient recipe saved with names, reference quantities, adjustable flow and fixed mixing.
+PASS three ingredient form has mixing after dosing 2 and 3, editing switches to two ingredients.
+PASS employee previews 200 L across four 50 L tanks and sends for approval.
+PASS chief sees litres/tank/stages before approving; four batches begin together.
+PASS recipe duration is 12.5 s, not 10 s; all four batches complete and order enters history.
+PASS mobile form and plus-only control fit without horizontal overflow.
+PASS zero uncaught JavaScript errors. Isolated database; no physical PLC tested.
+
+Inspeção visual adicional do modal mobile após a animação: opacidade 1, largura 370 px em viewport 390 px.
+Teste em banco isolado; fixture temporário de enumeração de interfaces do Node apenas neste ambiente.
+Auth e landing preservados byte a byte da versão 1.1.4.

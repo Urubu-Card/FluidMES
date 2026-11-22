@@ -1,0 +1,1 @@
+PASS: cadastro real pelo auth cria Preposto, login libera todas as áreas, receita coca-cola e card de planta são criados sem 403; conta sem empresa conclui configuração como Preposto; zero erros JavaScript.

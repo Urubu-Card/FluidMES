@@ -1,0 +1,75 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.2.0 lint
+> eslint .
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.2.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 633 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/site-QrULA5-9.webmanifest              0.28 kB
+dist/assets/favicon-16x16-Bn9U5Td6.png             0.65 kB
+dist/index.html                                    1.03 kB │ gzip:   0.50 kB
+dist/assets/favicon-32x32-zayh_efj.png             1.73 kB
+dist/assets/apple-touch-icon-CMT2LCzc.png         23.37 kB
+dist/assets/android-chrome-192x192-Dp5neZfy.png   26.21 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2       134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff        180.29 kB
+dist/assets/particles-Db1wLs5d.css                 0.14 kB │ gzip:   0.13 kB
+dist/assets/forgot-Bp0dIHnE.css                    2.35 kB │ gzip:   0.81 kB
+dist/assets/auth-DG2gZBW6.css                      4.50 kB │ gzip:   1.30 kB
+dist/assets/landing-D505HWR0.css                  21.69 kB │ gzip:   5.09 kB
+dist/assets/app-CbXb-f-m.css                      28.08 kB │ gzip:   6.14 kB
+dist/assets/index-BX2ZSblL.css                   313.62 kB │ gzip:  45.39 kB
+dist/assets/errors-D0CpkBp5.js                     0.23 kB │ gzip:   0.20 kB
+dist/assets/format-ogQBBkm1.js                     0.47 kB │ gzip:   0.34 kB
+dist/assets/profile-DNm134iK.js                    0.50 kB │ gzip:   0.33 kB
+dist/assets/useData-CHCqnoXH.js                    0.87 kB │ gzip:   0.54 kB
+dist/assets/reset-C-zBOR6e.js                      1.12 kB │ gzip:   0.62 kB
+dist/assets/particles-FIHQGpHf.js                  1.28 kB │ gzip:   0.72 kB
+dist/assets/funcionarios-BicdMhbi.js               1.29 kB │ gzip:   0.70 kB
+dist/assets/rendimentos-BMba65Ke.js                1.57 kB │ gzip:   0.85 kB
+dist/assets/EntityForm-BT1-brAw.js                 1.68 kB │ gzip:   0.90 kB
+dist/assets/Field-BHZ50ras.js                      1.74 kB │ gzip:   0.90 kB
+dist/assets/forgot-Dc3VN_ff.js                     1.74 kB │ gzip:   0.89 kB
+dist/assets/atualizacoes-KJSyJ2oD.js               1.82 kB │ gzip:   0.92 kB
+dist/assets/resources-iFwZp58E.js                  1.83 kB │ gzip:   0.81 kB
+dist/assets/UI-B_GKXhKd.js                         2.16 kB │ gzip:   0.95 kB
+dist/assets/Modal-B-nlsi4G.js                      2.33 kB │ gzip:   1.06 kB
+dist/assets/config-DpSz6j1l.js                     2.45 kB │ gzip:   1.16 kB
+dist/assets/administracao-DALFDIVT.js              2.54 kB │ gzip:   1.40 kB
+dist/assets/EntityList-Cje6x1fM.js                 2.66 kB │ gzip:   1.33 kB
+dist/assets/Charts-BSP3h0Tm.js                     3.00 kB │ gzip:   1.24 kB
+dist/assets/home-D2E6j7bz.js                       4.02 kB │ gzip:   1.77 kB
+dist/assets/receitas-t09w3u49.js                   4.20 kB │ gzip:   1.82 kB
+dist/assets/app-C2LWtzGe.js                        6.50 kB │ gzip:   2.76 kB
+dist/assets/plantas-Qp4SOh4Q.js                    6.52 kB │ gzip:   2.67 kB
+dist/assets/pedidos-D1dUA5ey.js                   14.01 kB │ gzip:   5.03 kB
+dist/assets/auth-DubQVCB3.js                      16.52 kB │ gzip:   5.96 kB
+dist/assets/api-DoKBSwYY.js                       52.28 kB │ gzip:  19.84 kB
+dist/assets/landing-B3LQzIKW.js                  284.54 kB │ gzip:  96.79 kB
+dist/assets/index-CINtMTwy.js                    321.03 kB │ gzip: 101.48 kB
+✓ built in 3.56s
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> fluid_mes@1.2.0 test:scroll
+> node --test tests/scrollGeometry.test.js
+
+✔ chooses the nearest section on either side without direction bias (0.893237ms)
+✔ clamps the final section to the document scroll range (0.178399ms)
+✔ long sections keep their middle readable and align near either edge (0.129846ms)
+✔ handles an empty page and an unavailable viewport (0.129235ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 85.627042
