@@ -1,0 +1,76 @@
+# Backend FluidMES local: API, produção, coletor, Celery, Postgres e Redis.
+# O frontend roda separado (veja o repositório fluidmes-frontend) e acessa a API em http://localhost:8000.
+x-backend: &backend
+  build: .
+  environment: &environment
+    DJANGO_SETTINGS_MODULE: config.settings.dev
+    DATABASE_URL: postgres://fluid:fluid-local@db:5432/fluidmes
+    REDIS_URL: redis://redis:6379/0
+    CELERY_BROKER_URL: redis://redis:6379/1
+    FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fluidmes
+      POSTGRES_USER: fluid
+      POSTGRES_PASSWORD: fluid-local
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fluid -d fluidmes"]
+      interval: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 20
+  migrate:
+    <<: *backend
+    command: ["python", "manage.py", "migrate", "--noinput"]
+  api:
+    <<: *backend
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  production:
+    <<: *backend
+    command: ["python", "manage.py", "run_production"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  collector:
+    <<: *backend
+    command: ["python", "manage.py", "read_plants"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  worker:
+    <<: *backend
+    command: ["celery", "-A", "config", "worker", "--loglevel=info"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+  beat:
+    <<: *backend
+    command: ["celery", "-A", "config", "beat", "--loglevel=info", "--schedule=/tmp/celerybeat-schedule"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+volumes:
+  postgres-data:
