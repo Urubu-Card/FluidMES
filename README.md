@@ -4,7 +4,7 @@ MES (Manufacturing Execution System) para plantas com tanques TK1/TK2 controlado
 
 | Pasta | Conteúdo | Como rodar |
 | --- | --- | --- |
-| [`backend/`](backend) | API Django/DRF, WebSockets, coleta Modbus, produção e OEE | veja `backend/README.md` |
+| [`backend/`](backend/README.md) | API Django/DRF, WebSockets, coleta Modbus, produção e OEE | veja `backend/README.md` |
 | [`frontend/`](frontend) | Interface React/Vite | veja `frontend/README.md` |
 
 ## Início rápido
